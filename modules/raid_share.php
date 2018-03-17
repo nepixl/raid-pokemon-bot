@@ -33,9 +33,6 @@ $raid = $rs->fetch_assoc();
 $text = show_raid_poll($raid);
 $keys = keys_vote($raid);
 
-// Send the message.
-send_message($chat, $text, $keys, ['reply_to_message_id' => $chat, 'disable_web_page_preview' => 'true']);
-
 // Send location.
 if (RAID_LOCATION == true) {
     // Send location.
@@ -45,6 +42,9 @@ if (RAID_LOCATION == true) {
     debug_log('location:');
     debug_log($loc);
 }
+
+// Send the message.
+send_message($chat, $text, $keys, ['reply_to_message_id' => $chat, 'disable_web_page_preview' => 'true']);
 
 // Set callback keys and message
 $callback_msg = getTranslation('successfully_shared');
