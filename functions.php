@@ -519,7 +519,7 @@ function curl_json_request($json)
         debug_log('ERROR: ' . $json . "\n\n" . $json_response . "\n\n");
     } else {
 	// Result seems ok, get message_id and chat_id if supergroup or channel message
-	if ($response['result']['chat']['type'] == "channel" || $response['result']['chat']['type'] == "supergroup") {
+	if (isset($response['result']['chat']['type']) && ($response['result']['chat']['type'] == "channel" || $response['result']['chat']['type'] == "supergroup")) {
             // Init raid_id
             $raid_id = 0;
 
@@ -566,7 +566,7 @@ function curl_json_request($json)
             // Check if text starts with getTranslation('raid_overview_for_chat') and inline keyboard is empty
             $translation = getTranslation('raid_overview_for_chat');
             $translation_length = strlen($translation);
-            $text = substr($response['result']['text'], 0, $translation_length);
+            $text = !empty($response['result']['text']) ? substr($response['result']['text'], 0, $translation_length) : '';
             if ($text == $translation && empty($json_message['reply_markup']['inline_keyboard'])) {
                 debug_log('Detected overview message!');
                 debug_log('Chat_ID: ' . $chat_id);

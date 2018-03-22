@@ -23,7 +23,8 @@ my_query(
     "
 );
 
-if ($update['message']['chat']['type'] == 'private' || $update['callback_query']['message']['chat']['type'] == 'private') {
+//if ($update['message']['chat']['type'] == 'private' || $update['callback_query']['message']['chat']['type'] == 'private') {
+if ($update['callback_query']['message']['chat']['type'] == 'private') {
     // Init keys.
     $keys = array();
 

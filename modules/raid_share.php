@@ -48,6 +48,8 @@ send_message($chat, $text, $keys, ['reply_to_message_id' => $chat, 'disable_web_
 
 // Set callback keys and message
 $callback_msg = getTranslation('successfully_shared');
+$callback_keys = array();
+$callback_keys = [];
 
 // Edit message.
 edit_message($update, $callback_msg, $callback_keys, false);
