@@ -65,12 +65,6 @@ if ($db->connect_errno) {
     sendMessage($update['message']['chat']['id'], "Failed to connect to Database!\nPlease contact " . MAINTAINER . " and forward this message...\n");
 }
 
-// Update the user.
-$userUpdate = update_user($update);
-
-// Write to log.
-debug_log('Update user: ' . $userUpdate);
-
 // Cleanup request received.
 if (isset($update['cleanup']) && CLEANUP == true) {
     cleanup_log('Cleanup process request received...');
@@ -97,6 +91,12 @@ if (isset($update['cleanup']) && CLEANUP == true) {
     // Exit after cleanup
     exit();
 } 
+
+// Update the user.
+$userUpdate = update_user($update);
+
+// Write to log.
+debug_log('Update user: ' . $userUpdate);
 
 // Callback query received.
 if (isset($update['callback_query'])) {
@@ -151,7 +151,7 @@ if (isset($update['callback_query'])) {
     exit();
 
 // Cleanup collection from channel/supergroup messages.
-} else if ($update['channel_post']['chat']['type'] == "channel" || $update['message']['chat']['type'] == "supergroup") {
+} else if (isset($update['channel_post']['chat']['type']) && ($update['channel_post']['chat']['type'] == "channel" || $update['message']['chat']['type'] == "supergroup")) {
     // Write to log.
     debug_log('Collecting cleanup preparation information...');
     // Init raid_id.
