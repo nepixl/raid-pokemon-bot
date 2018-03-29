@@ -89,12 +89,21 @@ if(in_array(strtolower($arg), $X_pokemons)) {
 	$switch_view = "clocktime";
 	$key_count = 5;
 
+        // Timezone - maybe there's a more elegant solution as date_default_timezone_set?!
+        $tz = TIMEZONE;
+        date_default_timezone_set($tz);
+
+        // Now 
+        $now = time();
+
         for ($i = 1; $i <= RAID_EGG_DURATION; $i = $i + 1) {
+            $now_plus_i = $now + $i*60;
             // Create the keys.
             $keys[] = array(
                 // Just show the time, no text - not everyone has a phone or tablet with a large screen...
                 'text'          => floor($i / 60) . ':' . str_pad($i % 60, 2, '0', STR_PAD_LEFT),
-                'callback_data' => $id . ':edit_start:' . $i
+                //'callback_data' => $id . ':edit_start:' . $i
+                'callback_data' => $id . ':edit_start:' . unix2tz($now_plus_i,$tz,"H-i")
             );
         }
     } else {
@@ -117,7 +126,8 @@ if(in_array(strtolower($arg), $X_pokemons)) {
             $keys[] = array(
 	        // Just show the time, no text - not everyone has a phone or tablet with a large screen...
 	        'text'	        => unix2tz($now_plus_i,$tz,"H:i"),
-                'callback_data' => $id . ':edit_start:' . $i
+                //'callback_data' => $id . ':edit_start:' . $i
+                'callback_data' => $id . ':edit_start:' . unix2tz($now_plus_i,$tz,"H-i") 
             );
         }
     }

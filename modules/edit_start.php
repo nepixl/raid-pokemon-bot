@@ -18,17 +18,26 @@ if (strpos($arg, ',') !== false)
     $args = explode(",", $arg);
     $arg = $args[0];
     $slot_switch = $args[1];
-    debug_log('More options got reqeusted for raid duration!');
+    debug_log('More options got requested for raid duration!');
     debug_log('Received argument and start_time in minutes: ' . $arg . ', ' . $slot_switch);
 }
 
 if (true || $arg == "more-options" || $arg == "ex-raid") {
     if ($arg != "more-options" && $arg !="ex-raid") {
+        // Current date
+        $current_date = date('Y-m-d', strtotime('now'));
+        debug_log('Today is a raid day! Setting raid date to ' . $current_date);
+        debug_log('Received the following time (hour-minute) for the raid: ' . $arg);
+        debug_log('Formatting the date now properly...');
+        // Replace "-" with ":"
+        $arg = str_replace('-', ':', $arg);
+        $start_date_time = $current_date . ' ' . $arg . ':00';
+        debug_log('Writing the formatted date to the database now: ' . $start_date_time);
         // Build query.
         my_query(
             "
             UPDATE    raids
-            SET       start_time = DATE_ADD(start_time, INTERVAL {$arg} MINUTE)
+            SET       start_time = '{$start_date_time}'
               WHERE   id = {$id}
             "
         );
@@ -84,7 +93,7 @@ if (true || $arg == "more-options" || $arg == "ex-raid") {
 edit_message($update, getTranslation('how_long_raid'), $keys);
 
 // Build callback message string.
-$callback_response = getTranslation('lead_time_set_to') . ' ' . $data['arg'] . ' ' . getTranslation('minutes');
+$callback_response = getTranslation('start_date_time') . ' ' . $arg;
 
 // Answer callback.
 answerCallbackQuery($update['callback_query']['id'], $callback_response);
