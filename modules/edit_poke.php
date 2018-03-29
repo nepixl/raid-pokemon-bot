@@ -83,18 +83,18 @@ if(in_array(strtolower($arg), $X_pokemons)) {
     // Init empty keys array.
     $keys = array();
 
+    // Timezone - maybe there's a more elegant solution as date_default_timezone_set?!
+    $tz = TIMEZONE;
+    date_default_timezone_set($tz);
+
+    // Now 
+    $now = time();
+
     if ($arg == "minutes") {
 	// Set switch view.
 	$switch_text = getTranslation('raid_starts_when_clocktime_view');
 	$switch_view = "clocktime";
 	$key_count = 5;
-
-        // Timezone - maybe there's a more elegant solution as date_default_timezone_set?!
-        $tz = TIMEZONE;
-        date_default_timezone_set($tz);
-
-        // Now 
-        $now = time();
 
         for ($i = 1; $i <= RAID_EGG_DURATION; $i = $i + 1) {
             $now_plus_i = $now + $i*60;
@@ -113,13 +113,6 @@ if(in_array(strtolower($arg), $X_pokemons)) {
 	// Small screen fix
 	$key_count = 4;
 
-        // Timezone - maybe there's a more elegant solution as date_default_timezone_set?!
-        $tz = TIMEZONE;
-        date_default_timezone_set($tz);
-
-        // Now 
-        $now = time();
-
         for ($i = 1; $i <= RAID_EGG_DURATION; $i = $i + 1) {
 	    $now_plus_i = $now + $i*60;
             // Create the keys.
@@ -135,7 +128,7 @@ if(in_array(strtolower($arg), $X_pokemons)) {
     // Raid already running
     $keys[] = array(
         'text'	        => getTranslation('is_raid_active'),
-        'callback_data' => $id . ':edit_start:0' 
+        'callback_data' => $id . ':edit_start:' . unix2tz($now,$tz,"H-i")
     );
 
     // Switch view: clocktime / minutes until start
