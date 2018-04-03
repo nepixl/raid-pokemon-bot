@@ -443,6 +443,18 @@
     		"EN": "Typhlosion",
 		"PT-BR": "Typhlosion"
   	},
+  	"houndoom" : {
+    		"NL": "Houndoom",
+    		"DE": "Hundemon",
+    		"EN": "Houndoom",
+		"PT-BR": "Houndoom"
+  	},
+  	"walrein" : {
+    		"NL": "Walrein",
+    		"DE": "Walraisa",
+    		"EN": "Walrein",
+		"PT-BR": "Walrein"
+  	},
 	"egg_5" : {
 		"NL": "Level 5 Ei",
 		"DE": "Level 5 Ei",
@@ -563,30 +575,30 @@
 		"EN": "Starmie",
 		"PT-BR": "Starmie"
 	},
-  "charizard" : {
+	"charizard" : {
 		"NL": "Charizard",
 		"DE": "Glurak",
 		"EN": "Charizard",
 		"PT-BR": "Charizard"
-    },
-    "aerodactyl" : {
+	},
+	"aerodactyl" : {
 		"NL": "Aerodactyl",
 		"DE": "Aerodactyl",
 		"EN": "Aerodactyl",
 		"PT-BR": "Aerodactyl"
-    },
+	},
         "claydol" : {
 		"NL": "Claydol",
 		"DE": "Lepumentas",
 		"EN": "Claydol",
 		"PT-BR": "Claydol"
-    },
-  "machamp" : {
+	},
+	"machamp" : {
 		"NL": "Machamp",
 		"DE": "Machomei",
 		"EN": "Machamp",
 		"PT-BR": "Machamp"
-    },
+	},
 	"alakazam" : {
 		"NL": "Alakazam",
 		"DE": "Simsala",
@@ -610,6 +622,18 @@
 		"DE": "Vulnona",
 		"EN": "Ninetails",
 		"PT-BR": "Ninetails"
+	},
+	"pinsir" : {
+		"NL": "Pinsir",
+		"DE": "Pinsir",
+		"EN": "Pinsir",
+		"PT-BR": "Pinsir"
+	},
+	"granbull" : {
+		"NL": "Granbull",
+		"DE": "Granbull",
+		"EN": "Granbull",
+		"PT-BR": "Granbull"
 	},
 	"forest" : {
 		"NL": "Ergens in het bos",
