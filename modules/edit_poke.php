@@ -83,6 +83,13 @@ if(in_array(strtolower($arg), $X_pokemons)) {
     // Init empty keys array.
     $keys = array();
 
+    // Timezone - maybe there's a more elegant solution as date_default_timezone_set?!
+    $tz = TIMEZONE;
+    date_default_timezone_set($tz);
+
+    // Now 
+    $now = time();
+
     if ($arg == "minutes") {
 	// Set switch view.
 	$switch_text = getTranslation('raid_starts_when_clocktime_view');
@@ -90,11 +97,13 @@ if(in_array(strtolower($arg), $X_pokemons)) {
 	$key_count = 5;
 
         for ($i = 1; $i <= RAID_EGG_DURATION; $i = $i + 1) {
+            $now_plus_i = $now + $i*60;
             // Create the keys.
             $keys[] = array(
                 // Just show the time, no text - not everyone has a phone or tablet with a large screen...
                 'text'          => floor($i / 60) . ':' . str_pad($i % 60, 2, '0', STR_PAD_LEFT),
-                'callback_data' => $id . ':edit_start:' . $i
+                //'callback_data' => $id . ':edit_start:' . $i
+                'callback_data' => $id . ':edit_start:' . unix2tz($now_plus_i,$tz,"H-i")
             );
         }
     } else {
@@ -104,20 +113,14 @@ if(in_array(strtolower($arg), $X_pokemons)) {
 	// Small screen fix
 	$key_count = 4;
 
-        // Timezone - maybe there's a more elegant solution as date_default_timezone_set?!
-        $tz = TIMEZONE;
-        date_default_timezone_set($tz);
-
-        // Now 
-        $now = time();
-
         for ($i = 1; $i <= RAID_EGG_DURATION; $i = $i + 1) {
 	    $now_plus_i = $now + $i*60;
             // Create the keys.
             $keys[] = array(
 	        // Just show the time, no text - not everyone has a phone or tablet with a large screen...
 	        'text'	        => unix2tz($now_plus_i,$tz,"H:i"),
-                'callback_data' => $id . ':edit_start:' . $i
+                //'callback_data' => $id . ':edit_start:' . $i
+                'callback_data' => $id . ':edit_start:' . unix2tz($now_plus_i,$tz,"H-i") 
             );
         }
     }
@@ -125,7 +128,7 @@ if(in_array(strtolower($arg), $X_pokemons)) {
     // Raid already running
     $keys[] = array(
         'text'	        => getTranslation('is_raid_active'),
-        'callback_data' => $id . ':edit_start:0' 
+        'callback_data' => $id . ':edit_start:' . unix2tz($now,$tz,"H-i").",0"
     );
 
     // Switch view: clocktime / minutes until start
@@ -166,10 +169,10 @@ if ($arg == "minutes") {
 }
 
 // Build callback message string.
-if ($arg == "minutes" || $arg == "clocktime") {
-    $callback_response = getTranslation('raid_starts_when_view_changed');
-} else {
+if ($data['arg'] != "minutes" && $data['arg'] != "clocktime") {
     $callback_response = getTranslation('pokemon_saved') . $data['arg'];
+} else {
+    $callback_response = getTranslation('raid_starts_when_view_changed');
 }
 
 // Answer callback.

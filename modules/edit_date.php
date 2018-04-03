@@ -35,8 +35,11 @@ if(substr_count($arg, '-') == 1) {
     $month = substr($arg, -2);
     $year = substr($arg, 0, 4);
 
+    // Is month the current month then start from current day, otherwise from 1st day of the month
+    $start_date = (date('m') == $month) ? date('j') : 1;
+
     // Buttons for each day in the given month
-    for ($i = 1; $i <= $days_in_month; $i = $i + 1) {
+    for ($i = $start_date; $i <= $days_in_month; $i = $i + 1) {
         // Create the keys.
         $keys[] = array(
             //'text'          => $arg . '-' . str_pad($i, 2, '0', STR_PAD_LEFT),

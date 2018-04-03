@@ -890,7 +890,7 @@ function run_cleanup ($telegram = 2, $database = 2) {
                 FROM      cleanup
                   WHERE   chat_id <> 0
                   ORDER BY id DESC
-                  LIMIT 0, 100     
+                  LIMIT 0, 250     
                 ", true
             );
         // Query for database cleanup without telegram cleanup
@@ -901,7 +901,7 @@ function run_cleanup ($telegram = 2, $database = 2) {
                 SELECT    * 
                 FROM      cleanup
                   WHERE   chat_id = 0
-                  LIMIT 0, 100
+                  LIMIT 0, 250
                 ", true
             );
         // Query for telegram and database cleanup
@@ -911,7 +911,7 @@ function run_cleanup ($telegram = 2, $database = 2) {
                 "
                 SELECT    * 
                 FROM      cleanup
-                  LIMIT 0, 100
+                  LIMIT 0, 250
                 ", true
             );
         }
@@ -1398,15 +1398,15 @@ function update_user($update)
     $nick = '';
     $sep = '';
 
-    if (isset($update['message'])) {
+    if (isset($update['message']['from'])) {
         $msg = $update['message']['from'];
     }
 
-    if (isset($update['callback_query'])) {
+    if (isset($update['callback_query']['from'])) {
         $msg = $update['callback_query']['from'];
     }
 
-    if (isset($update['inline_query'])) {
+    if (isset($update['inline_query']['from'])) {
         $msg = $update['inline_query']['from'];
     }
 
@@ -1574,11 +1574,12 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
 {
     // Add pseudo array for last run to active chats array
     $last_run = array();
-    $last_run[chat_id] = 'LAST_RUN';
+    $last_run['chat_id'] = 'LAST_RUN';
     $chats_active[] = $last_run;
 
-    // Init previous chat_id
+    // Init previous chat_id and raid_id
     $previous = 'FIRST_RUN';
+    $previous_raid = 'FIRST_RAID';
 
     // Any active raids currently?
     if (empty($raids_active)) {
@@ -1755,6 +1756,11 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
             break;
         }
 
+        // Continue with next if previous and current raid id are equal
+        if ($previous_raid == $row['raid_id']) {
+            continue;
+        }
+
         // Create message for each raid_id
         if($previous !== $current) {
             // Get info about chat for username.
@@ -1845,6 +1851,7 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
 
         // Prepare next iteration
         $previous = $current;
+        $previous_raid = $row['raid_id'];
     }
 }
 /**
