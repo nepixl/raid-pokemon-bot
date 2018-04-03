@@ -19,7 +19,9 @@ if (strpos($arg, ',') !== false)
     $arg = $args[0];
     $slot_switch = $args[1];
     debug_log('More options got requested for raid duration!');
-    debug_log('Received argument and start_time in minutes: ' . $arg . ', ' . $slot_switch);
+    debug_log('Received argument and start_time: ' . $arg . ', ' . $slot_switch);
+} else {
+    $slot_switch = $arg;
 }
 
 if (true || $arg == "more-options" || $arg == "ex-raid") {
@@ -74,7 +76,7 @@ if (true || $arg == "more-options" || $arg == "ex-raid") {
         // Button for more options.
         $keys[] = array(
             'text'          => getTranslation('expand'),
-            'callback_data' => $id . ':edit_start:more-options,' . $arg
+            'callback_data' => $id . ':edit_start:more-options,' . $slot_switch
         );
     }
 
@@ -93,7 +95,11 @@ if (true || $arg == "more-options" || $arg == "ex-raid") {
 edit_message($update, getTranslation('how_long_raid'), $keys);
 
 // Build callback message string.
-$callback_response = getTranslation('start_date_time') . ' ' . $arg;
+if ($arg != "more-options" && $arg !="ex-raid") {
+    $callback_response = getTranslation('start_date_time') . ' ' . $arg;
+} else {
+    $callback_response = getTranslation('raid_starts_when_view_changed');
+}
 
 // Answer callback.
 answerCallbackQuery($update['callback_query']['id'], $callback_response);
