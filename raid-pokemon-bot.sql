@@ -87,6 +87,24 @@ CREATE TABLE IF NOT EXISTS `overview` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `pokemon`
+--
+
+CREATE TABLE IF NOT EXISTS `pokemon` (
+`id` int(10) unsigned NOT NULL,
+  `pokedex_id` int(10) unsigned NOT NULL,
+  `pokemon_name` varchar(12) DEFAULT NULL,
+  `raid_level` enum('0','1','2','3','4','5','X') DEFAULT NULL,
+  `min_cp` int(10) unsigned NOT NULL,
+  `max_cp` int(10) unsigned NOT NULL,
+  `min_weather_cp` int(10) unsigned NOT NULL,
+  `max_weather_cp` int(10) unsigned NOT NULL,
+  `weather` int(10) unsigned NOT NULL 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `raids`
 --
 
@@ -151,6 +169,12 @@ ALTER TABLE `gyms`
 -- Indizes für die Tabelle `overview`
 --
 ALTER TABLE `overview`
+ ADD PRIMARY KEY (`id`);
+
+--
+-- Indizes für die Tabelle `pokemon`
+--
+ALTER TABLE `pokemon`
  ADD PRIMARY KEY (`id`);
 
 --

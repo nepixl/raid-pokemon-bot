@@ -4,7 +4,7 @@ debug_log('moderators()');
 debug_log($update);
 debug_log($data);
 
-// Get the action.
+// Get the limit.
 $limit = $data['id'];
 
 // Get the action.

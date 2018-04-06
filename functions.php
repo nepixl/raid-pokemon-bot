@@ -590,12 +590,23 @@ function curl_json_request($json)
  */
 function getTranslation($text)
 {
-	debug_log($text);
-	
-	$str = file_get_contents('./language.json');
-	
-	$json = json_decode($str, true);
-	$translation = $json[$text][LANGUAGE];	
-	
-	return $translation;
+    debug_log($text,'T:');
+
+    // Pokemon name or other translation?
+    if(strpos($text, 'pokemon_id_') === 0) {
+        // Get ID from string - e.g. 150 from pokemon_id_150
+        $pokemon_id = substr($text, strrpos($text, '_') + 1);
+        $str = file_get_contents('./pokemon_' . strtolower(LANGUAGE) . '.json');
+
+        // Index starts at 0, so pokemon_id minus 1 for the correct name!
+        $json = json_decode($str, true);
+        $translation = $json[$pokemon_id - 1];
+    } else {
+        $str = file_get_contents('./language.json');
+
+        $json = json_decode($str, true);
+        $translation = $json[$text][LANGUAGE];
+    }
+
+    return $translation;
 }

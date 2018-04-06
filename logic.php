@@ -17,7 +17,7 @@ function bot_access_check($update, $access_type = BOT_ACCESS, $return_result = f
 	// Make sure all_chats does not end with ,
 	$all_chats = rtrim($all_chats,',');
 
-	// Get telegram ID to check access from $update - either messagem callback_query or inline_query
+	// Get telegram ID to check access from $update - either message, callback_query or inline_query
 	$update_type = '';
 	$update_type = !empty($update['message']['from']['id']) ? 'message' : $update_type; 
 	$update_type = (empty($update_type) && !empty($update['callback_query']['from']['id'])) ? 'callback_query' : $update_type; 
@@ -333,6 +333,67 @@ function insert_gym($name, $lat, $lon, $address)
 }
 
 /**
+ * Get raid level of a pokemon.
+ * @param $pokedex_id
+ * @return array
+ */
+function get_raid_level($pokedex_id)
+{
+    // Get raid level from database
+    $rs = my_query(
+            "
+            SELECT    raid_level
+            FROM      pokemon
+            WHERE     pokedex_id = $pokedex_id
+            "
+        );
+
+    $raid_level = '0';
+    while ($level = $rs->fetch_assoc()) {
+        $raid_level = $level['raid_level'];
+    }
+
+    return $raid_level;
+}
+
+
+/**
+ * Get local name of pokemon.
+ * @param $pokedex_id
+ * @return array
+ */
+function get_local_pokemon_name($pokedex_id)
+{
+    // Init pokemon name and define fake pokedex ids used for raid eggs
+    $pokemon_name = '';
+    $eggs = $GLOBALS['eggs'];
+
+    // Get eggs from normal translation.
+    if(in_array($pokedex_id, $eggs)) {
+        $pokemon_name = getTranslation('egg_' . substr($pokedex_id, -1));
+    } else { 
+        $pokemon_name = getTranslation('pokemon_id_' . $pokedex_id);
+    }
+
+    // Fallback: Get original pokemon name from database
+    if(empty($pokemon_name)) {
+        $rs = my_query(
+                "
+                SELECT    pokemon_name
+                FROM      pokemon
+                WHERE     pokedex_id = $pokedex_id
+                "
+            );
+
+        while ($pokemon = $rs->fetch_assoc()) {
+            $pokemon_name = ucfirst($pokemon['pokemon_name']);
+        }
+    }
+
+    return $pokemon_name;
+}
+
+/**
  * Get gym.
  * @param $id
  * @return array
@@ -396,6 +457,55 @@ function get_user($user_id)
 }
 
 /**
+ * Get timezone from user or config as fallback.
+ * @param $update
+ * @return timezone
+ */
+function get_timezone($update)
+{
+    // Get telegram ID to check access from $update - either message, callback_query or inline_query
+    $update_type = '';
+    $update_type = !empty($update['message']['from']['id']) ? 'message' : $update_type;
+    $update_type = (empty($update_type) && !empty($update['callback_query']['from']['id'])) ? 'callback_query' : $update_type;
+    $update_type = (empty($update_type) && !empty($update['inline_query']['from']['id'])) ? 'inline_query' : $update_type;
+    $update_id = $update[$update_type]['from']['id'];
+
+    // Log message type and ID
+    debug_log('Telegram message type: ' . $update_type);
+    debug_log('Getting timezone for ID: ' . $update_id);
+
+    // Build query.
+    $rs = my_query(
+        "
+        SELECT    timezone
+        FROM      raids
+          WHERE   id = (
+                      SELECT    raid_id
+                      FROM      attendance
+                        WHERE   user_id = {$update_id}
+                      ORDER BY  id DESC LIMIT 1
+                  )
+        "
+    );
+
+    // Get row.
+    $row = $rs->fetch_assoc();
+
+    // No data found.
+    if (!$row) {
+        $tz = TIMEZONE;
+        debug_log('No timezone found for ID: ' . $update_id, '!');
+        debug_log('Returning default timezone: ' . $tz, '!');
+    } else {
+        $tz = $row['timezone'];
+        debug_log('Found timezone for ID: ' . $update_id);
+        debug_log('Returning timezone: ' . $tz);
+    }
+
+    return $tz;
+}
+
+/**
  * Moderator keys.
  * @param $limit
  * @param $action
@@ -405,6 +515,12 @@ function edit_moderator_keys($limit, $action)
 {
     // Number of entries to display at once.
     $entries = 10;
+
+    // Number of entries to skip with skip-back and skip-next buttons
+    $skip = 50;
+
+    // Module for back and next keys
+    $module = "mods";
 
     // Init empty keys array.
     $keys = array();
@@ -461,24 +577,47 @@ function edit_moderator_keys($limit, $action)
             'callback_data' => '0:mods_' . $action . ':' . $mod['user_id']
         );
     }
-
     // Add back key.
     if ($limit > 0) {
-	$new_limit = $limit - $entries;
-	$empty_back_key = array();
-	$key_back = back_key($empty_back_key, $new_limit, "mods", $action);
-	$key_back = $key_back[0];
-	$keys = array_merge($key_back, $keys);
+        $new_limit = $limit - $entries;
+        $empty_back_key = array();
+        $key_back = back_key($empty_back_key, $new_limit, $module, $action, "", " (-" . $entries . ")");
+        $key_back = $key_back[0];
+        $keys = array_merge($key_back, $keys);
+    }
+
+    // Add skip back key.
+    if ($limit - $skip > 0) {
+        $new_limit = $limit - $skip - $entries;
+        $empty_back_key = array();
+        $key_back = back_key($empty_back_key, $new_limit, $module, $action, "", " (-" . $skip . ")");
+        $key_back = $key_back[0];
+        $keys = array_merge($key_back, $keys);
     }
 
     // Add next key.
     if (($limit + $entries) < $count) {
-	$new_limit = $limit + $entries;
-	$empty_next_key = array();
-	$key_next = next_key($empty_next_key, $new_limit, "mods", $action);
-	$key_next = $key_next[0];
-	$keys = array_merge($keys, $key_next);
+        $new_limit = $limit + $entries;
+        $empty_next_key = array();
+        $key_next = next_key($empty_next_key, $new_limit, $module, $action, "", " (+" . $entries . ")");
+        $key_next = $key_next[0];
+        $keys = array_merge($keys, $key_next);
     }
+
+    // Add skip next key.
+    if (($limit + $skip + $entries) < $count) {
+        $new_limit = $limit + $skip + $entries;
+        $empty_next_key = array();
+        $key_next = next_key($empty_next_key, $new_limit, $module, $action, "", " (+" . $skip . ")");
+        $key_next = $key_next[0];
+        $keys = array_merge($keys, $key_next);
+    }
+
+    // Exit key
+    $empty_exit_key = array();
+    $key_exit = exit_key($empty_exit_key, "0", "exit", "0");
+    $key_exit = $key_exit[0];
+    $keys = array_merge($keys, $key_exit);
 
     // Get the inline key array.
     $keys = inline_key_array($keys, 1);
@@ -517,53 +656,29 @@ function inline_key_array($buttons, $columns)
  */
 function raid_edit_start_keys($id)
 {
+    // Get all raid levels from database
+    $rs = my_query(
+            "
+            SELECT    raid_level
+            FROM      pokemon
+            WHERE     raid_level != '0'
+            GROUP BY  raid_level
+            "
+        );
+
     // Init empty keys array.
     $keys = array();
 
-    // Create start keys based on levels in constants
-    $pokemonlist = $GLOBALS['pokemon'];
-    foreach($pokemonlist as $level => $levelmons) {
-        if($level == "X") continue;
-            $keys[] = array(
-                'text'          => getTranslation($level . 'stars'),
-                'callback_data' => $id . ':edit:' . $level
-            );
+    // Add key for each raid level
+    while ($level = $rs->fetch_assoc()) {
+        $keys[] = array(
+            'text'          => getTranslation($level['raid_level'] . 'stars'),
+            'callback_data' => $id . ':edit:' . $level['raid_level']
+        );
     }
-
+    
     // Get the inline key array.
     $keys = inline_key_array($keys, 3);
-
-// OLD, static code:
-/*
-    $keys = [
-        [
-            [
-                'text'          => getTranslation('5stars'),
-                'callback_data' => $id . ':edit:5'
-            ]
-        ],
-        [
-            [
-                'text'          => getTranslation('4stars'),
-                'callback_data' => $id . ':edit:4'
-            ],
-            [
-                'text'          => getTranslation('3stars'),
-                'callback_data' => $id . ':edit:3'
-            ]
-        ],
-        [
-            [
-                'text'          => getTranslation('2stars'),
-                'callback_data' => $id . ':edit:2'
-            ],
-            [
-                'text'          => getTranslation('1stars'),
-                'callback_data' => $id . ':edit:1'
-            ]
-        ]
-    ];
-*/
 
     return $keys;
 }
@@ -578,28 +693,21 @@ function raid_edit_gyms_first_letter_keys($chatid, $chattype) {
     // Get gyms from database
     $rs = my_query(
             "
-            SELECT    *
+            SELECT UPPER(LEFT(gym_name, 1)) AS first_letter
             FROM      gyms
-            ORDER BY  gym_name
+            GROUP BY LEFT(gym_name, 1)
             "
         );
 
     // Init empty keys array.
     $keys = array();
 
-    // Init previous first letter
-    $previous = null;
-
     while ($gym = $rs->fetch_assoc()) {
-	$first = strtoupper(substr($gym['gym_name'], 0, 1));
 	// Add first letter to keys array
-        if($previous !== $first) {
-            $keys[] = array(
-                'text'          => $first,
-                'callback_data' => $chatid . ',' . $chattype . ':raid_by_gym:' . $first
-            );
-	}
-        $previous = $first;
+        $keys[] = array(
+            'text'          => $gym['first_letter'],
+            'callback_data' => $chatid . ',' . $chattype . ':raid_by_gym:' . $gym['first_letter']
+        );
     }
 
     // Get the inline key array.
@@ -620,7 +728,7 @@ function raid_edit_gym_keys($chatid, $chattype, $first)
     // Get gyms from database
     $rs = my_query(
             "
-            SELECT    *
+            SELECT    id, gym_name
             FROM      gyms
 	    WHERE     UPPER(LEFT(gym_name, 1)) = UPPER('{$first}')
 	    ORDER BY  gym_name
@@ -644,27 +752,130 @@ function raid_edit_gym_keys($chatid, $chattype, $first)
 }
 
 /**
+ * Pokedex edit pokemon keys.
+ * @param $limit
+ * @param $action
+ * @return $keys array
+ */
+function edit_pokedex_keys($limit, $action)
+{
+    // Number of entries to display at once.
+    $entries = 10;
+
+    // Number of entries to skip with skip-back and skip-next buttons
+    $skip = 50;
+
+    // Module for back and next keys
+    $module = "pokedex";
+
+    // Init empty keys array.
+    $keys = array();
+
+    // Get pokemon from database
+    $rs = my_query(
+            "
+            SELECT    pokedex_id
+            FROM      pokemon
+            ORDER BY  pokedex_id
+            LIMIT     $limit, $entries
+            "
+        );
+
+    // Number of entries
+    $cnt = my_query(
+            "
+            SELECT    COUNT(*)
+            FROM      pokemon
+            "
+        );
+
+    // Number of database entries found.
+    $sum = $cnt->fetch_row();
+    $count = $sum['0'];
+
+    // List users / moderators
+    while ($mon = $rs->fetch_assoc()) {
+        $pokemon_name = get_local_pokemon_name($mon['pokedex_id']);
+        $keys[] = array(
+            'text'          => $mon['pokedex_id'] . ' ' . $pokemon_name,
+            'callback_data' => $mon['pokedex_id'] . ':pokedex_edit_pokemon:0'
+        );
+    }
+
+    // Add back key.
+    if ($limit > 0) {
+        $new_limit = $limit - $entries;
+        $empty_back_key = array();
+        $key_back = back_key($empty_back_key, $new_limit, $module, $action, "", " (-" . $entries . ")");
+        $key_back = $key_back[0];
+        $keys = array_merge($key_back, $keys);
+    }
+
+    // Add skip back key.
+    if ($limit - $skip > 0) {
+        $new_limit = $limit - $skip - $entries;
+        $empty_back_key = array();
+        $key_back = back_key($empty_back_key, $new_limit, $module, $action, "", " (-" . $skip . ")");
+        $key_back = $key_back[0];
+        $keys = array_merge($key_back, $keys);
+    }
+
+    // Add next key.
+    if (($limit + $entries) < $count) {
+        $new_limit = $limit + $entries;
+        $empty_next_key = array();
+        $key_next = next_key($empty_next_key, $new_limit, $module, $action, "", " (+" . $entries . ")");
+        $key_next = $key_next[0];
+        $keys = array_merge($keys, $key_next);
+    }
+
+    // Add skip next key.
+    if (($limit + $skip + $entries) < $count) {
+        $new_limit = $limit + $skip + $entries;
+        $empty_next_key = array();
+        $key_next = next_key($empty_next_key, $new_limit, $module, $action, "", " (+" . $skip . ")");
+        $key_next = $key_next[0];
+        $keys = array_merge($keys, $key_next);
+    }
+
+    // Exit key
+    $empty_exit_key = array();
+    $key_exit = exit_key($empty_exit_key, "0", "exit", "0");
+    $key_exit = $key_exit[0];
+    $keys = array_merge($keys, $key_exit);
+
+    // Get the inline key array.
+    $keys = inline_key_array($keys, 1);
+
+    return $keys;
+}
+
+/**
  * Pokemon keys.
  * @param $raid_id
  * @param $raid_level
  * @return array
  */
-function pokemon_keys($raid_id, $raid_level, $pokemonlist, $action)
+function pokemon_keys($raid_id, $raid_level, $action)
 {
     // Init empty keys array.
     $keys = array();
 
-    // Iterate thru the pokemon list to create the keys
-    foreach($pokemonlist as $level => $levelmons) {
-        if($level == $raid_level) {
-            // Create the keys.
-            foreach($levelmons as $key => $pokemon) {
-                $keys[] = array(
-                    'text'          => $pokemon,
-                    'callback_data' => $raid_id . ':' . $action . ':' . $pokemon
-                );
-	    }
-	}
+    // Get pokemon from database
+    $rs = my_query(
+            "
+            SELECT    pokedex_id
+            FROM      pokemon
+            WHERE     raid_level = '$raid_level'
+            "
+        );
+
+    // Add key for each raid level
+    while ($pokemon = $rs->fetch_assoc()) {
+        $keys[] = array(
+            'text'          => get_local_pokemon_name($pokemon['pokedex_id']),
+            'callback_data' => $raid_id . ':' . $action . ':' . $pokemon['pokedex_id']
+        );
     }
 
     // Get the inline key array.
@@ -679,13 +890,15 @@ function pokemon_keys($raid_id, $raid_level, $pokemonlist, $action)
  * @param $id
  * @param $action
  * @param $arg
+ * @param $pretext
+ * @param $posttext
  * @return array
  */
-function back_key($keys, $id, $action, $arg)
+function back_key($keys, $id, $action, $arg, $pretext = '', $posttext = '')
 {
     $keys[] = [
             array(
-                'text'          => getTranslation('back'),
+                'text'          => $pretext . getTranslation('back') . $posttext,
                 'callback_data' => $id . ':' . $action . ':' . $arg
             )
         ];
@@ -699,13 +912,37 @@ function back_key($keys, $id, $action, $arg)
  * @param $id
  * @param $action
  * @param $arg
+ * @param $pretext
+ * @param $posttext
  * @return array
  */
-function next_key($keys, $id, $action, $arg) 
+function next_key($keys, $id, $action, $arg, $pretext = '', $posttext = '') 
 {
     $keys[] = [
             array(
-                'text'          => getTranslation('next'), 
+                'text'          => $pretext . getTranslation('next') . $posttext, 
+                'callback_data' => $id . ':' . $action . ':' . $arg
+            )
+        ];
+
+    return $keys;
+}
+
+/**
+ * Exit key.
+ * @param $keys
+ * @param $id
+ * @param $action
+ * @param $arg
+ * @param $pretext
+ * @param $posttext
+ * @return array
+ */
+function exit_key($keys, $id, $action, $arg, $pretext = '', $posttext = '')
+{
+    $keys[] = [
+            array(
+                'text'          => $pretext . getTranslation('abort') . $posttext,
                 'callback_data' => $id . ':' . $action . ':' . $arg
             )
         ];
@@ -1242,38 +1479,9 @@ function keys_vote($raid)
         // Get current pokemon
         $raid_pokemon = $raid['pokemon'];
 
-        // Init raid level and level found
-        $raid_level = 0;
-        $level_found = false;
-
-        // Ignore level X raid bosses
-        $ignore_X = [];
-        $X_list = $GLOBALS['pokemon']['X'];
-        foreach($X_list as $pokemon) {
-            $ignore_X[] = strtolower($pokemon);
-            debug_log('Adding pokemon to keys ignore list: ' . $pokemon); 
-        }
-
-        // Iterate thru the pokemon list to get raid level
-        $pokemonlist = $GLOBALS['pokemon'];
-        foreach($pokemonlist as $level => $levelmons) {
-            if($level == "X") continue;
-            //debug_log("Searching raid boss '" . $raid_pokemon . "' in level " . $level . " raids");
-            // Compare pokemon by pokemon to get raid level
-            foreach($levelmons as $key => $pokemon) {
-                if(strtolower($raid_pokemon) == strtolower($pokemon)) {
-                    // Stop if pokemon is in level X too.
-                    if(in_array(strtolower($raid_pokemon), $ignore_X)) {
-                        break 2;
-                    } else {
-                        $level_found = true;
-                        $raid_level = $level;
-                        //debug_log("Found raid boss '" . $pokemon . "' in level " . $level . " raids");
-                        break 2;
-                    }
-                }
-            }
-        }
+        // Get raid level
+        $raid_level = '0';
+        $raid_level = get_raid_level($raid_pokemon);
 
         // Get participants
         $rs = my_query(
@@ -1304,38 +1512,45 @@ function keys_vote($raid)
         // Hide keys for specific cases
         $show_keys = true;
         // Make sure raid boss is not an egg
-        if (strtolower($raid_pokemon) != strtolower(getTranslation('egg_' . $level))) {
+        if(!in_array($raid_pokemon, $GLOBALS['eggs'])) {
+        //if ($raid_pokemon) != strtolower(getTranslation('egg_' . $level))) {
             // Make sure we either have no participants
             // OR all participants voted for "any" raid boss
             // OR all participants voted for the hatched raid boss 
             // OR all participants voted for "any" or the hatched raid boss
+        debug_log('DRIN_1');
             if($count_pp == 0 || $count_pp == $count_any_pokemon || $count_pp == $count_raid_pokemon || $count_pp == ($count_any_pokemon + $count_raid_pokemon)) {
                 $show_keys = false;
+        debug_log('DRIN_2');
             }
         }
 
         // Add pokemon keys if we found the raid boss
-        if ($level_found && $show_keys) {
+        if ($raid_level != '0' && $show_keys) {
+        debug_log('DRIN_3');
+
+                //SELECT    count(raid_level)    AS  count_raid_level,
+            // Get pokemon from database
+            $rs = my_query(
+                "
+                SELECT    pokedex_id
+                FROM      pokemon
+                WHERE     raid_level = '$raid_level'
+                "
+            );
+
             // Init counter. 
             $count = 0;
 
-            foreach($pokemonlist as $level => $levelmons) {
-                if($level == $raid_level) {
-                    foreach($levelmons as $key => $pokemon) {
-                        // Ignore raid eggs and level X pokemon
-                        if(strtolower($pokemon) == strtolower(getTranslation('egg_' . $level))) continue;
-                        if(in_array(strtolower($pokemon), $ignore_X)) continue; 
+            // Add key for each raid level
+            while ($pokemon = $rs->fetch_assoc()) {
+                $keys_poke[] = array(
+                    'text'          => get_local_pokemon_name($pokemon['pokedex_id']),
+                    'callback_data' => $raid['id'] . ':vote_pokemon:' . $pokemon['pokedex_id']
+                );
 
-                        // Add pokemon to keys
-                        $keys_poke[] = array(
-                            'text'          => $pokemon,
-                            'callback_data' => $raid['id'] . ':vote_pokemon:' . $pokemon
-                        );
-
-                        // Counter
-                        $count = $count + 1;
-                    }
-                }
+                // Counter
+                $count = $count + 1;
             }
 
             // Add pokemon keys if we have two or more pokemon
@@ -1780,6 +1995,7 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
         // Set variables for easier message building.
         $raid_id = $row['raid_id'];
         $pokemon = $raids_active[$raid_id]['pokemon'];
+        $pokemon = get_local_pokemon_name($pokemon);
         $gym = $raids_active[$raid_id]['gym_name'];
         $now = $raids_active[$raid_id]['ts_now'];
         $tz = $raids_active[$raid_id]['timezone'];
@@ -1804,7 +2020,7 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
         if ($now < $start_time) {
             $weekday_now = date('N', $now);
             $weekday_start = date('N', $start_time);
-            $raid_day = weekday_number2name ($weekday_start);
+            $raid_day = getTranslation('weekday_' . $weekday_start);
             if ($weekday_now == $weekday_start) {
                 $msg .= getTranslation('raid_egg_opens') . ' ' . unix2tz($start_time, $tz) . CR;
             } else {
@@ -1877,42 +2093,6 @@ function unix2tz($unix, $tz, $format = 'H:i')
     } else {
         return false;
     }
-}
-
-/**
- * Weekday number to weekday name
- * @param weekdaynumber
- */
-function weekday_number2name ($weekdaynumber)
-{
-    // Numeric value below 7 is required
-    if(is_numeric($weekdaynumber) && $weekdaynumber <= 7) {
-	switch($weekdaynumber) {
-	    case 1: 
-		$weekday = getTranslation('monday');
-		break;
-	    case 2: 
-		$weekday = getTranslation('tuesday');
-		break;
-	    case 3: 
-		$weekday = getTranslation('wednesday');
-		break;
-	    case 4: 
-		$weekday = getTranslation('thursday');
-		break;
-	    case 5: 
-		$weekday = getTranslation('friday');
-		break;
-	    case 6: 
-		$weekday = getTranslation('saturday');
-		break;
-	    case 7: 
-		$weekday = getTranslation('sunday');
-		break;
-	}
-    }
-    // Return the weekday
-    return $weekday;
 }
 
 /**
@@ -2019,7 +2199,7 @@ function show_raid_poll($raid)
     }
 
     // Display raid boss name.
-    $msg .= getTranslation('raid_boss') . ': <b>' . ucfirst($raid['pokemon']) . '</b>' . CR;
+    $msg .= getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($raid['pokemon']) . '</b>' . CR;
 
     $time_left = floor($raid['t_left'] / 60);
     if ( strpos(str_pad($time_left % 60, 2, '0', STR_PAD_LEFT) , '-' ) !== false ) {
@@ -2034,7 +2214,7 @@ function show_raid_poll($raid)
     if ($raid['ts_now'] < $raid['ts_start']) {
 	$weekday_now = date('N', $raid['ts_now']);
 	$weekday_start = date('N', $raid['ts_start']);
-	$raid_day = weekday_number2name ($weekday_start);
+        $raid_day = getTranslation('weekday_' . $weekday_start);
 	if ($weekday_now == $weekday_start) {
 	    $msg .= '<b>' . getTranslation('raid_egg_opens') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
 	} else {
@@ -2099,17 +2279,11 @@ function show_raid_poll($raid)
 
     debug_log($data);
 
+
     // Add Ex-Raid Message if Pokemon is in Ex-Raid-List.
-    $pokemonlist = $GLOBALS['pokemon'];
-    foreach($pokemonlist as $level => $levelmons) {
-        if($level == "X") {
-            foreach($levelmons as $key => $pokemon) {
-		if(strtolower($pokemon) == strtolower($raid['pokemon'])) {
-		    $msg.= CR . EMOJI_WARN . ' <b>' . getTranslation('exraid_pass') . '</b> ' . EMOJI_WARN;
-		    break 2;
-	        }
-	    }
-        }
+    $raid_level = get_raid_level($raid['pokemon']);
+    if($raid_level == 'X') {
+        $msg.= CR . EMOJI_WARN . ' <b>' . getTranslation('exraid_pass') . '</b> ' . EMOJI_WARN;
     }
 
     // Add no attendance found message.
@@ -2242,7 +2416,7 @@ function show_raid_poll($raid)
                 // Show attendances when multiple pokemon are selected, unless all attending users voted for the raid boss + any pokemon
                 if($count_pp != ($count_any_pokemon + $count_raid_pokemon)) {
                     // Add participants message.
-                    $msg .= $pp['pokemon'] == '0' ? '<b>' . getTranslation('any_pokemon') . '</b>' : '<b>' . $pp['pokemon'] . '</b>';
+                    $msg .= $pp['pokemon'] == '0' ? '<b>' . getTranslation('any_pokemon') . '</b>' : '<b>' . get_local_pokemon_name($pp['pokemon']) . '</b>';
                     $msg .= ' [' . ($row_pp['count'] + $row_pp['extra']) . '] — ';
                     $msg .= (($row_pp['count_mystic'] > 0) ? TEAM_B . $row_pp['count_mystic'] . '  ' : '');
                     $msg .= (($row_pp['count_valor'] > 0) ? TEAM_R . $row_pp['count_valor'] . '  ' : '');
@@ -2431,11 +2605,18 @@ function show_raid_poll_small($raid)
     $msg = '';
     // Pokemon
     if(!empty($raid['pokemon'])) {
-        $msg .= '<b>' . ucfirst($raid['pokemon']) . '</b> ';
+        $msg .= '<b>' . get_local_pokemon_name($raid['pokemon']) . '</b> ';
     }
     // Start time and end time
     if(!empty($raid['ts_start']) && !empty($raid['ts_end'])) {
-        $msg .= '<b>' . getTranslation('from') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . ' ' . getTranslation('to') . ' ' . unix2tz($raid['ts_end'], $raid['timezone'])  . '</b>' . CR;
+        $weekday_now = date('N', $raid['ts_now']);
+        $weekday_start = date('N', $raid['ts_start']);
+        $raid_day = getTranslation('weekday_' . $weekday_start);
+        if ($weekday_now == $weekday_start) {
+            $msg .= '<b>' . getTranslation('from') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . ' ' . getTranslation('to') . ' ' . unix2tz($raid['ts_end'], $raid['timezone'])  . '</b>' . CR;
+        } else {
+            $msg .= '<b>' . '— ' . $raid_day . ' ' . getTranslation('from') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . ' ' . getTranslation('to') . ' ' . unix2tz($raid['ts_end'], $raid['timezone'])  . '</b>' . CR;
+        }
     }
     // Gym Name
     if(!empty($raid['gym_name'])) {

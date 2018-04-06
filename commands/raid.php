@@ -93,18 +93,11 @@ if ($raid_id > 0) {
     debug_log('Current Pokemon in database for this raid: ' . $poke_name);
 
     // Make sure it's not an Ex-Raid before updating the pokemon.
-    $pokemonlist = $GLOBALS['pokemon'];
-    foreach($pokemonlist as $level => $levelmons) {
-        if($level == "X") {
-            foreach($levelmons as $key => $pokemon) {
-                if(strtolower($pokemon) == strtolower($poke_name)) {
-                    $ex_raid = true;
-    		    debug_log('Current pokemon is an ex-raid pokemon: ' . $poke_name);
-    		    debug_log('Pokemon "' .$poke_name . '" will NOT be updated to "' . $boss . '"!');
-                    break 2;
-                }
-            }
-        }
+    $raid_level = get_raid_level($poke_name);
+    if($raid_level == 'X') {
+        $ex_raid = true;
+        debug_log('Current pokemon is an ex-raid pokemon: ' . $poke_name);
+        debug_log('Pokemon "' .$poke_name . '" will NOT be updated to "' . $boss . '"!');
     }
 
     if ($ex_raid) {

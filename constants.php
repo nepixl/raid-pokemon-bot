@@ -23,66 +23,11 @@ $teams = array(
     'cancel'    => TEAM_CANCEL
 );
 
-// Raid boss pokemon.
-$pokemon = array(
-    'X' => array(
-        getTranslation('mewtwo')
-    ),
-    '5' => array(
-//        getTranslation('articuno'),
-//        getTranslation('lugia'),
-//        getTranslation('moltres'),
-//        getTranslation('zapdos'),
-//        getTranslation('mew'),
-        getTranslation('mewtwo'),
-//        getTranslation('hooh'),
-//        getTranslation('celebi'),
-//        getTranslation('raikou'),
-//        getTranslation('entei'),
-//        getTranslation('suicune'),
-//        getTranslation('groudon'),
-//        getTranslation('rayquaza'),
-//        getTranslation('kyogre'),
-//        getTranslation('latios'),
-        getTranslation('latias'),
-//        getTranslation('deoxys'),
-//        getTranslation('jirachi'),
-//        getTranslation('regirock'),
-//        getTranslation('regice'),
-//        getTranslation('registeel'),
-        getTranslation('egg_5')
-    ),
-    '4' => array(
-        getTranslation('tyranitar'),
-//        getTranslation('lapras'),
-//        getTranslation('snorlax'),
-//        getTranslation('feraligatr'),
-        getTranslation('absol'),
-        getTranslation('aggron'),
-//        getTranslation('charizard'),
-        getTranslation('walrein'),
-        getTranslation('houndoom'),
-        getTranslation('egg_4')
-    ),
-    '3' => array(
-        getTranslation('machamp'),
-        getTranslation('jynx'),
-//        getTranslation('azumarill'),
-        getTranslation('piloswine'),
-//        getTranslation('starmie'),
-//        getTranslation('aerodactyl'),
-//        getTranslation('claydol'),
-//        getTranslation('alakazam'),
-        getTranslation('gengar'),
-        getTranslation('pinsir'),
-        getTranslation('granbull'),
-        getTranslation('egg_3')
-    ),
-    '2' => array(
-        getTranslation('egg_2')
-    ),
-    '1' => array(
-        getTranslation('egg_1')
-    )
+// Raid eggs.
+$eggs = array(
+    '9995',  // Level 5
+    '9994',  // Level 4
+    '9993',  // Level 3
+    '9992',  // Level 2
+    '9991'   // Level 1
 );
-

@@ -12,11 +12,8 @@ $raid_id = $data['id'];
 // Set the raid level.
 $raid_level = $data['arg'];
 
-// Set the pokkemon list
-$pokemonlist = $GLOBALS['pokemon'];
-
 // Get the keys.
-$keys = pokemon_keys($raid_id, $raid_level, $pokemonlist, "edit_poke");
+$keys = pokemon_keys($raid_id, $raid_level, "edit_poke");
 
 // No keys found.
 if (!$keys) {
