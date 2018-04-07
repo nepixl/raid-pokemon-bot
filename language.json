@@ -609,14 +609,14 @@
 	},
 	"pokedex_edit_pokemon" : {
 		"NL": "TRANSLATE",
-		"DE": "Pokemon auswählen zum Bearbeiten:",
+		"DE": "Zum Bearbeiten Pokemon auswählen:",
 		"EN": "Select pokemon to edit:",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_raid_level" : {
 		"NL": "TRANSLATE",
-		"DE": "Raid Level ändern",
-		"EN": "Change raid level:",
+		"DE": "Raid Level",
+		"EN": "Raid level:",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_new_raid_level" : {
@@ -627,8 +627,38 @@
 	},
 	"pokedex_select_action" : {
 		"NL": "TRANSLATE",
-		"DE": "Aktion auswählen:",
-		"EN": "Select an action:",
+		"DE": "Eigenschaft zum Ändern auswählen:",
+		"EN": "Select feature to be changed:",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_min_cp" : {
+		"NL": "TRANSLATE",
+		"DE": "Min WP",
+		"EN": "Min CP",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_max_cp" : {
+		"NL": "TRANSLATE",
+		"DE": "Max WP",
+		"EN": "Max CP",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_min_boosted_cp" : {
+		"NL": "TRANSLATE",
+		"DE": "Min boosted WP",
+		"EN": "Min boosted CP",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_max_boosted_cp" : {
+		"NL": "TRANSLATE",
+		"DE": "Max boosted WP",
+		"EN": "Max boosted CP",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_weather" : {
+		"NL": "TRANSLATE",
+		"DE": "Wetter",
+		"EN": "Weather",
 		"PT-BR": "TRANSLATE"
 	},
 	"how_long_raid" : {

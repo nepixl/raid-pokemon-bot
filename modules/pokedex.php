@@ -12,7 +12,7 @@ $action = $data['arg'];
 
 if ($update['message']['chat']['type'] == 'private' || $update['callback_query']['message']['chat']['type'] == 'private') {
     // Set message.
-    $msg = getTranslation('pokedex_list_of_all') . CR . getTranslation('pokedex_edit_pokemon');
+    $msg = getTranslation('pokedex_list_of_all') . CR . CR . '<b>' . getTranslation('pokedex_edit_pokemon') . '</b>';
 
     // Get pokemon.
     $keys = edit_pokedex_keys($limit, $action);
