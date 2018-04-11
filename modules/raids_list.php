@@ -1,6 +1,10 @@
 <?php
 // Write to log.
-debug_log('RAIDS_LIST');
+debug_log('raids_list()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Build query.
 $rs = my_query(

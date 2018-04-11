@@ -1,43 +1,21 @@
 <?php
-// Get Userid, chatid and chattype from message 
-if (isset($update['message']['from']['id'])) {
-    $userid = $update['message']['from']['id'];
-}
-if (isset($update['message']['chat']['id'])) {
-    $chatid = $update['message']['chat']['id'];
-}
-if (isset($update['message']['chat']['type'])) {
-    $chattype = $update['message']['chat']['type'];
-}
+// Write to log.
+debug_log('raid_by_gym()');
 
-// Get the userid, chat id and type
-$id_type = $data['id'];
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
+// Get the first letter
 $first = $data['arg'];
 
 // Back key id, action and arg
 $back_id = $data['id'];
-$back_action = "raid_by_gym_letter";
+$back_action = 'raid_by_gym_letter';
 $back_arg = 0;
 
-// Create data array (max. 2)
-$userdata = explode(',', $id_type, 2);
-
-// Set userid, chat id and type
-$userid = $userdata[0];
-$chatid = $userid;
-$chattype = $userdata[1];
-
-// Debug
-debug_log('User ID=' . $userid);
-debug_log('Chat type=' . $chatid);
-debug_log('Chat type=' . $chattype);
-debug_log('First letter=' . $first);
-
-// Init id to 0
-$id = 0;
-
 // Get the keys.
-$keys = raid_edit_gym_keys($chatid, $chattype, $first);
+$keys = raid_edit_gym_keys($first);
 
 // No keys found.
 if (!$keys) {
@@ -51,7 +29,7 @@ if (!$keys) {
         ]
     ];
 } else {
-    $keys = back_key($keys, $back_id, $back_action, $back_arg);
+    $keys = universal_key($keys, $back_id, $back_action, $back_arg, getTranslation('back'));
 }
 
 // Edit the message.

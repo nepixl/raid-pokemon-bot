@@ -1,4 +1,11 @@
 <?php
+// Write to log.
+debug_log('GYM()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
 // Get gym name.
 $gym_name = trim(substr($update['message']['text'], 4));
 

@@ -1,4 +1,11 @@
 <?php
+// Write to log.
+debug_log('RAID()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
 /**
  * Mimic inline message to create raid poll from external notifier.
  *

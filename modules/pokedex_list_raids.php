@@ -1,8 +1,10 @@
 <?php
 // Write to log.
 debug_log('pokedex_list_raids()');
-debug_log($update);
-debug_log($data);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Get all pokemon with raid levels from database.
 $rs = my_query(

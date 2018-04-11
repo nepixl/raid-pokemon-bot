@@ -1,6 +1,10 @@
 <?php
 // Write to log.
-debug_log('POKEDEX');
+debug_log('POKEDEX()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check access - user must be admin!
 bot_access_check($update, BOT_ADMINS);

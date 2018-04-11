@@ -1,4 +1,11 @@
 <?php
+// Write to log.
+debug_log('vote_level()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
 // Get action.
 $action = $data['arg'];
 
@@ -30,3 +37,5 @@ if ($action == 'down') {
 
 // Send vote response.
 send_response_vote($update, $data);
+
+exit();

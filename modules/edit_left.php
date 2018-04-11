@@ -1,11 +1,13 @@
 <?php
+// Write to log.
+debug_log('edit_left()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
 // Check raid access.
 raid_access_check($update, $data);
-
-// Write to log.
-debug_log('raid_edit_left()');
-debug_log($update);
-debug_log($data);
 
 // Set the id.
 $id = $data['id'];

@@ -1,8 +1,10 @@
 <?php
 // Write to log.
-debug_log('EXIT()');
-debug_log($update);
-debug_log($data);
+debug_log('exit()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Set empty keys.
 $keys = [];

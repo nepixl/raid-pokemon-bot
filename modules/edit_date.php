@@ -1,8 +1,10 @@
 <?php
 // Write to log.
 debug_log('edit_date()');
-debug_log($update);
-debug_log($data);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check access - user must be admin!
 $admin_access = bot_access_check($update, BOT_ADMINS, true);

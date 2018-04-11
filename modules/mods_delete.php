@@ -1,8 +1,10 @@
 <?php
 // Write to log.
-debug_log('mods_del()');
-debug_log($update);
-debug_log($data);
+debug_log('mods_delete()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Set the id.
 $user_id = $data['arg'];

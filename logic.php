@@ -192,7 +192,7 @@ function raid_access_check($update, $data, $return_result = false)
  * Raid duplication check.
  * @param $gym
  * @param $end
- * @return $raid['id'] or 0
+ * @return string
  */
 function raid_duplication_check($gym,$end)
 {
@@ -335,7 +335,7 @@ function insert_gym($name, $lat, $lon, $address)
 /**
  * Get raid level of a pokemon.
  * @param $pokedex_id
- * @return array
+ * @return string
  */
 function get_raid_level($pokedex_id)
 {
@@ -360,7 +360,7 @@ function get_raid_level($pokedex_id)
 /**
  * Get local name of pokemon.
  * @param $pokedex_id
- * @return array
+ * @return string
  */
 function get_local_pokemon_name($pokedex_id)
 {
@@ -412,6 +412,80 @@ function get_gym($id)
     $gym = $rs->fetch_assoc();
 
     return $gym;
+}
+
+/**
+ * Get pokemon cp values.
+ * @param $pokedex_id
+ * @return array
+ */
+function get_pokemon_cp($pokedex_id)
+{
+    // Get gyms from database
+    $rs = my_query(
+            "
+            SELECT    min_cp, max_cp, min_weather_cp, max_weather_cp
+            FROM      pokemon
+            WHERE     pokedex_id = {$pokedex_id}
+            "
+        );
+
+    $cp = $rs->fetch_assoc();
+
+    return $cp;
+}
+
+/**
+ * Get pokemon weather.
+ * @param $pokedex_id
+ * @return string
+ */
+function get_pokemon_weather($pokedex_id)
+{
+    // Get pokemon weather from database
+    $rs = my_query(
+            "
+            SELECT    weather
+            FROM      pokemon
+            WHERE     pokedex_id = {$pokedex_id}
+            "
+        );
+
+    // Fetch the row.
+    $ww = $rs->fetch_assoc();
+
+    return $ww['weather'];
+}
+
+/**
+ * Get weather icons.
+ * @param $weather_value
+ * @return string
+ */
+function get_weather_icons($weather_value)
+{
+    if($weather_value > 0) {
+        // Get length of arg and split arg
+        $weather_value_length = strlen((string)$weather_value);
+        $weather_value_string = str_split((string)$weather_value);
+
+        // Init weather icons string.
+        $weather_icons = '';
+
+        // Add icons to string.
+        for ($i = 0; $i < $weather_value_length; $i = $i + 1) {
+            // Get weather icon from constants
+            $weather_icons .= $GLOBALS['weather'][$weather_value_string[$i]];
+            $weather_icons .= ' ';
+        }
+
+        // Trim space after last icon
+        $weather_icons = rtrim($weather_icons);
+    } else {
+        $weather_icons = '';
+    }
+
+    return $weather_icons;
 }
 
 /**
@@ -581,7 +655,7 @@ function edit_moderator_keys($limit, $action)
     if ($limit > 0) {
         $new_limit = $limit - $entries;
         $empty_back_key = array();
-        $key_back = back_key($empty_back_key, $new_limit, $module, $action, "", " (-" . $entries . ")");
+        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . " (-" . $entries . ")");
         $key_back = $key_back[0];
         $keys = array_merge($key_back, $keys);
     }
@@ -590,7 +664,7 @@ function edit_moderator_keys($limit, $action)
     if ($limit - $skip > 0) {
         $new_limit = $limit - $skip - $entries;
         $empty_back_key = array();
-        $key_back = back_key($empty_back_key, $new_limit, $module, $action, "", " (-" . $skip . ")");
+        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . "(-" . $skip . ")");
         $key_back = $key_back[0];
         $keys = array_merge($key_back, $keys);
     }
@@ -599,7 +673,7 @@ function edit_moderator_keys($limit, $action)
     if (($limit + $entries) < $count) {
         $new_limit = $limit + $entries;
         $empty_next_key = array();
-        $key_next = next_key($empty_next_key, $new_limit, $module, $action, "", " (+" . $entries . ")");
+        $key_next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . "(+" . $entries . ")");
         $key_next = $key_next[0];
         $keys = array_merge($keys, $key_next);
     }
@@ -608,14 +682,14 @@ function edit_moderator_keys($limit, $action)
     if (($limit + $skip + $entries) < $count) {
         $new_limit = $limit + $skip + $entries;
         $empty_next_key = array();
-        $key_next = next_key($empty_next_key, $new_limit, $module, $action, "", " (+" . $skip . ")");
+        $key_next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . "(+" . $skip . ")");
         $key_next = $key_next[0];
         $keys = array_merge($keys, $key_next);
     }
 
     // Exit key
     $empty_exit_key = array();
-    $key_exit = exit_key($empty_exit_key, "0", "exit", "0");
+    $key_exit = universal_key($empty_exit_key, "0", "exit", "0", getTranslation('abort'));
     $key_exit = $key_exit[0];
     $keys = array_merge($keys, $key_exit);
 
@@ -685,11 +759,9 @@ function raid_edit_start_keys($id)
 
 /**
  * Raid gym first letter selection
- * @param $chat_id
- * @param $chattype
- * @return $keys array
+ * @return array
  */
-function raid_edit_gyms_first_letter_keys($chatid, $chattype) {
+function raid_edit_gyms_first_letter_keys() {
     // Get gyms from database
     $rs = my_query(
             "
@@ -706,7 +778,7 @@ function raid_edit_gyms_first_letter_keys($chatid, $chattype) {
 	// Add first letter to keys array
         $keys[] = array(
             'text'          => $gym['first_letter'],
-            'callback_data' => $chatid . ',' . $chattype . ':raid_by_gym:' . $gym['first_letter']
+            'callback_data' => '0:raid_by_gym:' . $gym['first_letter']
         );
     }
 
@@ -718,12 +790,10 @@ function raid_edit_gyms_first_letter_keys($chatid, $chattype) {
 
 /**
  * Raid edit gym keys.
- * @param $chat_id
- * @param $chattype
  * @param $first
- * @return $keys array
+ * @return array
  */
-function raid_edit_gym_keys($chatid, $chattype, $first)
+function raid_edit_gym_keys($first)
 {
     // Get gyms from database
     $rs = my_query(
@@ -741,7 +811,7 @@ function raid_edit_gym_keys($chatid, $chattype, $first)
     while ($gym = $rs->fetch_assoc()) {
 	$keys[] = array(
             'text'          => $gym['gym_name'],
-            'callback_data' => $chatid . ',' . $chattype . ':raid_create:ID,' . $gym['id']
+            'callback_data' => '0:raid_create:ID,' . $gym['id']
         );
     }
     
@@ -755,7 +825,7 @@ function raid_edit_gym_keys($chatid, $chattype, $first)
  * Pokedex edit pokemon keys.
  * @param $limit
  * @param $action
- * @return $keys array
+ * @return array
  */
 function edit_pokedex_keys($limit, $action)
 {
@@ -806,7 +876,7 @@ function edit_pokedex_keys($limit, $action)
     if ($limit > 0) {
         $new_limit = $limit - $entries;
         $empty_back_key = array();
-        $key_back = back_key($empty_back_key, $new_limit, $module, $action, "", " (-" . $entries . ")");
+        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . "(-" . $entries . ")");
         $key_back = $key_back[0];
         $keys = array_merge($key_back, $keys);
     }
@@ -815,7 +885,7 @@ function edit_pokedex_keys($limit, $action)
     if ($limit - $skip > 0) {
         $new_limit = $limit - $skip - $entries;
         $empty_back_key = array();
-        $key_back = back_key($empty_back_key, $new_limit, $module, $action, "", " (-" . $skip . ")");
+        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . "(-" . $skip . ")");
         $key_back = $key_back[0];
         $keys = array_merge($key_back, $keys);
     }
@@ -824,7 +894,7 @@ function edit_pokedex_keys($limit, $action)
     if (($limit + $entries) < $count) {
         $new_limit = $limit + $entries;
         $empty_next_key = array();
-        $key_next = next_key($empty_next_key, $new_limit, $module, $action, "", " (+" . $entries . ")");
+        $key_next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . "(+" . $entries . ")");
         $key_next = $key_next[0];
         $keys = array_merge($keys, $key_next);
     }
@@ -833,14 +903,14 @@ function edit_pokedex_keys($limit, $action)
     if (($limit + $skip + $entries) < $count) {
         $new_limit = $limit + $skip + $entries;
         $empty_next_key = array();
-        $key_next = next_key($empty_next_key, $new_limit, $module, $action, "", " (+" . $skip . ")");
+        $key_next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . "(+" . $skip . ")");
         $key_next = $key_next[0];
         $keys = array_merge($keys, $key_next);
     }
 
     // Exit key
     $empty_exit_key = array();
-    $key_exit = exit_key($empty_exit_key, "0", "exit", "0");
+    $key_exit = universal_key($empty_exit_key, "0", "exit", "0", getTranslation('abort'));
     $key_exit = $key_exit[0];
     $keys = array_merge($keys, $key_exit);
 
@@ -885,64 +955,193 @@ function pokemon_keys($raid_id, $raid_level, $action)
 }
 
 /**
- * Back key.
- * @param $keys
- * @param $id
+ * Weather keys.
+ * @param $pokedex_id
  * @param $action
  * @param $arg
- * @param $pretext
- * @param $posttext
  * @return array
  */
-function back_key($keys, $id, $action, $arg, $pretext = '', $posttext = '')
+function weather_keys($pokedex_id, $action, $arg)
 {
-    $keys[] = [
-            array(
-                'text'          => $pretext . getTranslation('back') . $posttext,
-                'callback_data' => $id . ':' . $action . ':' . $arg
-            )
-        ];
+    // Get the type, level and cp
+    $data = explode("-", $arg);
+    $weather_add = $data[0] . '-';
+    $weather_value = $data[1];
+
+    // Save and reset values
+    $save_arg = 'save-' . $weather_value;
+    $reset_arg = $weather_add . '0';
+    
+    // Init empty keys array.
+    $keys = array();
+
+    // Max amount of weathers a pokemon raid boss can have is 3 which means 999
+    // Keys will be shown up to 99 and when user is adding one more weather we exceed 99, so we remove the keys then
+    // This means we do not exceed the max amout of 3 weathers a pokemon can have :)
+    // And no, 99 is not a typo if you read my comment above :P
+    if($weather_value <= 99) {
+        // Get last number from weather array
+        end($GLOBALS['weather']);
+        $last = key($GLOBALS['weather']);
+
+        // Add buttons for each weather.
+        for ($i = 1; $i <= $last; $i = $i + 1) {
+            // Get length of arg and split arg
+            $weather_value_length = strlen((string)$weather_value);
+            $weather_value_string = str_split((string)$weather_value);
+
+            // Continue if weather got already selected
+            if($weather_value_length == 1 && $weather_value == $i) continue;
+            if($weather_value_length == 2 && $weather_value_string[0] == $i) continue;
+            if($weather_value_length == 2 && $weather_value_string[1] == $i) continue;
+
+            // Set new weather.
+            $new_weather = $weather_add . ($weather_value == 0 ? '' : $weather_value) . $i;
+
+            // Set keys.
+            $keys[] = array(
+                'text'          => $GLOBALS['weather'][$i],
+                'callback_data' => $pokedex_id . ':' . $action . ':' . $new_weather
+            ); 
+        }
+    }
+
+    // Get the inline key array.
+    $keys = inline_key_array($keys, 3);
+
+    // Save and Reset key
+    $keys[] = array(
+        array(
+            'text'          => EMOJI_DISK,
+            'callback_data' => $pokedex_id . ':' . $action . ':' . $save_arg
+        ),
+        array(
+            'text'          => getTranslation('reset'),
+            'callback_data' => $pokedex_id . ':' . $action . ':' . $reset_arg
+        )
+    );
 
     return $keys;
 }
 
 /**
- * Next key.
- * @param $keys
- * @param $id
+ * CP keys.
+ * @param $pokedex_id
  * @param $action
  * @param $arg
- * @param $pretext
- * @param $posttext
  * @return array
  */
-function next_key($keys, $id, $action, $arg, $pretext = '', $posttext = '') 
+function cp_keys($pokedex_id, $action, $arg)
 {
-    $keys[] = [
-            array(
-                'text'          => $pretext . getTranslation('next') . $posttext, 
-                'callback_data' => $id . ':' . $action . ':' . $arg
-            )
-        ];
+    // Get the type, level and cp
+    $data = explode("-", $arg);
+    $cp_type_level = $data[0] . '-' . $data[1];
+    $cp_add = $data[0] . '-' . $data[1] . '-' . $data[2] . '-';
+    $old_cp = $data[3];
+
+    // Save and reset values
+    $save_arg = $cp_type_level . '-save-' . $old_cp;
+    $reset_arg = $cp_add . '0';
+    
+    // Init empty keys array.
+    $keys = array();
+
+    // Max CP is 9999 and no the value 999 is not a typo!
+    // Keys will be shown up to 999 and when user is adding one more number we exceed 999, so we remove the keys then
+    // This means we do not exceed a Max CP of 9999 :)
+    if($old_cp <= 999) {
+
+        // Add keys 0 to 9
+        /**
+         * 7 8 9
+         * 4 5 6
+         * 1 2 3
+         * 0
+        */
+
+        // 7 8 9
+        for ($i = 7; $i <= 9; $i = $i + 1) {
+            // Set new cp
+            $new_cp = $cp_add . ($old_cp == 0 ? '' : $old_cp) . $i;
+
+            // Set keys.
+            $keys[] = array(
+                'text'          => $i,
+                'callback_data' => $pokedex_id . ':' . $action . ':' . $new_cp
+            );
+        }
+
+        // 4 5 6
+        for ($i = 4; $i <= 6; $i = $i + 1) {
+            // Set new cp
+            $new_cp = $cp_add . ($old_cp == 0 ? '' : $old_cp) . $i;
+
+            // Set keys.
+            $keys[] = array(
+                'text'          => $i,
+                'callback_data' => $pokedex_id . ':' . $action . ':' . $new_cp
+            );
+        }
+
+        // 1 2 3
+        for ($i = 1; $i <= 3; $i = $i + 1) {
+            // Set new cp
+            $new_cp = $cp_add . ($old_cp == 0 ? '' : $old_cp) . $i;
+
+            // Set keys.
+            $keys[] = array(
+                'text'          => $i,
+                'callback_data' => $pokedex_id . ':' . $action . ':' . $new_cp
+            );
+        }
+
+        // 0
+        if($old_cp != 0) {
+            // Set new cp
+            $new_cp = $cp_add . $old_cp . '0';
+        } else {
+            $new_cp = $reset_arg;
+        }
+        
+        // Set keys.
+        $keys[] = array(
+            'text'          => '0',
+            'callback_data' => $pokedex_id . ':' . $action . ':' . $new_cp
+        );
+    }
+
+    // Save
+    $keys[] = array(
+        'text'          => EMOJI_DISK,
+        'callback_data' => $pokedex_id . ':' . $action . ':' . $save_arg
+    );
+
+    // Reset
+    $keys[] = array(
+        'text'          => getTranslation('reset'),
+        'callback_data' => $pokedex_id . ':' . $action . ':' . $reset_arg
+    );
+
+    // Get the inline key array.
+    $keys = inline_key_array($keys, 3);
 
     return $keys;
 }
 
 /**
- * Exit key.
+ * Universal key.
  * @param $keys
  * @param $id
  * @param $action
  * @param $arg
- * @param $pretext
- * @param $posttext
+ * @param $text
  * @return array
  */
-function exit_key($keys, $id, $action, $arg, $pretext = '', $posttext = '')
+function universal_key($keys, $id, $action, $arg, $text = '0')
 {
     $keys[] = [
             array(
-                'text'          => $pretext . getTranslation('abort') . $posttext,
+                'text'          => $text,
                 'callback_data' => $id . ':' . $action . ':' . $arg
             )
         ];
@@ -1575,15 +1774,15 @@ function keys_vote($raid)
         ],
         [
             'text'          => getTranslation('here'),
-            'callback_data' => $raid['id'] . ':vote_arrived:0'
+            'callback_data' => $raid['id'] . ':vote_status:arrived'
         ],
         [
             'text'          => getTranslation('done'),
-            'callback_data' => $raid['id'] . ':vote_done:0'
+            'callback_data' => $raid['id'] . ':vote_status:raid_done'
         ],
         [
             'text'          => getTranslation('cancellation'),
-            'callback_data' => $raid['id'] . ':vote_cancel:0'
+            'callback_data' => $raid['id'] . ':vote_status:cancel'
         ],
     ];
 
@@ -1704,7 +1903,6 @@ function send_response_vote($update, $data, $new = false)
         send_message($update['callback_query']['message']['chat']['id'], $msg . "\n", $keys, ['reply_to_message_id' => $loc['result']['message_id']]);
         // Answer the callback.
         answerCallbackQuery($update['callback_query']['id'], $msg);
-
     } else {
         // Edit the message.
         edit_message($update, $msg, $keys, ['disable_web_page_preview' => 'true']);
@@ -1714,7 +1912,7 @@ function send_response_vote($update, $data, $new = false)
         answerCallbackQuery($update['callback_query']['id'], $msg);
     }
 
-    exit;
+    exit();
 }
 
 /**

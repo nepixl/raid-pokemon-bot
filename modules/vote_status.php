@@ -1,6 +1,6 @@
 <?php
 // Write to log.
-debug_log('vote_pokemon()');
+debug_log('vote_status()');
 
 // For debug.
 //debug_log($update);
@@ -22,13 +22,19 @@ $answer = $rs->fetch_assoc();
 // Write to log.
 debug_log($answer);
 
-// User has voted before.
+// Make sure user has voted before.
 if (!empty($answer)) {
+    // Get status to update
+    $status = $data['arg'];
+
     // Update attendance.
     my_query(
         "
         UPDATE    attendance
-        SET       pokemon = {$data['arg']}
+        SET       arrived = 0,
+                  raid_done = 0,
+                  cancel = 0,
+                  $status = 1
           WHERE   raid_id = {$data['id']}
             AND   user_id = {$update['callback_query']['from']['id']}
         "

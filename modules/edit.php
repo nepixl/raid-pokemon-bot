@@ -1,10 +1,13 @@
 <?php
-// Check raid access.
-raid_access_check($update, $data);
-
 // Write to log.
 debug_log('edit()');
-debug_log($update);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
+// Check raid access.
+raid_access_check($update, $data);
 
 // Set the id.
 $raid_id = $data['id'];

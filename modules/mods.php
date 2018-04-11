@@ -1,8 +1,10 @@
 <?php
 // Write to log.
-debug_log('moderators()');
-debug_log($update);
-debug_log($data);
+debug_log('mods()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Get the limit.
 $limit = $data['id'];

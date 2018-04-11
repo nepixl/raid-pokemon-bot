@@ -1,7 +1,10 @@
 <?php
 // Write to log.
-debug_log('OVERVIEW_SHARE');
-debug_log($data);
+debug_log('overview_share()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check access.
 bot_access_check($update, BOT_ADMINS);

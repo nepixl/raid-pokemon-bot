@@ -1,4 +1,11 @@
 <?php
+// Write to log.
+debug_log('TEAM()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
 // Get the team.
 $gym_team = trim(strtolower(substr($update['message']['text'], 5)));
 

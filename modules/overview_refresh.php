@@ -1,7 +1,10 @@
 <?php
 // Write to log.
-debug_log('OVERVIEW_REFRESH');
-debug_log($data);
+debug_log('overview_refresh()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Get chat ID from data
 $chat_id = 0;

@@ -1,11 +1,13 @@
 <?php
-// Check raid access.
-raid_access_check($update, $data);
-
 // Write to log.
 debug_log('raid_share()');
-debug_log($update);
-debug_log($data);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
+// Check raid access.
+raid_access_check($update, $data);
 
 // Get raid id.
 $id = $data['id'];
@@ -57,4 +59,4 @@ edit_message($update, $callback_msg, $callback_keys, false);
 // Answer callback.
 answerCallbackQuery($update['callback_query']['id'], $callback_msg);
 
-exit;
+exit();

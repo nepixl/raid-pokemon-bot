@@ -1,8 +1,10 @@
 <?php
 // Write to log.
 debug_log('edit_poke()');
-debug_log($update);
-debug_log($data);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check raid access.
 raid_access_check($update, $data);

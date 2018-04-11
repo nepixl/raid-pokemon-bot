@@ -1,8 +1,10 @@
 <?php
 // Write to log.
 debug_log('pokedex_edit_pokemon()');
-debug_log($update);
-debug_log($data);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Set the id.
 $pokedex_id = $data['id'];
@@ -11,7 +13,7 @@ $pokedex_id = $data['id'];
 $keys = array();
 
 // Set the message.
-$msg = get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')' . CR . CR;
+$msg = getTranslation('raid_boss') . ': ' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')' . CR . CR;
 $msg .= '<b>' . getTranslation('pokedex_select_action') . '</b>';
 
 // Create keys array.
@@ -25,31 +27,31 @@ $keys = [
     [
         [
             'text'          => getTranslation('pokedex_min_cp'),
-            'callback_data' => $pokedex_id . ':pokedex_set_cp:min-20'
+            'callback_data' => $pokedex_id . ':pokedex_set_cp:min-20-add-0'
         ]
     ],
     [
         [
             'text'          => getTranslation('pokedex_max_cp'),
-            'callback_data' => $pokedex_id . ':pokedex_set_cp:max-20'
+            'callback_data' => $pokedex_id . ':pokedex_set_cp:max-20-add-0'
         ]
     ],
     [
         [
-            'text'          => getTranslation('pokedex_min_boosted_cp'),
-            'callback_data' => $pokedex_id . ':pokedex_set_cp:min-25'
+            'text'          => getTranslation('pokedex_min_weather_cp'),
+            'callback_data' => $pokedex_id . ':pokedex_set_cp:min-25-add-0'
         ]
     ],
     [
         [
-            'text'          => getTranslation('pokedex_max_boosted_cp'),
-            'callback_data' => $pokedex_id . ':pokedex_set_cp:max-25'
+            'text'          => getTranslation('pokedex_max_weather_cp'),
+            'callback_data' => $pokedex_id . ':pokedex_set_cp:max-25-add-0'
         ]
     ],
     [
         [
             'text'          => getTranslation('pokedex_weather'),
-            'callback_data' => $pokedex_id . ':pokedex_set_weather:setweather'
+            'callback_data' => $pokedex_id . ':pokedex_set_weather:add-0'
         ]
     ],
     [

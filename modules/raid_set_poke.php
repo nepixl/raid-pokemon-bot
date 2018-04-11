@@ -1,8 +1,10 @@
 <?php
 // Write to log.
 debug_log('raid_set_poke()');
-debug_log($update);
-debug_log($data);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check raid access.
 raid_access_check($update, $data);
@@ -54,3 +56,5 @@ if ($update['message']['chat']['type'] == 'private' || $update['callback_query']
     answerCallbackQuery($update['callback_query']['id'], $callback_response);
 
 }
+
+exit();

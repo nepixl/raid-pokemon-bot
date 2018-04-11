@@ -39,7 +39,7 @@
 		"NL": "0 Sterren Raid",
 		"DE": "0 Sterne Raid",
 		"EN": "0 Star Raid",
-		"PT-BR": "Raid nível 1"
+		"PT-BR": "Raid nível 0"
 	},
 	"back" : {
 		"NL": "Terug",
@@ -52,6 +52,12 @@
 		"DE": "Weiter",
 		"EN": "Next",
 		"PT-BR": "Próximo"
+	},
+	"reset" : {
+		"NL": "TRANSLATE",
+		"DE": "Reset",
+		"EN": "Reset",
+		"PT-BR": "TRANSLATE"
 	},
 	"alone" : {
 		"NL": "Alleen",
@@ -413,10 +419,9 @@
 		"DE": "Raid gespeichert:",
 		"EN": "Raid saved:",
 		"PT-BR": "Raid salva:"
-		
 	},
 	"raid_boss" : {
-		"NL": "#Raid baas",
+		"NL": "Raid baas",
 		"DE": "Raid-Boss",
 		"EN": "Raid boss",
 		"PT-BR": "Chefe da raid"
@@ -585,14 +590,14 @@
 	},
 	"pokedex_start" : {
 		"NL": "TRANSLATE",
-		"DE": "Pokemon anzeigen und bearbeiten",
-		"EN": "List and edit pokemon",
+		"DE": "Raid Boss Pokemon anzeigen und bearbeiten",
+		"EN": "List and edit raid boss pokemon",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_raid_pokemon" : {
 		"NL": "TRANSLATE",
-		"DE": "Raid Pokemon anzeigen",
-		"EN": "List raid pokemon",
+		"DE": "Raid Boss Pokemon anzeigen",
+		"EN": "List raid boss pokemon",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_list_of_all" : {
@@ -609,8 +614,8 @@
 	},
 	"pokedex_edit_pokemon" : {
 		"NL": "TRANSLATE",
-		"DE": "Zum Bearbeiten Pokemon auswählen:",
-		"EN": "Select pokemon to edit:",
+		"DE": "Zum Bearbeiten Pokemon Raid Boss auswählen:",
+		"EN": "Select pokemon raid boss to edit:",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_raid_level" : {
@@ -643,22 +648,40 @@
 		"EN": "Max CP",
 		"PT-BR": "TRANSLATE"
 	},
-	"pokedex_min_boosted_cp" : {
+	"pokedex_min_weather_cp" : {
 		"NL": "TRANSLATE",
 		"DE": "Min boosted WP",
 		"EN": "Min boosted CP",
 		"PT-BR": "TRANSLATE"
 	},
-	"pokedex_max_boosted_cp" : {
+	"pokedex_max_weather_cp" : {
 		"NL": "TRANSLATE",
 		"DE": "Max boosted WP",
 		"EN": "Max boosted CP",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_current_cp" : {
+		"NL": "TRANSLATE",
+		"DE": "Aktuelle WP:",
+		"EN": "Current CP:",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_weather" : {
 		"NL": "TRANSLATE",
 		"DE": "Wetter",
 		"EN": "Weather",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_current_weather" : {
+		"NL": "TRANSLATE",
+		"DE": "Aktuelles Wetter:",
+		"EN": "Current weather:",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_new_weather" : {
+		"NL": "TRANSLATE",
+		"DE": "Neues Wetter:",
+		"EN": "New weather:",
 		"PT-BR": "TRANSLATE"
 	},
 	"how_long_raid" : {

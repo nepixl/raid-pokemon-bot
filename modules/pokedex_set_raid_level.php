@@ -1,8 +1,10 @@
 <?php
 // Write to log.
 debug_log('pokedex_set_raid_level()');
-debug_log($update);
-debug_log($data);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Set the id.
 $pokedex_id = $data['id'];
@@ -50,7 +52,7 @@ if($data['arg'] == "setlevel") {
     }
 
     // Exit key
-    $keys = exit_key($keys, "0", "exit", "0");
+    $keys = universal_key($keys, "0", "exit", "0", getTranslation('abort'));
 
     // Build callback message string.
     $callback_response = getTranslation('select_raid_level');

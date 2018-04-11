@@ -1,8 +1,10 @@
 <?php
 // Write to log.
 debug_log('raid_edit_poke()');
-debug_log($update);
-debug_log($data);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check raid access.
 raid_access_check($update, $data);
@@ -10,13 +12,11 @@ raid_access_check($update, $data);
 // Set the id.
 $raid_id = $data['id'];
 
-// Init raid level
-$raid_level = '0';
-
 // Get current pokemon
 $old_pokemon = $data['arg'];
 
 // Get raid level
+$raid_level = '0';
 $raid_level = get_raid_level($old_pokemon);
 debug_log('Raid level of pokemon: ' . $raid_level);
 

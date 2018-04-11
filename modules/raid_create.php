@@ -1,11 +1,19 @@
 <?php
+// Write to log.
+debug_log('raid_create()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
+// Timezone
 $tz = TIMEZONE;
+$lat = '';
+$lon = '';
 
 // Get latitude / longitude values from Telegram Mobile Client
-if (isset($update['message']['location']['latitude'])) {
+if (isset($update['message']['location'])) {
     $lat = $update['message']['location']['latitude'];
-}
-if (isset($update['message']['location']['longitude'])) {
     $lon = $update['message']['location']['longitude'];
 }
 
@@ -27,27 +35,13 @@ $gym_id = 0;
 // Get latitude / longitude from message text if empty
 // Necessary for Telegram Desktop Client as you cannot send a location :(
 if (empty($lat) && empty($lon)) {
-    // Get the userid, chat id and type
-    $id_type = $data['id'];
+    // Set userid, chatid and chattype
+    $userid = $update['callback_query']['from']['id'];
+    $chatid = $update['callback_query']['message']['chat']['id'];
+    $chattype = $update['callback_query']['message']['chat']['type'];
 
     // Create data array (max. 2)
-    $userdata = explode(',', $id_type, 2);
-
-    // Set userid, chat id and type
-    $userid = $userdata[0];
-    $chatid = $userid;
-    $chattype = $userdata[1];
-
-    // Debug
-    debug_log('User ID=' . $userid);
-    debug_log('Chat type=' . $chatid);
-    debug_log('Chat type=' . $chattype);
-
-    // Get lat and lon from message text
-    $coords = $data['arg'];
-
-    // Create data array (max. 2)
-    $data = explode(',', $coords, 2);
+    $data = explode(',', $data['arg'], 2);
 
     // Latitude and longitude or Gym ID?
     if($data[0] == "ID") {
@@ -294,14 +288,13 @@ if($gym_id != 0 || (empty($update['message']['location']['latitude']) && empty($
         send_message($chatid, $msg . CR . getTranslation('select_raid_level') . ':', $keys);
 
     } else {
-        //$reply_to = $update['message']['chat']['id'];
-        $reply_to = $chatid;
+        $reply_to = $update['message']['chat']['id'];
         if ($update['message']['reply_to_message']['message_id']) {
             $reply_to = $update['message']['reply_to_message']['message_id'];
         }
 
         // Send the message.
-        send_message($chatid, $msg . CR . getTranslation('select_raid_level') . ':', $keys, ['reply_to_message_id' => $reply_to, 'reply_markup' => ['selective' => true, 'one_time_keyboard' => true]]);
+        send_message($reply_to, $msg . CR . getTranslation('select_raid_level') . ':', $keys, ['reply_to_message_id' => $reply_to, 'reply_markup' => ['selective' => true, 'one_time_keyboard' => true]]);
     }
 
     exit();
