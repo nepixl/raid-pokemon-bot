@@ -2646,7 +2646,39 @@ function show_raid_poll($raid)
             
         }
 
-        // Get done and canceled
+        // Get sums canceled/done for the raid
+        $rs_cnt_cancel_done = my_query(
+            "
+            SELECT DISTINCT sum(raid_done = '1')   AS count_done,
+                            sum(cancel = '1')      AS count_cancel
+            FROM            attendance
+              WHERE         raid_id = {$raid['id']}
+                AND         (raid_done = 1
+                            OR cancel = 1)
+              GROUP BY      raid_done
+              ORDER BY      raid_done
+            "
+        );
+
+        // Init empty count array and count sum.
+        $cnt_cancel_done = array();
+
+        while ($cnt_row_cancel_done = $rs_cnt_cancel_done->fetch_assoc()) {
+            // Cancel count
+            if($cnt_row_cancel_done['count_cancel'] > 0) {
+                $cnt_cancel_done['count_cancel'] = $cnt_row_cancel_done['count_cancel'];
+            }
+
+            // Done count
+            if($cnt_row_cancel_done['count_done'] > 0) {
+                $cnt_cancel_done['count_done'] = $cnt_row_cancel_done['count_done'];
+            }
+        }
+
+        // Write to log.
+        debug_log($cnt_cancel_done);
+
+        // Get done and canceled attendances
         $rs_att = my_query(
             "
             SELECT      attendance.*,
@@ -2659,26 +2691,25 @@ function show_raid_poll($raid)
               WHERE     raid_id = {$raid['id']}
                 AND     (raid_done = 1
                         OR cancel = 1)
-              ORDER BY  cancel,
-                        raid_done,
+              ORDER BY  raid_done,
                         attend_time
             "
         );
 
+        // Init cancel_done value.
         $cancel_done = 'CANCEL';
 
+        // For each canceled / done.
         while ($row = $rs_att->fetch_assoc()) {
             // Add section/header for canceled
             if($row['cancel'] == 1 && $cancel_done == 'CANCEL') {
-                $msg .= CR . TEAM_CANCEL . ' <b>' . getTranslation('cancel') . ': </b>';// . ' [' . count($data['cancel']) . ']' . CR;
-                $msg .= CR;
+                $msg .= CR . TEAM_CANCEL . ' <b>' . getTranslation('cancel') . ': </b>' . '[' . $cnt_cancel_done['count_cancel'] . ']' . CR;
                 $cancel_done = 'DONE';
             }
 
             // Add section/header for canceled
-            if($row['raid_done'] == 1 && $cancel_done == 'CANCEL') {
-                $msg .= CR . TEAM_DONE . ' <b>' . getTranslation('finished') . ': </b>';// . ' [' . count($data['done']) . ']' . CR;
-                $msg .= CR;
+            if($row['raid_done'] == 1 && $cancel_done == 'CANCEL' || $row['raid_done'] == 1 && $cancel_done == 'DONE') {
+                $msg .= CR . TEAM_DONE . ' <b>' . getTranslation('finished') . ': </b>' . '[' . $cnt_cancel_done['count_done'] . ']' . CR;
                 $cancel_done = 'END';
             }
 
