@@ -636,17 +636,23 @@
 		"EN": "Select feature to be changed:",
 		"PT-BR": "TRANSLATE"
 	},
+	"pokedex_cp" : {
+		"NL": "CP:",
+		"DE": "WP:",
+		"EN": "CP:",
+		"PT-BR": "CP:"
+	},
 	"pokedex_min_cp" : {
-		"NL": "TRANSLATE",
+		"NL": "Min CP",
 		"DE": "Min WP",
 		"EN": "Min CP",
-		"PT-BR": "TRANSLATE"
+		"PT-BR": "Min CP"
 	},
 	"pokedex_max_cp" : {
-		"NL": "TRANSLATE",
+		"NL": "Max CP",
 		"DE": "Max WP",
 		"EN": "Max CP",
-		"PT-BR": "TRANSLATE"
+		"PT-BR": "Max CP"
 	},
 	"pokedex_min_weather_cp" : {
 		"NL": "TRANSLATE",

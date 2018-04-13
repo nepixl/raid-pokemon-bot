@@ -463,6 +463,42 @@ function get_pokemon_cp($pokedex_id)
 }
 
 /**
+ * Get formatted pokemon cp values.
+ * @param $pokedex_id
+ * @return string
+ */
+function get_formatted_pokemon_cp($pokedex_id)
+{
+    // Get gyms from database
+    $rs = my_query(
+            "
+            SELECT    min_cp, max_cp, min_weather_cp, max_weather_cp
+            FROM      pokemon
+            WHERE     pokedex_id = {$pokedex_id}
+            "
+        );
+
+    $cp20 = '';
+    $cp25 = '';
+
+    while($row = $rs->fetch_assoc()) {
+        // CP
+        $cp20 .= $row['min_cp'];
+        $cp20 .= (!empty($cp20)) ? ('/' . $row['max_cp']) : ($row['max_cp']);
+
+        // Weather boosted CP
+        $cp25 .= $row['min_weather_cp'];
+        $cp25 .= (!empty($cp25)) ? ('/' . $row['max_weather_cp']) : ($row['max_weather_cp']);
+    }
+
+    // Combine CP and weather boosted CP
+    $cp = (!empty($cp20)) ? (getTranslation('pokedex_cp') . ' <b>' . $cp20 . '</b>') : '';
+    $cp .= (!empty($cp25)) ? (' (' . $cp25 . ')') : '';
+
+    return $cp;
+}
+
+/**
  * Get pokemon weather.
  * @param $pokedex_id
  * @return string
@@ -2401,8 +2437,18 @@ function show_raid_poll($raid)
     }
 
     // Display raid boss name.
-    $msg .= getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($raid['pokemon']) . '</b>' . CR;
+    $msg .= getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($raid['pokemon']) . '</b>';
 
+    // Display raid boss weather.
+    $pokemon_weather = get_pokemon_weather($raid['pokemon']);
+    $msg .= ($pokemon_weather != 0) ? (' ' . get_weather_icons($pokemon_weather)) : '';
+    $msg .= CR;
+
+    // Display raid boss CP values.
+    $pokemon_cp = get_formatted_pokemon_cp($raid['pokemon']);
+    $msg .= (!empty($pokemon_cp)) ? ($pokemon_cp . CR) : ''; 
+
+    // Display time left.
     $time_left = floor($raid['t_left'] / 60);
     if ( strpos(str_pad($time_left % 60, 2, '0', STR_PAD_LEFT) , '-' ) !== false ) {
         $tl_msg = '<b>' . getTranslation('raid_done') . '</b>';
@@ -2436,10 +2482,6 @@ function show_raid_poll($raid)
         }
     }
 
-// NEW CODE START XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-$messung_start = microtime(true);
-debug_log('MEASURE NEW START: ' . $messung_start);
-
     // Add Ex-Raid Message if Pokemon is in Ex-Raid-List.
     $raid_level = get_raid_level($raid['pokemon']);
     if($raid_level == 'X') {
@@ -2447,6 +2489,7 @@ debug_log('MEASURE NEW START: ' . $messung_start);
     }
 
     // Get counts and sums for the raid
+    // 1 - Grouped by attend_time
     $rs_cnt = my_query(
         "
         SELECT DISTINCT UNIX_TIMESTAMP(attend_time) AS ts_att,
@@ -2456,11 +2499,8 @@ debug_log('MEASURE NEW START: ' . $messung_start);
                         sum(team = 'instinct')      AS count_instinct,
                         sum(team IS NULL)           AS count_no_team,
                         sum(extra_people)           AS extra,
-                        sum(extra_people AND team = 'mystic')           AS extra_mystic,
                         sum(pokemon = '0')          AS count_any_pokemon,
-                        sum(team = 'mystic' AND pokemon = '0')          AS count_mystic_any_pokemon,
                         sum(pokemon = '{$raid['pokemon']}') AS count_raid_pokemon,
-                        sum(team = 'mystic' AND pokemon = '{$raid['pokemon']}') AS count_mystic_raid_pokemon,
                         attend_time
         FROM            attendance
           WHERE         raid_id = {$raid['id']}
@@ -2480,9 +2520,44 @@ debug_log('MEASURE NEW START: ' . $messung_start);
         $cnt[$cnt_row['ts_att']] = $cnt_row;
         $cnt_all = $cnt_all + $cnt_row['count'];
     }
-    // Create array with counts and sums
 
-debug_log($cnt);
+    // Write to log.
+    debug_log($cnt);
+
+    // Get counts and sums for the raid
+    // 2 - Grouped by attend_time and pokemon
+    $rs_cnt_pokemon = my_query(
+        "
+        SELECT DISTINCT UNIX_TIMESTAMP(attend_time) AS ts_att,
+                        count(attend_time)          AS count,
+                        sum(team = 'mystic')        AS count_mystic,
+                        sum(team = 'valor')         AS count_valor,
+                        sum(team = 'instinct')      AS count_instinct,
+                        sum(team IS NULL)           AS count_no_team,
+                        sum(extra_people)           AS extra,
+                        sum(pokemon = '0')          AS count_any_pokemon,
+                        sum(pokemon = '{$raid['pokemon']}') AS count_raid_pokemon,
+                        attend_time,
+                        pokemon
+        FROM            attendance
+          WHERE         raid_id = {$raid['id']}
+            AND         attend_time IS NOT NULL
+            AND         raid_done != 1
+            AND         cancel != 1
+          GROUP BY      attend_time, pokemon
+          ORDER BY      attend_time, pokemon
+        "
+    );
+
+    // Init empty count array and count sum.
+    $cnt_pokemon = array();
+
+    while ($cnt_rowpoke = $rs_cnt_pokemon->fetch_assoc()) {
+        $cnt_pokemon[$cnt_rowpoke['ts_att'] . '_' . $cnt_rowpoke['pokemon']] = $cnt_rowpoke;
+    }
+
+    // Write to log.
+    debug_log($cnt_pokemon);
 
     // Add no attendance found message.
     if ($cnt_all == 0) {
@@ -2536,9 +2611,6 @@ debug_log($cnt);
 
             // Add section/header for pokemon
             if($previous_pokemon != $current_pokemon || $previous_att_time != $current_att_time) {
-                // Add to message.
-                $msg .= ($current_pokemon == 0) ? ('<b>' . getTranslation('any_pokemon') . '</b>') : ('<b>' . get_local_pokemon_name($current_pokemon) . '</b>');
-
                 // Get counts for pokemons
                 $count_all = $cnt[$current_att_time]['count'];
                 $count_any_pokemon = $cnt[$current_att_time]['count_any_pokemon'];
@@ -2546,16 +2618,18 @@ debug_log($cnt);
 
                 // Show attendances when multiple pokemon are selected, unless all attending users voted for the raid boss + any pokemon
                 if($count_all != ($count_any_pokemon + $count_raid_pokemon)) {
+                    // Add pokemon name.
+                    $msg .= ($current_pokemon == 0) ? ('<b>' . getTranslation('any_pokemon') . '</b>') : ('<b>' . get_local_pokemon_name($current_pokemon) . '</b>');
+
                     // Add attendance counts by team.
-/*
-                    $msg .= ' [' . ($cnt['count'] + $cnt['extra']) . '] — ';
-                    $msg .= (($cnt[$current_att_time]['count_mystic'] > 0) ? TEAM_B . $cnt[$current_att_time]['count_mystic'] . '  ' : '');
-                    $msg .= (($cnt[$current_att_time]['count_valor'] > 0) ? TEAM_R . $cnt[$current_att_time]['count_valor'] . '  ' : '');
-                    $msg .= (($cnt[$current_att_time]['count_instinct'] > 0) ? TEAM_Y . $cnt[$current_att_time]['count_instinct'] . '  ' : '');
-                    $msg .= ((($cnt[$current_att_time]['count_no_team'] + $cnt[$current_att_time]['extra']) > 0) ? TEAM_UNKNOWN . ($cnt[$current_att_time]['count_no_team'] + $cnt[$current_att_time]['extra']) : '');
-*/
+                    $current_att_time_poke = $cnt_pokemon[$current_att_time . '_' . $current_pokemon];
+                    $msg .= ' [' . ($current_att_time_poke['count'] + $current_att_time_poke['extra']) . '] — ';
+                    $msg .= (($current_att_time_poke['count_mystic'] > 0) ? TEAM_B . $current_att_time_poke['count_mystic'] . '  ' : '');
+                    $msg .= (($current_att_time_poke['count_valor'] > 0) ? TEAM_R . $current_att_time_poke['count_valor'] . '  ' : '');
+                    $msg .= (($current_att_time_poke['count_instinct'] > 0) ? TEAM_Y . $current_att_time_poke['count_instinct'] . '  ' : '');
+                    $msg .= ((($current_att_time_poke['count_no_team'] + $current_att_time_poke['extra']) > 0) ? TEAM_UNKNOWN . ($current_att_time_poke['count_no_team'] + $current_att_time_poke['extra']) : '');
+                    $msg .= CR;
                 }
-                $msg .= CR;
             }
 
             // Add users: TEAM -- LEVEL -- NAME -- ARRIVED -- EXTRAPEOPLE
@@ -2626,368 +2700,6 @@ debug_log($cnt);
     $msg .= CR . '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), $raid['timezone'], 'H:i:s') . '</i>';
     $msg .= '  ID = ' . $raid['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
 
-    $msg .= CR . 'END OF NEW CODE' . CR;
-
-$messung_ende = microtime(true) - $messung_start;
-// NEW CODE END XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX 
-
-// OLD CODE START ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
-$messung_old_start = microtime(true);
-debug_log('MEASURE OLD START: ' . $messung_old_start);
-    // Get attendance for this raid.
-    $rs = my_query(
-        "
-        SELECT      *,
-                    UNIX_TIMESTAMP(attend_time) AS ts_att
-        FROM        attendance
-          WHERE     raid_id = {$raid['id']}
-          ORDER BY  cancel ASC,
-                    raid_done DESC,
-                    team ASC,
-                    arrived DESC,
-                    attend_time ASC
-        "
-    );
-
-    // Init empty data array.
-    $data = array();
-
-    // For each attendance.
-    while ($row = $rs->fetch_assoc()) {
-        // Set cancel text.
-        if ($row['cancel']) {
-            $row['team'] = 'cancel';
-        }
-        // Set done text.
-        if ($row['raid_done']) {
-            $row['team'] = 'done';
-        }
-        if (!$row['team']) {
-            $row['team'] = 'unknown';
-        }
-
-        $data[$row['team']][] = $row;
-
-        if ($row['extra_people']) {
-            for ($i = 1; $i <= $row['extra_people']; $i++) {
-                $data[$row['team']][] = false;
-            }
-        }
-    }
-
-    debug_log($data);
-
-    // Add Ex-Raid Message if Pokemon is in Ex-Raid-List.
-    $raid_level = get_raid_level($raid['pokemon']);
-    if($raid_level == 'X') {
-        $msg.= CR . EMOJI_WARN . ' <b>' . getTranslation('exraid_pass') . '</b> ' . EMOJI_WARN;
-    }
-
-    // Add no attendance found message.
-    if (count($data) == 0) {
-        $msg .= CR . getTranslation('no_participants_yet') . CR;
-    }
-
-    $rs = my_query(
-        "
-        SELECT DISTINCT UNIX_TIMESTAMP(attend_time) AS ts_att,
-                        count(attend_time)          AS count,
-                        sum(team = 'mystic')        AS count_mystic,
-                        sum(team = 'valor')         AS count_valor,
-                        sum(team = 'instinct')      AS count_instinct,
-                        sum(team IS NULL)           AS count_no_team,
-                        sum(extra_people)           AS extra,
-                        sum(pokemon = '0')          AS count_any_pokemon,
-                        sum(pokemon = '{$raid['pokemon']}') AS count_raid_pokemon,
-			attend_time
-        FROM            attendance
-          WHERE         raid_id = {$raid['id']}
-            AND         attend_time IS NOT NULL
-            AND         raid_done != 1
-            AND         cancel != 1
-          GROUP BY      attend_time
-          ORDER BY      attend_time ASC
-        "
-    );
-
-    // Init empty time slots array.
-    $timeSlots = array();
-
-    while ($row = $rs->fetch_assoc()) {
-        $timeSlots[] = $row;
-    }
-
-    // Write to log.
-    debug_log($timeSlots);
-
-    // TIMES
-    foreach ($timeSlots as $ts) {
-        // Add to message.
-        $msg .= CR . '<b>' . unix2tz($ts['ts_att'], $raid['timezone']) . '</b>' . ' [' . ($ts['count'] + $ts['extra']) . ']';
-	if ($ts['count'] > 0) {
-	    $msg .= ' — ';
-	    $msg .= (($ts['count_mystic'] > 0) ? TEAM_B . $ts['count_mystic'] . '  ' : '');
-	    $msg .= (($ts['count_valor'] > 0) ? TEAM_R . $ts['count_valor'] . '  ' : '');
-	    $msg .= (($ts['count_instinct'] > 0) ? TEAM_Y . $ts['count_instinct'] . '  ' : '');
-	    $msg .= ((($ts['count_no_team'] + $ts['extra']) > 0) ? TEAM_UNKNOWN . ($ts['count_no_team'] + $ts['extra']) : '');
-	    $msg .= CR;
-	}
-
-        // Get pokemon
-        $poke_rs = my_query(
-            "
-            SELECT        *
-            FROM          attendance
-              WHERE       raid_id = {$raid['id']}
-                GROUP BY  pokemon
-            "
-        );
-
-        // Init empty pokemon array.
-        $voted_poke = array();
-
-        // Count pokemons which users voted for.
-        while ($rowPoke = $poke_rs->fetch_assoc()) {
-            $voted_poke[] = $rowPoke;
-        }
-
-        // Get users for each pokemon.
-        foreach ($voted_poke as $pp) {
-            // Get users.
-            $user_rs = my_query(
-                "
-                SELECT        *
-                FROM          attendance
-                  WHERE       UNIX_TIMESTAMP(attend_time) = {$ts['ts_att']}
-                    AND       raid_done != 1
-                    AND       cancel != 1
-                    AND       raid_id = {$raid['id']}
-                    AND       pokemon = '{$pp['pokemon']}'
-                    ORDER BY  team ASC, arrived ASC
-                "
-            );
-
-            // Init empty attend users array.
-            $att_users = array();
-
-            while ($rowUsers = $user_rs->fetch_assoc()) {
-                $att_users[] = $rowUsers;
-            }
-
-            // Get participants for voted time and pokemon.
-            $participants_rs = my_query(
-                "
-                SELECT        count(attend_time)          AS count,
-                              sum(team = 'mystic')        AS count_mystic,
-                              sum(team = 'valor')         AS count_valor,
-                              sum(team = 'instinct')      AS count_instinct,
-                              sum(team IS NULL)           AS count_no_team,
-                              sum(extra_people)           AS extra,
-                              attend_time
-                FROM          attendance
-                  WHERE       UNIX_TIMESTAMP(attend_time) = {$ts['ts_att']}
-                    AND       raid_done != 1
-                    AND       cancel != 1
-                    AND       raid_id = {$raid['id']}
-                    AND       pokemon = '{$pp['pokemon']}'
-                "
-            );
-
-            $row_pp = $participants_rs->fetch_assoc();
-
-            if($row_pp['count'] == 0) {
-                // No users voted for this pokemon, continue
-                continue;
-            } else {
-                // Count all attendances, attendances for "any" pokemon and attendances for the raid boss
-                $count_pp = $ts['count'];
-                $count_any_pokemon = $ts['count_any_pokemon'];
-                $count_raid_pokemon = $ts['count_raid_pokemon'];
-
-                // Write to log.
-                debug_log('Summary for timeslot: ' . unix2tz($ts['ts_att'], $raid['timezone']));
-                debug_log('Participants for raid with ID ' . $raid['id'] . ': ' . $count_pp);
-                debug_log('Participants who voted for any pokemon: ' . $count_any_pokemon);
-                debug_log('Participants who voted for ' . $raid['pokemon'] . ': ' . $count_raid_pokemon);
-
-                // Show attendances when multiple pokemon are selected, unless all attending users voted for the raid boss + any pokemon
-                if($count_pp != ($count_any_pokemon + $count_raid_pokemon)) {
-                    // Add participants message.
-                    $msg .= $pp['pokemon'] == '0' ? '<b>' . getTranslation('any_pokemon') . '</b>' : '<b>' . get_local_pokemon_name($pp['pokemon']) . '</b>';
-                    $msg .= ' [' . ($row_pp['count'] + $row_pp['extra']) . '] — ';
-                    $msg .= (($row_pp['count_mystic'] > 0) ? TEAM_B . $row_pp['count_mystic'] . '  ' : '');
-                    $msg .= (($row_pp['count_valor'] > 0) ? TEAM_R . $row_pp['count_valor'] . '  ' : '');
-                    $msg .= (($row_pp['count_instinct'] > 0) ? TEAM_Y . $row_pp['count_instinct'] . '  ' : '');
-                    $msg .= ((($row_pp['count_no_team'] + $row_pp['extra']) > 0) ? TEAM_UNKNOWN . ($row_pp['count_no_team'] + $row_pp['extra']) : '');
-                    $msg .= CR;
-                }
-            }
-
-            // Write to log.
-            debug_log($att_users);
-
-            foreach ($att_users as $vv) {
-
-                // Write to log.
-                debug_log($vv['user_id']);
-
-                // Get user data.
-                $rs = my_query(
-                    "
-                    SELECT  *
-                    FROM    users
-                    WHERE   user_id = {$vv['user_id']}
-                    "
-                );
-
-                // Get the row.
-                $row = $rs->fetch_assoc();
-
-                // Always use name.
-                $name = '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a>';
-
-                // Unknown team.
-                if ($row['team'] === NULL) {
-                    $msg .= ' └ ' . $GLOBALS['teams']['unknown'] . ' ';
-
-                // Known team.
-                } else {
-                    $msg .= ' └ ' . $GLOBALS['teams'][$row['team']] . ' ';
-                }
-
-                // Add level.
-                if ($row['level'] != 0) {
-                    $msg .= '<b>'.$row['level'].'</b>';
-                    $msg .= ' ';
-                }
-
-                // Add name.
-                $msg .= $name;
-                $msg .= ' ';
-
-                // Arrived.
-                if ($vv['arrived']) {
-		    // No time is displayed, but undefined_index error in log, so changed it:
-                    //$msg .= '[Bin da' . unix2tz($vv['ts_att'], $raid['timezone']) . '] ';
-                    $msg .= '[' . getTranslation('here') . '] ';
-
-                // Cancelled.
-                } else if ($vv['cancel']) {
-                    $msg .= '[' . getTranslation('cancel') . '] ';
-                }
-
-                // Add extra people.
-                if ($vv['extra_people']) {
-                    $msg .= '+' . $vv['extra_people'];
-                }
-
-                $msg .= CR;
-            }
-        }
-    }
-
-    // DONE
-    if (isset($data['done']) ? count($data['done']) : '' ) {
-    //if (count($data['done'])) {
-        // Add to message.
-        $msg .= CR . TEAM_DONE . ' <b>' . getTranslation('finished') . ': </b>' . ' [' . count($data['done']) . ']' . CR;
-
-        foreach ($data['done'] as $vv) {
-
-            if (!$vv['raid_done']) continue;
-
-            $rs = my_query(
-                "
-                SELECT    *
-                FROM      users
-                  WHERE   user_id = {$vv['user_id']}
-                "
-            );
-
-            $row = $rs->fetch_assoc();
-
-            $name = '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a>';
-
-            // Add to message.
-            $msg .= ' └ ' . $GLOBALS['teams'][$row['team']] . ' ' . $name . ' ';
-
-            // Done.
-            if ($vv['raid_done']) {
-                $msg .= '[' . unix2tz($vv['ts_att'], $raid['timezone']) . '] ';
-            }
-            // Add extra people.
-            if ($vv['extra_people']) {
-                $msg .= '+' . $vv['extra_people'];
-            }
-
-            $msg .= CR;
-        }
-    }
-
-    // CANCEL
-    if (isset($data['cancel']) ? count($data['cancel']) : '' ) {
-    //if (count($data['cancel'])) {
-        // Add to message.
-        $msg .= CR . TEAM_CANCEL . ' <b>' . getTranslation('cancel') . ': </b>' . ' [' . count($data['cancel']) . ']' . CR;
-
-        foreach ($data['cancel'] as $vv) {
-
-            if (!$vv['cancel']) continue;
-
-            $rs = my_query(
-                "
-                SELECT    *
-                FROM      users
-                  WHERE   user_id = {$vv['user_id']}
-                "
-            );
-
-            $row = $rs->fetch_assoc();
-
-            $name = '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a>';
-
-            $msg .= ' └ ' . $GLOBALS['teams'][$row['team']] . ' ' . $name . ' ';
-
-            // Cancel.
-            if ($vv['cancel']) {
-                $msg .= '[' . unix2tz($vv['ts_att'], $raid['timezone']) . '] ';
-            }
-            // Add extra people.
-            if ($vv['extra_people']) {
-                $msg .= '+' . $vv['extra_people'];
-            }
-
-            $msg .= CR;
-        }
-    }
-
-    // Display user which created the raid.
-    // Get user data.
-    $rs = my_query(
-        "
-        SELECT  *
-        FROM    users
-        WHERE   user_id = {$raid['user_id']}
-        "
-    );
-
-    // Get the row.
-    $row = $rs->fetch_assoc();
-
-    // Display creator.
-    if ($row['user_id'] && $row['name']) {
-        $msg .= CR . getTranslation('created_by') . ': <a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a>';
-    }
-
-    // Add update time and raid id to message.
-    $msg .= CR . '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), $raid['timezone'], 'H:i:s') . '</i>';
-    $msg .= '  ID = ' . $raid['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
-
-$messung_old_ende = microtime(true) - $messung_old_start;
-debug_log('DEBUGDEBUG - RESULT NEW TIME: ' . $messung_ende);
-debug_log('DEBUGDEBUG - RESULT OLD TIME: ' . $messung_old_ende);
-
-// END OLD CODE ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
     // Return the message.
     return $msg;
 }
