@@ -81,7 +81,6 @@ if (!empty($data[8])) {
 
 // Insert new raid or update existing raid/ex-raid?
 $raid_id = raid_duplication_check($name,($endtime + $countdown));
-$ex_raid = false;
 
 if ($raid_id > 0) {
     // Get current pokemon from database for raid.
@@ -102,13 +101,9 @@ if ($raid_id > 0) {
     // Make sure it's not an Ex-Raid before updating the pokemon.
     $raid_level = get_raid_level($poke_name);
     if($raid_level == 'X') {
-        $ex_raid = true;
+        // Ex-Raid! Update only team in raids table.
         debug_log('Current pokemon is an ex-raid pokemon: ' . $poke_name);
         debug_log('Pokemon "' .$poke_name . '" will NOT be updated to "' . $boss . '"!');
-    }
-
-    if ($ex_raid) {
-        // Ex-Raid! Update only team in raids table.
         my_query(
             "
             UPDATE    raids
@@ -158,7 +153,7 @@ if ($raid_id > 0) {
     //sendMessage($update['message']['chat']['id'], $text);
 
     // Exit now after update of raid and message.
-    exit;
+    exit();
 }
 
 // Address found.
@@ -174,7 +169,7 @@ if (!empty($address)) {
 		              user_id = {$update['message']['from']['id']},
 		              lat = '{$lat}',
 		              lon = '{$lon}',
-		              first_seen = NOW(),
+		              first_seen = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:00'),
 		              start_time = DATE_ADD(first_seen, INTERVAL {$countdown} MINUTE),
 		              end_time = DATE_ADD(start_time, INTERVAL {$endtime} MINUTE),
 		              gym_team = '{$db->real_escape_string($team)}',
@@ -193,7 +188,7 @@ if (!empty($address)) {
 		              user_id = {$update['message']['from']['id']},
 		              lat = '{$lat}',
 		              lon = '{$lon}',
-		              first_seen = NOW(),
+		              first_seen = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:00'),
 		              start_time = DATE_ADD(first_seen, INTERVAL {$countdown} MINUTE),
 		              end_time = DATE_ADD(start_time, INTERVAL {$endtime} MINUTE),
 		              gym_team = '{$db->real_escape_string($team)}',
@@ -268,4 +263,4 @@ if ($update['message']['chat']['type'] == 'private' || $update['callback_query']
     send_message($update['message']['chat']['id'], $text, $keys, ['reply_to_message_id' => $reply_to, 'reply_markup' => ['selective' => true, 'one_time_keyboard' => true], 'disable_web_page_preview' => 'true']);
 }
 
-exit;
+exit();

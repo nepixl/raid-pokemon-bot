@@ -83,3 +83,28 @@ function cleanup_log($val, $type = '*')
 {
     debug_log($val, $type, $cleanup_log = true);
 }
+
+/**
+ * Code performance/speed logging.
+ * @param $action
+ * @param $function
+ */
+function perf_log($action, $function)
+{
+    // Examples:
+    // perf_log('start', __FUNCTION__);
+    // perf_log('end', __FUNCTION__);
+
+    // Code performance measurement start
+    if($action == 'start') {
+        ${'time_start_' . $function} = microtime(true);
+    }
+
+    // Code performance measurement end
+    if($action == 'end') {
+        $time_now = microtime(true);
+        $time = $time_now - ${'time_start_' . $function};
+        $time = round(($time/1000000000), 2);
+        debug_log($function . ' took ' . $time . ' seconds', 'P:');
+    }
+}
