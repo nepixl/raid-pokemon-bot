@@ -36,6 +36,9 @@ if (!empty($answer)) {
 
     // Send vote response.
     send_response_vote($update, $data);
+} else {
+    // Send vote time first.
+    send_vote_time_first($update);
 }
 
 exit();

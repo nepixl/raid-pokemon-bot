@@ -73,19 +73,7 @@ if ($update['message']['chat']['type'] == 'private' || $update['callback_query']
             );
         }
 
-        $rs = my_query(
-            "
-            SELECT  *,
-                    UNIX_TIMESTAMP(end_time)                        AS ts_end,
-                    UNIX_TIMESTAMP(NOW())                           AS ts_now,
-                    UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-            FROM    raids
-              WHERE id = {$id}
-            "
-        );
-
-        $raid = $rs->fetch_assoc();
-
+        $raid = get_raid($id);
         $text = show_raid_poll($raid);
         $keys = keys_vote($raid);
 
@@ -93,4 +81,4 @@ if ($update['message']['chat']['type'] == 'private' || $update['callback_query']
     }
 }
 
-exit;
+exit();

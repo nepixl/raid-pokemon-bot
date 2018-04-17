@@ -40,7 +40,6 @@ if (!empty($answer)) {
     } else {
         // Get team.
         $team = 'extra_' . $data['arg'];
-debug_log("TEAM:" . $team);
 
         // Increase team extra people.
         my_query(
@@ -49,13 +48,16 @@ debug_log("TEAM:" . $team);
             SET       {$team} = {$team}+1
               WHERE   raid_id = {$data['id']}
                 AND   user_id = {$update['callback_query']['from']['id']}
-                AND   {$team} < 3
+                AND   {$team} < 5
             "
         );
     }
 
     // Send vote response.
     send_response_vote($update, $data);
+} else {
+    // Send vote time first.
+    send_vote_time_first($update);
 }
 
 exit();

@@ -23,20 +23,7 @@ my_query(
 
 if ($update['message']['chat']['type'] == 'private' || $update['callback_query']['message']['chat']['type'] == 'private') {
     // Get raid times.
-    $rs = my_query(
-        "
-        SELECT    *, 
-                              UNIX_TIMESTAMP(start_time)                      AS ts_start,
-                              UNIX_TIMESTAMP(end_time)                        AS ts_end,
-                              UNIX_TIMESTAMP(NOW())                           AS ts_now,
-                              UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-                FROM      raids
-                  WHERE   id = {$data['id']}
-        "
-    );
-
-    // Fetch the row.
-    $raid = $rs->fetch_assoc();
+    $raid = get_raid($data['id']);
 
     // Create the keys.
     $keys = [];

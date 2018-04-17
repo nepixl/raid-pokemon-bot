@@ -239,7 +239,7 @@ function answerInlineQuery($query_id, $contents)
         $results[] = [
             'type'                  => 'article',
             'id'                    => $query_id . $key,
-            'title'                 => ucfirst($row['pokemon']) . ' ' . unix2tz($row['ts_end'], $row['timezone']),
+            'title'                 => get_local_pokemon_name($row['pokemon']) . ' ' . getTranslation('from') . ' ' . unix2tz($row['ts_start'], $row['timezone'])  . ' ' . getTranslation('to') . ' ' . unix2tz($row['ts_end'], $row['timezone']),
             'description'           => strval($row['gym_name']),
             'input_message_content' => $input_message_content,
             'reply_markup'          => [
@@ -295,15 +295,15 @@ function editMessageText($id_val, $text_val, $markup_val, $chat_id = NULL, $merg
     }
 
     // Write to log.
-    debug_log($merge_args, 'K');
-    debug_log($response, 'K');
+    //debug_log($merge_args, 'K');
+    //debug_log($response, 'K');
 
     if (is_array($merge_args) && count($merge_args)) {
         $response = array_merge_recursive($response, $merge_args);
     }
 
     // Write to log.
-    debug_log($response, 'K');
+    //debug_log($response, 'K');
 
     // Encode response to json format.
     $json_response = json_encode($response);

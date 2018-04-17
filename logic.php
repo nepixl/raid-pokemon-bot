@@ -372,8 +372,8 @@ function get_raid($raid_id)
     $rs = my_query(
         "
         SELECT     raids.*, users.name,
-                   UNIX_TIMESTAMP(end_time)                        AS ts_end,
                    UNIX_TIMESTAMP(start_time)                      AS ts_start,
+                   UNIX_TIMESTAMP(end_time)                        AS ts_end,
                    UNIX_TIMESTAMP(NOW())                           AS ts_now,
                    UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
         FROM       raids
@@ -387,6 +387,36 @@ function get_raid($raid_id)
     $raid = $rs->fetch_assoc();
 
     return $raid;
+}
+
+/**
+ * Get last 20 active raids.
+ * @param $timezone
+ * @return array
+ */
+function get_active_raids($tz)
+{
+    // Get the raid data by id.
+    $rs = my_query(
+        "
+        SELECT     *,
+                   UNIX_TIMESTAMP(start_time)                      AS ts_start,
+                   UNIX_TIMESTAMP(end_time)                        AS ts_end,
+                   UNIX_TIMESTAMP(NOW())                           AS ts_now,
+                   UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
+        FROM       raids
+        WHERE      end_time>NOW()
+        AND        timezone='{$tz}'
+        ORDER BY   end_time ASC LIMIT 20
+        "
+    );
+
+    // Get the raids.
+    $raids = $rs->fetch_assoc();
+
+    debug_log($raids);
+
+    return $raids;
 }
 
 /**
@@ -444,6 +474,24 @@ function get_gym($id)
     $gym = $rs->fetch_assoc();
 
     return $gym;
+}
+
+/**
+ * Get pokemon info as string.
+ * @param $pokedex_id
+ * @return array
+ */
+function get_pokemon_info($pokedex_id)
+{
+    $info = '';
+    $info .= getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')</b>' . CR . CR;
+    $info .= getTranslation('pokedex_raid_level') . ': ' . get_raid_level($pokedex_id) . CR;
+    $poke_cp = get_formatted_pokemon_cp($pokedex_id);
+    $poke_weather = get_pokemon_weather($pokedex_id);
+    $info .= (empty($poke_cp)) ? (getTranslation('pokedex_cp') . CR) : $poke_cp . CR;
+    $info .= getTranslation('pokedex_weather') . ': ' . get_weather_icons($poke_weather) . CR . CR;
+
+    return $info;
 }
 
 /**
@@ -1639,31 +1687,6 @@ function keys_vote($raid)
     $now = $raid['ts_now'];
     $start_time = $raid['ts_start'];
 
-/*
-    $keys = [
-        [
-            [
-                'text'          => getTranslation('alone'),
-                'callback_data' => $raid['id'] . ':vote:1'
-            ],
-            [
-                'text'          => '+1',
-                'callback_data' => $raid['id'] . ':vote:2'
-            ],
-            [
-                'text'          => '+2',
-                'callback_data' => $raid['id'] . ':vote:3'
-            ],
-            [
-                'text'          => '+3',
-                'callback_data' => $raid['id'] . ':vote:4'
-            ],
-            [
-                'text'          => '+4',
-                'callback_data' => $raid['id'] . ':vote:5'
-            ]
-        ],
-*/
     $keys = [
         [
             [
@@ -1684,20 +1707,6 @@ function keys_vote($raid)
             ]
         ],
         [
-/*
-            [
-                'text'          => TEAM_B,
-                'callback_data' => $raid['id'] . ':vote_team:mystic'
-            ],
-            [
-                'text'          => TEAM_R,
-                'callback_data' => $raid['id'] . ':vote_team:valor'
-            ],
-            [
-                'text'          => TEAM_Y,
-                'callback_data' => $raid['id'] . ':vote_team:instinct'
-            ],
-*/
             [
                 'text'          => 'Team',
                 'callback_data' => $raid['id'] . ':vote_team:0'
@@ -1713,14 +1722,17 @@ function keys_vote($raid)
         ]
     ];
 
+    // Raid ended already.
     if ($end_time < $now) {
-        $keys[] = [
-            array(
-                'text'          => getTranslation('raid_done'),
-                'callback_data' => $raid['id'] . ':vote_time:' . (ceil(time() / 900) * 900)
-            )
+        $keys = [
+            [
+                [
+                    'text'          => getTranslation('raid_done'),
+                    'callback_data' => $raid['id'] . ':vote_refresh:0'
+                ]
+            ]
         ];
-
+    // Raid is still running.
     } else {
 	$timePerSlot = 60*RAID_SLOTS;
 	$timeBeforeEnd = 60*RAID_LAST_START;
@@ -1728,7 +1740,6 @@ function keys_vote($raid)
         // Old stuff, left for possible future use or in case of bugs:
         //for ($i = ceil($now / $timePerSlot) * $timePerSlot; $i <= ($end_time - $timeBeforeEnd); $i = $i + $timePerSlot) {
         for ($i = ceil($start_time / $timePerSlot) * $timePerSlot; $i <= ($end_time - $timeBeforeEnd); $i = $i + $timePerSlot) {
-
             if ($col++ >= 4) {
                 $keys[] = $keys_time;
                 $keys_time = [];
@@ -1854,35 +1865,24 @@ function keys_vote($raid)
                 $keys = array_merge($keys, $keys_poke);
             }
         }
-    }
 
-    $keys[] = [
-        [
-            'text'          => EMOJI_REFRESH,
-            'callback_data' => $raid['id'] . ':vote_refresh:0'
-        ],
-        [
-            'text'          => getTranslation('here'),
-            'callback_data' => $raid['id'] . ':vote_status:arrived'
-        ],
-        [
-            'text'          => getTranslation('done'),
-            'callback_data' => $raid['id'] . ':vote_status:raid_done'
-        ],
-        [
-            'text'          => getTranslation('cancellation'),
-            'callback_data' => $raid['id'] . ':vote_status:cancel'
-        ],
-    ];
-
-    if ($end_time < $now) {
-        $keys = [
+        $keys[] = [
             [
-                [
-                    'text'          => getTranslation('raid_done'),
-                    'callback_data' => $raid['id'] . ':vote_refresh:0'
-                ]
-            ]
+                'text'          => EMOJI_REFRESH,
+                'callback_data' => $raid['id'] . ':vote_refresh:0'
+            ],
+            [
+                'text'          => getTranslation('here'),
+                'callback_data' => $raid['id'] . ':vote_status:arrived'
+            ],
+            [
+                'text'          => getTranslation('done'),
+                'callback_data' => $raid['id'] . ':vote_status:raid_done'
+            ],
+            [
+                'text'          => getTranslation('cancellation'),
+                'callback_data' => $raid['id'] . ':vote_status:cancel'
+            ],
         ];
     }
 
@@ -1988,6 +1988,21 @@ function send_response_vote($update, $data, $new = false)
         // Answer the callback.
         answerCallbackQuery($update['callback_query']['id'], $msg);
     }
+
+    exit();
+}
+
+/**
+ * Send please vote for a time first.
+ * @param $update
+ */
+function send_vote_time_first($update)
+{
+    // Set the message.
+    $msg = getTranslation('vote_time_first');
+
+    // Answer the callback.
+    answerCallbackQuery($update['callback_query']['id'], $msg);
 
     exit();
 }
@@ -2480,22 +2495,47 @@ function show_raid_poll($raid)
     // Display time left.
     $time_left = floor($raid['t_left'] / 60);
     if ( strpos(str_pad($time_left % 60, 2, '0', STR_PAD_LEFT) , '-' ) !== false ) {
-        $tl_msg = '<b>' . getTranslation('raid_done') . '</b>';
+        $tl_msg = '<b>' . getTranslation('raid_done') . '</b>' . CR;
     } else {
 	// Replace $time_left with $tl_msg too
-        $tl_msg = ' — <b>' . getTranslation('still') . ' ' . floor($time_left / 60) . ':' . str_pad($time_left % 60, 2, '0', STR_PAD_LEFT) . 'h</b>';
+        $tl_msg = ' — <b>' . getTranslation('still') . ' ' . floor($time_left / 60) . ':' . str_pad($time_left % 60, 2, '0', STR_PAD_LEFT) . 'h</b>' . CR;
     }
 
     // Raid has not started yet - adjust time left message
     if ($raid['ts_now'] < $raid['ts_start']) {
-	$weekday_now = date('N', $raid['ts_now']);
+        // Now
+	$week_now = date('W', $raid['ts_now']);
+	$year_now = date('Y', $raid['ts_now']);
+
+        // Start
+	$week_start = date('W', $raid['ts_start']);
 	$weekday_start = date('N', $raid['ts_start']);
+	$day_start = date('j', $raid['ts_start']);
+	$month_start = date('m', $raid['ts_start']);
+	$year_start = date('Y', $raid['ts_start']);
         $raid_day = getTranslation('weekday_' . $weekday_start);
-	if ($weekday_now == $weekday_start) {
-	    $msg .= '<b>' . getTranslation('raid_egg_opens') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
-	} else {
-	    $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day . ' ' . getTranslation('raid_egg_opens_at') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
-	}
+        $raid_month = getTranslation('month_' . $month_start);
+
+        // Days until the raid starts
+        $date_now = new DateTime(date('Y-m-d', $raid['ts_now']));
+        $date_raid = new DateTime(date('Y-m-d', $raid['ts_start']));
+        $days_to_raid = $date_raid->diff($date_now)->format("%a");
+
+        // Is the raid in the same week?
+        if($week_now == $week_start && $date_now == $date_raid) {
+            // Output: Raid egg opens up 17:00
+            $msg .= '<b>' . getTranslation('raid_egg_opens') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
+        } else {
+            if($days_to_raid > 7) {
+                // Output: Raid egg opens on Friday, 13 April (2018)
+                $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day . ', ' . $day_start . ' ' . $raid_month . (($year_start > $year_now) ? $year_start : '');
+            } else {
+                // Output: Raid egg opens on Friday
+                $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day;
+            }
+            // Adds 'at 17:00' to the output.
+            $msg .= ' ' . getTranslation('raid_egg_opens_at') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
+        }
 
     // Raid has started and active or already ended
     } else {
@@ -2514,9 +2554,8 @@ function show_raid_poll($raid)
     // Add Ex-Raid Message if Pokemon is in Ex-Raid-List.
     $raid_level = get_raid_level($raid['pokemon']);
     if($raid_level == 'X') {
-        $msg.= CR . EMOJI_WARN . ' <b>' . getTranslation('exraid_pass') . '</b> ' . EMOJI_WARN;
+        $msg .= CR . EMOJI_WARN . ' <b>' . getTranslation('exraid_pass') . '</b> ' . EMOJI_WARN . CR;
     }
-    $msg .= CR;
 
     // Get counts and sums for the raid
     // 1 - Grouped by attend_time
@@ -2628,7 +2667,8 @@ function show_raid_poll($raid)
             // Add section/header for time
             if($previous_att_time != $current_att_time) {
                 // Add to message.
-                $msg .= CR . '<b>' . unix2tz($current_att_time, $raid['timezone']) . '</b>' . ' [' . ($cnt[$current_att_time]['count'] + $cnt[$current_att_time]['extra']) . ']';
+                $count_att_time_extrapeople = $cnt[$current_att_time]['extra_mystic'] + $cnt[$current_att_time]['extra_valor'] + $cnt[$current_att_time]['extra_instinct'];
+                $msg .= CR . '<b>' . unix2tz($current_att_time, $raid['timezone']) . '</b>' . ' [' . ($cnt[$current_att_time]['count'] + $count_att_time_extrapeople) . ']';
 
                 // Add attendance counts by team.
                 if ($cnt[$current_att_time]['count'] > 0) {
@@ -2661,12 +2701,13 @@ function show_raid_poll($raid)
 
                     // Attendance counts by team.
                     $current_att_time_poke = $cnt_pokemon[$current_att_time . '_' . $current_pokemon];
+                    $count_att_time_poke_extrapeople = $current_att_time_poke['extra_mystic'] + $current_att_time_poke['extra_valor'] + $current_att_time_poke['extra_instinct'];
                     $poke_count_mystic = $current_att_time_poke['count_mystic'] + $current_att_time_poke['extra_mystic'];
                     $poke_count_valor = $current_att_time_poke['count_valor'] + $current_att_time_poke['extra_valor'];
                     $poke_count_instinct = $current_att_time_poke['count_instinct'] + $current_att_time_poke['extra_instinct'];
 
                     // Add to message.
-                    $msg .= ' [' . ($current_att_time_poke['count']) . '] — ';
+                    $msg .= ' [' . ($current_att_time_poke['count'] + $count_att_time_poke_extrapeople) . '] — ';
                     $msg .= (($poke_count_mystic > 0) ? TEAM_B . $poke_count_mystic . '  ' : '');
                     $msg .= (($poke_count_valor > 0) ? TEAM_R . $poke_count_valor . '  ' : '');
                     $msg .= (($poke_count_instinct > 0) ? TEAM_Y . $poke_count_instinct . '  ' : '');
@@ -2689,13 +2730,21 @@ function show_raid_poll($raid)
             $previous_att_time = $current_att_time;
             $previous_pokemon = $current_pokemon; 
         }
+    } else {
+        // Proper format :)
+        if($raid_level != 'X') {
+            $msg .= CR;
+        }
     }
 
     // Get sums canceled/done for the raid
     $rs_cnt_cancel_done = my_query(
         "
         SELECT DISTINCT sum(raid_done = '1')   AS count_done,
-                        sum(cancel = '1')      AS count_cancel
+                        sum(cancel = '1')      AS count_cancel,
+                        sum(extra_mystic)           AS extra_mystic,
+                        sum(extra_valor)            AS extra_valor,
+                        sum(extra_instinct)         AS extra_instinct
         FROM            attendance
           WHERE         raid_id = {$raid['id']}
             AND         (raid_done = 1
@@ -2711,12 +2760,12 @@ function show_raid_poll($raid)
     while ($cnt_row_cancel_done = $rs_cnt_cancel_done->fetch_assoc()) {
         // Cancel count
         if($cnt_row_cancel_done['count_cancel'] > 0) {
-            $cnt_cancel_done['count_cancel'] = $cnt_row_cancel_done['count_cancel'];
+            $cnt_cancel_done['count_cancel'] = $cnt_row_cancel_done['count_cancel'] + $cnt_row_cancel_done['extra_mystic'] + $cnt_row_cancel_done['extra_valor'] + $cnt_row_cancel_done['extra_instinct'];
         }
 
         // Done count
         if($cnt_row_cancel_done['count_done'] > 0) {
-            $cnt_cancel_done['count_done'] = $cnt_row_cancel_done['count_done'];
+            $cnt_cancel_done['count_done'] = $cnt_row_cancel_done['count_done'] + $cnt_row_cancel_done['extra_mystic'] + $cnt_row_cancel_done['extra_valor'] + $cnt_row_cancel_done['extra_instinct'];
         }
     }
 
@@ -2775,7 +2824,7 @@ function show_raid_poll($raid)
 
     // Add no attendance found message.
     if ($cnt_all + $cnt_cancel_done['count_cancel'] + $cnt_cancel_done['count_done'] == 0) {
-        $msg .= CR . getTranslation('no_participants_yet') . CR;
+        $msg .= getTranslation('no_participants_yet') . CR;
     }
 
     // Display creator.
@@ -2808,13 +2857,38 @@ function show_raid_poll_small($raid)
     }
     // Start time and end time
     if(!empty($raid['ts_start']) && !empty($raid['ts_end'])) {
-        $weekday_now = date('N', $raid['ts_now']);
+        // Now
+        $week_now = date('W', $raid['ts_now']);
+        $year_now = date('Y', $raid['ts_now']);
+
+        // Start
+        $week_start = date('W', $raid['ts_start']);
         $weekday_start = date('N', $raid['ts_start']);
+        $day_start = date('j', $raid['ts_start']);
+        $month_start = date('m', $raid['ts_start']);
+        $year_start = date('Y', $raid['ts_start']);
         $raid_day = getTranslation('weekday_' . $weekday_start);
-        if ($weekday_now == $weekday_start) {
-            $msg .= '<b>' . getTranslation('from') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . ' ' . getTranslation('to') . ' ' . unix2tz($raid['ts_end'], $raid['timezone'])  . '</b>' . CR;
+        $raid_month = getTranslation('month_' . $month_start);
+
+        // Days until the raid starts
+        $date_now = new DateTime(date('Y-m-d', $raid['ts_now']));
+        $date_raid = new DateTime(date('Y-m-d', $raid['ts_start']));
+        $days_to_raid = $date_raid->diff($date_now)->format("%a");
+
+        // Is the raid in the same week?
+        if($week_now == $week_start && $date_now == $date_raid) {
+            // Output: Raid egg opens up 17:00
+            $msg .= '<b>' . getTranslation('raid_egg_opens') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
         } else {
-            $msg .= '<b>' . '— ' . $raid_day . ' ' . getTranslation('from') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . ' ' . getTranslation('to') . ' ' . unix2tz($raid['ts_end'], $raid['timezone'])  . '</b>' . CR;
+            if($days_to_raid > 7) {
+                // Output: Raid egg opens on Friday, 13 April (2018)
+                $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day . ', ' . $day_start . ' ' . $raid_month . (($year_start > $year_now) ? $year_start : '');
+            } else {
+                // Output: Raid egg opens on Friday
+                $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day;
+            }
+            // Adds 'at 17:00' to the output.
+            $msg .= ' ' . getTranslation('raid_egg_opens_at') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
         }
     }
     // Gym Name

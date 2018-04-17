@@ -128,21 +128,8 @@ if ($raid_id > 0) {
     // Debug log
     debug_log('Updated raid ID: ' . $raid_id);
 
-    // Build query.
-    $rs = my_query(
-        "
-        SELECT    *,
-                          UNIX_TIMESTAMP(end_time)                        AS ts_end,
-                          UNIX_TIMESTAMP(start_time)                      AS ts_start,
-                          UNIX_TIMESTAMP(NOW())                           AS ts_now,
-                          UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-            FROM      raids
-              WHERE   id = {$raid_id}
-        "
-    );
-
-    // Get row.
-    $raid = $rs->fetch_assoc();
+    // Get raid data.
+    $raid = get_raid($raid_id);
 
     //Debug
     // Set text.
@@ -204,24 +191,11 @@ $id = my_insert_id();
 // Write to log.
 debug_log('ID=' . $id);
 
-// Build query.
-$rs = my_query(
-    "
-    SELECT    *,
-		      UNIX_TIMESTAMP(end_time)                        AS ts_end,
-		      UNIX_TIMESTAMP(start_time)                      AS ts_start,
-		      UNIX_TIMESTAMP(NOW())                           AS ts_now,
-		      UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-	FROM      raids
-	  WHERE   id = {$id}
-    "
-);
+// Get raid data.
+$raid = get_raid($id)
 
-// Get row.
-$raid = $rs->fetch_assoc();
-
+// Send location.
 if (RAID_LOCATION == true) {
-    // Send location.
     //$loc = send_location($update['message']['chat']['id'], $raid['lat'], $raid['lon']);
     $loc = send_venue($update['message']['chat']['id'], $raid['lat'], $raid['lon'], "", !empty($raid['address']) ? $raid['address'] . ', ID = ' . $raid['id'] : $raid['pokemon'] . ', ' . $raid['id']); // DO NOT REMOVE " ID = " --> NEEDED FOR CLEANUP PREPARATION!
 

@@ -54,7 +54,7 @@
 		"PT-BR": "Próximo"
 	},
 	"reset" : {
-		"NL": "TRANSLATE",
+		"NL": "Reset",
 		"DE": "Reset",
 		"EN": "Reset",
 		"PT-BR": "TRANSLATE"
@@ -95,6 +95,12 @@
 		"DE": "Abstimmung aktualisiert",
 		"EN": "Vote updated",
 		"PT-BR": "Votos atualizados"
+	},
+	"vote_time_first" : {
+		"NL": "TRANSLATE",
+		"DE": "Zuerst für eine Uhrzeit abstimmen!",
+		"EN": "Vote for a time first!",
+		"PT-BR": "TRANSLATE"
 	},
 	"weekday_1" : {
 		"NL": "Maandag",
@@ -163,7 +169,7 @@
 		"PT-BR": "Abril"
 	},
 	"month_05" : {
-		"NL": "Meer",
+		"NL": "Maart",
 		"DE": "Mai",
 		"EN": "May",
 		"PT-BR": "Mais"
@@ -589,13 +595,13 @@
 		"PT-BR": "Pokemon salvo "
 	},
 	"pokedex_start" : {
-		"NL": "TRANSLATE",
+		"NL": "Raid bazen lijst aanpassen",
 		"DE": "Raid Boss Pokemon anzeigen und bearbeiten",
 		"EN": "List and edit raid boss pokemon",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_raid_pokemon" : {
-		"NL": "TRANSLATE",
+		"NL": "Lijst met Pokemon raid bazen",
 		"DE": "Raid Boss Pokemon anzeigen",
 		"EN": "List raid boss pokemon",
 		"PT-BR": "TRANSLATE"
@@ -613,25 +619,25 @@
 		"PT-BR": "Erro! Nenhum pokemon encontrado!"
 	},
 	"pokedex_edit_pokemon" : {
-		"NL": "TRANSLATE",
+		"NL": "Selecteer een Pokemon Raid baas om hem te bewerken",
 		"DE": "Zum Bearbeiten Pokemon Raid Boss auswählen:",
 		"EN": "Select pokemon raid boss to edit:",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_raid_level" : {
-		"NL": "TRANSLATE",
+		"NL": "Raid level",
 		"DE": "Raid Level",
-		"EN": "Raid level:",
+		"EN": "Raid level",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_new_raid_level" : {
-		"NL": "TRANSLATE",
+		"NL": "Nieuw Raid level",
 		"DE": "Neues Raid Level",
 		"EN": "New raid level",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_select_action" : {
-		"NL": "TRANSLATE",
+		"NL": "Selecteer een eigenschap om deze aan te passen:",
 		"DE": "Eigenschaft zum Ändern auswählen:",
 		"EN": "Select feature to be changed:",
 		"PT-BR": "TRANSLATE"
@@ -655,37 +661,37 @@
 		"PT-BR": "Max CP"
 	},
 	"pokedex_min_weather_cp" : {
-		"NL": "TRANSLATE",
+		"NL": "Min boosted CP",
 		"DE": "Min boosted WP",
 		"EN": "Min boosted CP",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_max_weather_cp" : {
-		"NL": "TRANSLATE",
+		"NL": "Max boosted CP",
 		"DE": "Max boosted WP",
 		"EN": "Max boosted CP",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_current_cp" : {
-		"NL": "TRANSLATE",
+		"NL": "Actuele CP:",
 		"DE": "Aktuelle WP:",
 		"EN": "Current CP:",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_weather" : {
-		"NL": "TRANSLATE",
+		"NL": "Weer",
 		"DE": "Wetter",
 		"EN": "Weather",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_current_weather" : {
-		"NL": "TRANSLATE",
+		"NL": "Actuele weer:",
 		"DE": "Aktuelles Wetter:",
 		"EN": "Current weather:",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_new_weather" : {
-		"NL": "TRANSLATE",
+		"NL": "Nieuw weer:",
 		"DE": "Neues Wetter:",
 		"EN": "New weather:",
 		"PT-BR": "TRANSLATE"

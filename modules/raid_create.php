@@ -118,20 +118,7 @@ if ($raid_id != 0) {
     $raid_id = ($raid_status == "start") ? (ltrim($raid_id, '-')) : $raid_id;
 
     // Get the raid data by id.
-    $rs = my_query(
-        "
-        SELECT  *,
-                UNIX_TIMESTAMP(end_time)                        AS ts_end,
-                UNIX_TIMESTAMP(start_time)                      AS ts_start,
-                UNIX_TIMESTAMP(NOW())                           AS ts_now,
-                UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-        FROM    raids
-          WHERE id = {$raid_id}
-        "
-    );
-
-    // Fetch raid data.
-    $raid = $rs->fetch_assoc(); 
+    $raid = get_raid($raid_id);
 
     // Create the keys.
     if ($raid_status == "end") {
@@ -222,7 +209,7 @@ if (!empty($fullAddress)) {
 			          lat = '{$lat}',
 			          lon = '{$lon}',
 			          first_seen = NOW(),
-			          start_time = NOW(),
+			          start_time = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:00'),
 				  gym_name = '{$db->real_escape_string($gym_name)}',
 			          timezone = '{$tz}',
 			          address = '{$db->real_escape_string($fullAddress)}'
@@ -239,7 +226,7 @@ if (!empty($fullAddress)) {
 			          lat = '{$lat}',
 			          lon = '{$lon}',
 			          first_seen = NOW(),
-			          start_time = NOW(),
+			          start_time = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:00'),
 				  gym_name = '{$db->real_escape_string($gym_name)}',
 			          timezone = '{$tz}'
         "
