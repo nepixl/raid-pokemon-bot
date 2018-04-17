@@ -33,23 +33,25 @@ Sharing raid polls can be restricted, so only moderators or users or both can be
 
 Therefore it is possible, via a comma-separated list, to specify the chats the raid polls can be shared with.
 
+For the ID of a chat either forward a message from the chat to a bot like @RawDataBot or search the web for another method ;)
+
 A few examples:
 
-#### Restrict sharing for moderators and users to chats -100111222333 and @RaidChat
+#### Restrict sharing for moderators and users to chats -100111222333 and -100444555666
 
 `define('SHARE_MODERATORS', false);`
 
 `define('SHARE_USERS', false);`
 
-`define('SHARE_CHATS', '-100111222333,@RaidChat');`
+`define('SHARE_CHATS', '-100111222333,-100444555666');`
 
-#### Allow moderators to share with any chat, restrict sharing for users to chat @RaidChat
+#### Allow moderators to share with any chat, restrict sharing for users to chat -100111222333
 
 `define('SHARE_MODERATORS', true);`
 
 `define('SHARE_USERS', false);`
 
-`define('SHARE_CHATS', '@RaidChat');`
+`define('SHARE_CHATS', '-100111222333');`
 
 ## Raid times
 
@@ -73,7 +75,7 @@ Authentication against the proxy server by username and password is currently no
 
 Create database named for your bot ID (first part of your Telegram bot token)
 
-Set database password to second part of your TG bot token
+Set database password to second part of your Telegram bot token
 
 Only allow localhost access
 
@@ -189,7 +191,7 @@ As a member of `BOT_ACCESS` you can create raid polls, update your own raid poll
 Telegram Users can only vote on raid polls, but have no access to other bot functions (unless you configured it for public access).
 
 
-| Access:    |            |                                  | MAINTAINER_ID | BOT_ADMINS | BOT_ACCESS | BOT_ACCESS | Telegram |
+| Access:   |            |                                  | MAINTAINER_ID | BOT_ADMINS | BOT_ACCESS | BOT_ACCESS | Telegram |
 |-----------|------------|----------------------------------|---------------|------------|------------|------------|----------|
 | Database: |            |                                  |               |            | Moderator  | User       | User     |
 |           | **Area**   | **Action and /command**          |               |            |            |            |          |
@@ -209,6 +211,8 @@ Telegram Users can only vote on raid polls, but have no access to other bot func
 |           | Moderators | List `/mods`                     | Yes           | Yes        |            |            |          |
 |           |            | Add `/mods`                      | Yes           | Yes        |            |            |          |
 |           |            | Delete `/mods`                   | Yes           | Yes        |            |            |          |
+|           |            |                                  |               |            |            |            |          |
+|           | Pokedex    | Manage raid pokemon `/pokedex`   | Yes           | Yes        |            |            |          |
 |           |            |                                  |               |            |            |            |          |
 |           | Help       | Show `/help`                     | Yes           | Yes        | Yes        | Yes        |          |
 
@@ -247,9 +251,9 @@ Create a new raid by gomap-notifier or other input. The raid command expects 8 p
 
 Additionally the raid command checks for existing raids, so sending the same command multiple times to the bot will result in an update of the pokemon raid boss and gym team and won't create duplicate raids.
 
-Parameters: Pokemon raid boss, latitude, longitude, raid duration in minutes, gym team, gym name, district or street, district or street, raid pre-hatch egg countdown in minutes (optional)
+Parameters: Pokemon raid boss id, latitude, longitude, raid duration in minutes, gym team, gym name, district or street, district or street, raid pre-hatch egg countdown in minutes (optional)
 
-Example input: `/raid Entei,52.514545,13.350095,60,Mystic,Siegessäule,Großer Stern,10557 Berlin,30`
+Example input: `/raid 244,52.514545,13.350095,60,Mystic,Siegessäule,Großer Stern,10557 Berlin,30`
 
 
 #### Command: /pokemon
@@ -257,6 +261,11 @@ Example input: `/raid Entei,52.514545,13.350095,60,Mystic,Siegessäule,Großer S
 Update pokemon of an existing raid poll. With this command you can change the pokemon raid boss from e.g. "Level 5 Egg" to "Lugia" once the egg has hatched.
 
 Based on your access to the bot, you may can only change the pokemon raid boss of raid polls you created yourself and cannot modify the pokemon of raid polls from other bot users.
+
+
+#### Command: /pokedex
+
+Show and update any pokemon raid boss. You can change the raid level (select raid level 0 to disable a raid boss), pokemon CP values and weather information of any pokemon raid boss.
 
 
 #### Command: /new
@@ -294,10 +303,10 @@ The bot will set the name of gym to your input.
 Example input: `/gym Siegessäule`
 
 # Debugging
+
 Check your bot logfile and other related log files, e.g. apache/httpd log, php log, and so on.
 
 # TODO:
 
 * New gyms: Adding gyms to database without creating a raid via /raid
-* Preferred pokemon raid boss: When multiple level 5 raids are available, e.g. Lugia and Zapdos, add buttons to tell that you're coming a) only if Lugia, b) only if Zapdos, c) independently of the pokemon
 * Delete incomplete raids automatically: When a bot user starts to create a raid via /start, but does not finish the raid creation, incomplete raid data is stored in the raids table. A method to automatically delete them without interfering with raids just being created would be nice.
