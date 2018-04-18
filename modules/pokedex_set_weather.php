@@ -32,8 +32,17 @@ if($action == 'add') {
     // Build callback message string.
     $callback_response = 'OK';
 
-    // Exit key
-    $keys = universal_key($keys, "0", "exit", "0", getTranslation('abort'));
+    // Back and abort.
+    $keys[] = [
+        [
+            'text'          => getTranslation('back'),
+            'callback_data' => $pokedex_id . ':pokedex_edit_pokemon:0'
+        ],
+        [
+            'text'          => getTranslation('abort'),
+            'callback_data' => '0:exit:0'
+        ]
+    ];
 
     // Set the message.
     $msg = getTranslation('raid_boss') . ': ' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')' . CR . CR;
@@ -51,8 +60,22 @@ if($action == 'add') {
             "
         );
 
-    // Remove keys.
-    $keys = [];
+    // Init empty keys array.
+    $keys = array();
+
+    // Back to pokemon and done keys.
+    $keys = [
+        [
+            [
+                'text'          => getTranslation('back') . ' (' . get_local_pokemon_name($pokedex_id) . ')',
+                'callback_data' => $pokedex_id . ':pokedex_edit_pokemon:0'
+            ],
+            [
+                'text'          => getTranslation('done'),
+                'callback_data' => '0:exit:1'
+            ]
+        ]
+    ];
 
     // Build callback message string.
     $callback_response = getTranslation('pokemon_saved') . ' ' . get_local_pokemon_name($pokedex_id);

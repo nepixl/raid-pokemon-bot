@@ -51,8 +51,17 @@ if($data['arg'] == "setlevel") {
         ];
     }
 
-    // Exit key
-    $keys = universal_key($keys, "0", "exit", "0", getTranslation('abort'));
+    // Back and abort.
+    $keys[] = [
+        [
+            'text'          => getTranslation('back'),
+            'callback_data' => $pokedex_id . ':pokedex_edit_pokemon:0'
+        ],
+        [
+            'text'          => getTranslation('abort'),
+            'callback_data' => '0:exit:0'
+        ]
+    ];
 
     // Build callback message string.
     $callback_response = getTranslation('select_raid_level');
@@ -70,8 +79,22 @@ if($data['arg'] == "setlevel") {
             "
         );
 
-    // Remove keys.
-    $keys = [];
+    // Init empty keys array.
+    $keys = array();
+
+    // Back to pokemon and done keys.
+    $keys = [
+        [
+            [
+                'text'          => getTranslation('back') . ' (' . get_local_pokemon_name($pokedex_id) . ')',
+                'callback_data' => $pokedex_id . ':pokedex_edit_pokemon:0'
+            ],
+            [
+                'text'          => getTranslation('done'),
+                'callback_data' => '0:exit:1'
+            ]
+        ]
+    ];
 
     // Build callback message string.
     $callback_response = getTranslation('pokemon_saved') . ' ' . get_local_pokemon_name($pokedex_id);

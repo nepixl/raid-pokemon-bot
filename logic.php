@@ -477,12 +477,17 @@ function get_gym($id)
 }
 
 /**
- * Get pokemon info as string.
+ * Get pokemon info as formatted string.
  * @param $pokedex_id
  * @return array
  */
 function get_pokemon_info($pokedex_id)
 {
+    /** Example:
+     * Raid boss: Mewtwo (#ID)
+     * Weather: Icons
+     * CP: CP values (Boosted CP values)
+    */
     $info = '';
     $info .= getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')</b>' . CR . CR;
     $info .= getTranslation('pokedex_raid_level') . ': ' . get_raid_level($pokedex_id) . CR;

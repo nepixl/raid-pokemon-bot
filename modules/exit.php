@@ -10,7 +10,7 @@ debug_log('exit()');
 $keys = [];
 
 // Build message string.
-$msg = getTranslation('action_aborted');
+$msg = ($data['arg'] == 1) ? (getTranslation('done') . '!') : (getTranslation('action_aborted'));
 
 // Edit the message.
 edit_message($update, $msg, $keys);
