@@ -859,6 +859,7 @@ function raid_edit_start_keys($id)
             FROM      pokemon
             WHERE     raid_level != '0'
             GROUP BY  raid_level
+            ORDER BY  FIELD(raid_level, '5', '4', '3', '2', '1', 'X')
             "
         );
 
@@ -2337,7 +2338,9 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
                             sum(team = 'valor')         AS count_valor,
                             sum(team = 'instinct')      AS count_instinct,
                             sum(team IS NULL)           AS count_no_team,
-                            sum(extra_people)           AS extra
+                            sum(extra_mystic)           AS extra_mystic,
+                            sum(extra_valor)            AS extra_valor,
+                            sum(extra_instinct)         AS extra_instinct
             FROM            attendance
               WHERE         raid_id = {$raid_id}
                 AND         attend_time IS NOT NULL
@@ -2351,10 +2354,10 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
         // Add to message.
         if ($att['count'] > 0) {
             $msg .= EMOJI_GROUP . '<b> ' . ($att['count'] + $att['extra']) . '</b> — ';
-            $msg .= (($att['count_mystic'] > 0) ? TEAM_B . $att['count_mystic'] . '  ' : '');
-            $msg .= (($att['count_valor'] > 0) ? TEAM_R . $att['count_valor'] . '  ' : '');
-            $msg .= (($att['count_instinct'] > 0) ? TEAM_Y . $att['count_instinct'] . '  ' : '');
-            $msg .= ((($att['count_no_team'] + $att['extra']) > 0) ? TEAM_UNKNOWN . ($att['count_no_team'] + $att['extra']) : '');
+            $msg .= ((($att['count_mystic'] + $att['extra_mystic']) > 0) ? TEAM_B . ($att['count_mystic'] + $att['extra_mystic']) . '  ' : '');
+            $msg .= ((($att['count_valor'] + $att['extra_valor']) > 0) ? TEAM_R . ($att['count_valor'] + $att['extra_valor']) . '  ' : '');
+            $msg .= ((($att['count_instinct'] + $att['extra_instinct']) > 0) ? TEAM_Y . ($att['count_instinct'] + $att['extra_instinct']) . '  ' : '');
+            $msg .= (($att['count_no_team'] > 0) ? TEAM_UNKNOWN . $att['count_no_team'] : '');
             $msg .= CR;
         }
 
