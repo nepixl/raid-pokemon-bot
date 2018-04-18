@@ -67,8 +67,10 @@ if($data['arg'] == "setlevel") {
     $callback_response = getTranslation('select_raid_level');
 
     // Set the message.
-    $msg = '<b>' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')</b>' . CR;
-    $msg .= getTranslation('select_raid_level') . ':';
+    $msg = getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')</b>' . CR;
+    $old_raid_level = get_raid_level($pokedex_id);
+    $msg .= getTranslation('pokedex_current_raid_level') . ' ' . getTranslation($old_raid_level . 'stars') . CR . CR;
+    $msg .= '<b>' . getTranslation('pokedex_new_raid_level') . ':</b>';
 } else {
     // Update raid level of pokemon.
     $rs = my_query(

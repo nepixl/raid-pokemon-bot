@@ -45,7 +45,7 @@ if($action == 'add') {
     ];
 
     // Set the message.
-    $msg = getTranslation('raid_boss') . ': ' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')' . CR . CR;
+    $msg = getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')</b>' . CR;
     $msg .= getTranslation('pokedex_current_weather') . get_weather_icons($old_weather) . CR . CR;
     $msg .= '<b>' . getTranslation('pokedex_new_weather') . get_weather_icons($new_weather) . '</b>';
 

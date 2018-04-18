@@ -61,7 +61,7 @@ if($action == 'add') {
     $callback_response = 'OK';
 
     // Set the message.
-    $msg = getTranslation('raid_boss') . ': ' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')' . CR;
+    $msg = getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')</b>' . CR;
     $msg .= getTranslation('pokedex_current_cp') . ' ' . $current_cp . CR . CR;
     $msg .= '<b>' .getTranslation('pokedex_' . $cp_type . $boosted) . ': ' . $cp_value . '</b>';
 

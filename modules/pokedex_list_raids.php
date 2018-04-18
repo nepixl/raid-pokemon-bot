@@ -43,16 +43,39 @@ foreach ($levels as $id => $lv) {
         $msg .= '<b>' . getTranslation($lv . 'stars') . ':</b>' . CR ;
     }
     // Add pokemon with id and name.
-    $msg .= get_local_pokemon_name($id) . ' (#' . $id . ')' . CR;
+    $poke_name = get_local_pokemon_name($id);
+    $msg .= $poke_name . ' (#' . $id . ')' . CR;
+
+    // Add button to edit pokemon.
+    $keys[] = array(
+        'text'          => $poke_name,
+        'callback_data' => $id . ':pokedex_edit_pokemon:0'
+    );
 
     // Prepare next run.
     $previous = $current;
 }
 
-// Remove the keys.
-$keys = [];
+if(!empty($msg)) {
+    // Set the message.
+    $msg .= CR . '<b>' . getTranslation('pokedex_edit_pokemon') . '</b>';
+    // Set the keys.
+    $keys = inline_key_array($keys, 3);
 
-// Set the message.
+    // Done key.
+    $keys[] = [
+        [
+            'text'          => getTranslation('done'),
+            'callback_data' => '0:exit:1'
+        ]
+    ];
+} else {
+    // Set empty keys.
+    $keys = [];
+
+    // Set the message.
+    $msg = getTranslation('pokedex_not_found');
+}
 
 // Edit message.
 edit_message($update, $msg, $keys, false);

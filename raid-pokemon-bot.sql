@@ -66,7 +66,7 @@ CREATE TABLE `pokemon` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `pokedex_id` int(10) unsigned NOT NULL,
   `pokemon_name` varchar(12) DEFAULT NULL,
-  `raid_level` enum('0','1','2','3','4','5','X') DEFAULT NULL,
+  `raid_level` enum('0','1','2','3','4','5','X') DEFAULT '0',
   `min_cp` int(10) unsigned NOT NULL,
   `max_cp` int(10) unsigned NOT NULL,
   `min_weather_cp` int(10) unsigned NOT NULL,

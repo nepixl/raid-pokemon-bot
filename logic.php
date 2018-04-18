@@ -448,7 +448,7 @@ function get_local_pokemon_name($pokedex_id)
             );
 
         while ($pokemon = $rs->fetch_assoc()) {
-            $pokemon_name = ucfirst($pokemon['pokemon_name']);
+            $pokemon_name = $pokemon['pokemon_name'];
         }
     }
 
@@ -490,9 +490,10 @@ function get_pokemon_info($pokedex_id)
     */
     $info = '';
     $info .= getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($pokedex_id) . ' (#' . $pokedex_id . ')</b>' . CR . CR;
-    $info .= getTranslation('pokedex_raid_level') . ': ' . get_raid_level($pokedex_id) . CR;
+    $poke_raid_level = get_raid_level($pokedex_id);
     $poke_cp = get_formatted_pokemon_cp($pokedex_id);
     $poke_weather = get_pokemon_weather($pokedex_id);
+    $info .= getTranslation('pokedex_raid_level') . ': ' . getTranslation($poke_raid_level . 'stars') . CR;
     $info .= (empty($poke_cp)) ? (getTranslation('pokedex_cp') . CR) : $poke_cp . CR;
     $info .= getTranslation('pokedex_weather') . ': ' . get_weather_icons($poke_weather) . CR . CR;
 
@@ -776,7 +777,7 @@ function edit_moderator_keys($limit, $action)
     if ($limit > 0) {
         $new_limit = $limit - $entries;
         $empty_back_key = array();
-        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . " (-" . $entries . ")");
+        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . "(-" . $entries . ")");
         $key_back = $key_back[0];
         $keys = array_merge($key_back, $keys);
     }

@@ -79,7 +79,11 @@ Set database password to second part of your Telegram bot token
 
 Only allow localhost access
 
-Import `raid-pokemon-bot.sql` as default DB structure
+Import `raid-pokemon-bot.sql` as default DB structure and `raid-boss-pokedex.sql` for the raid bosses.
+
+Command DB structure: `mysql -u USERNAME -p DATABASENAME < raid-pokemon-bot.sql`
+
+Command raid bosses: `mysql -u USERNAME -p DATABASENAME < raid-boss-pokedex.sql`
 
 ## Webhooks
 
@@ -310,3 +314,15 @@ Check your bot logfile and other related log files, e.g. apache/httpd log, php l
 
 * New gyms: Adding gyms to database without creating a raid via /raid
 * Delete incomplete raids automatically: When a bot user starts to create a raid via /start, but does not finish the raid creation, incomplete raid data is stored in the raids table. A method to automatically delete them without interfering with raids just being created would be nice.
+
+# SQL Files
+
+The following commands are used to create the raid-pokemon-bot.sql and raid-boss-pokedex.sql files. Make sure to replace USERNAME and DATABASENAME before executing the commands.
+
+#### raid-pokemon-bot.sql
+
+Export command: `mysqldump -u USERNAME -p --no-data --skip-add-drop-table --skip-add-drop-database --skip-comments DATABASENAME | sed 's/ AUTO_INCREMENT=[0-9]*\b/ AUTO_INCREMENT=100/' > raid-pokemon-bot.sql`
+
+#### raid-boss-pokedex.sql
+
+Export command: `mysqldump -u root -p --skip-extended-insert --skip-comments dev_bot pokemon > raid-boss-pokedex.sql`

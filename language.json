@@ -636,6 +636,12 @@
 		"EN": "New raid level",
 		"PT-BR": "TRANSLATE"
 	},
+	"pokedex_current_raid_level" : {
+		"NL": "Actuele Raid level:",
+		"DE": "Aktuelles Raid Level:",
+		"EN": "Current raid level:",
+		"PT-BR": "TRANSLATE"
+	},
 	"pokedex_select_action" : {
 		"NL": "Selecteer een eigenschap om deze aan te passen:",
 		"DE": "Eigenschaft zum Ändern auswählen:",
