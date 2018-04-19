@@ -105,6 +105,9 @@ CREATE TABLE `users` (
   `team` enum('mystic','valor','instinct') DEFAULT NULL,
   `moderator` tinyint(1) unsigned DEFAULT NULL,
   `timezone` int(10) DEFAULT NULL,
+  `lang` varchar(5) DEFAULT NULL,
+  `alert_lat` varchar(12) DEFAULT NULL,
+  `alert_lon` varchar(12) DEFAULT NULL,
   `level` int(10) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `i_userid` (`user_id`)
