@@ -773,50 +773,54 @@ function edit_moderator_keys($limit, $action)
             'callback_data' => '0:mods_' . $action . ':' . $mod['user_id']
         );
     }
+
+    // Empty backs and next keys
+    $keys_back = array();
+    $keys_next = array();
+
     // Add back key.
     if ($limit > 0) {
         $new_limit = $limit - $entries;
         $empty_back_key = array();
-        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . "(-" . $entries . ")");
-        $key_back = $key_back[0];
-        $keys = array_merge($key_back, $keys);
+        $back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . " (-" . $entries . ")");
+        $keys_back[] = $back[0][0];
     }
 
     // Add skip back key.
     if ($limit - $skip > 0) {
         $new_limit = $limit - $skip - $entries;
         $empty_back_key = array();
-        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . "(-" . $skip . ")");
-        $key_back = $key_back[0];
-        $keys = array_merge($key_back, $keys);
+        $back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . " (-" . $skip . ")");
+        $keys_back[] = $back[0][0];
     }
 
     // Add next key.
     if (($limit + $entries) < $count) {
         $new_limit = $limit + $entries;
         $empty_next_key = array();
-        $key_next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . "(+" . $entries . ")");
-        $key_next = $key_next[0];
-        $keys = array_merge($keys, $key_next);
+        $next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . " (+" . $entries . ")");
+        $keys_next[] = $next[0][0];
     }
 
     // Add skip next key.
     if (($limit + $skip + $entries) < $count) {
         $new_limit = $limit + $skip + $entries;
         $empty_next_key = array();
-        $key_next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . "(+" . $skip . ")");
-        $key_next = $key_next[0];
-        $keys = array_merge($keys, $key_next);
+        $next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . " (+" . $skip . ")");
+        $keys_next[] = $next[0][0];
     }
 
     // Exit key
     $empty_exit_key = array();
     $key_exit = universal_key($empty_exit_key, "0", "exit", "0", getTranslation('abort'));
-    $key_exit = $key_exit[0];
-    $keys = array_merge($keys, $key_exit);
 
     // Get the inline key array.
     $keys = inline_key_array($keys, 1);
+    $keys_back = inline_key_array($keys_back, 2);
+    $keys_next = inline_key_array($keys_next, 2);
+    $keys = array_merge($keys_back, $keys);
+    $keys = array_merge($keys, $keys_next);
+    $keys = array_merge($keys, $key_exit);
 
     return $keys;
 }
@@ -950,7 +954,7 @@ function raid_edit_gym_keys($first)
  * @param $action
  * @return array
  */
-function edit_pokedex_keys($limit, $action)
+function edit_pokedex_keys($limit, $action, $all_pokemon = true)
 {
     // Number of entries to display at once.
     $entries = 10;
@@ -964,8 +968,37 @@ function edit_pokedex_keys($limit, $action)
     // Init empty keys array.
     $keys = array();
 
-    // Get pokemon from database
-    $rs = my_query(
+    // Get only pokemon with CP and weather values from database
+    if($all_pokemon == false) {
+        $rs = my_query(
+            "
+            SELECT    pokedex_id
+            FROM      pokemon
+            WHERE     min_cp > 0
+              AND     max_cp > 0
+              AND     min_weather_cp > 0
+              AND     max_weather_cp > 0
+              AND     weather > 0
+            ORDER BY  pokedex_id
+            LIMIT     $limit, $entries
+            "
+        );
+
+        // Number of entries
+        $cnt = my_query(
+            "
+            SELECT    COUNT(*)
+            FROM      pokemon
+            WHERE     min_cp > 0
+              AND     max_cp > 0
+              AND     min_weather_cp > 0
+              AND     max_weather_cp > 0
+              AND     weather > 0
+            "
+        );
+    // Get all pokemon from database
+    } else {
+        $rs = my_query(
             "
             SELECT    pokedex_id
             FROM      pokemon
@@ -974,14 +1007,14 @@ function edit_pokedex_keys($limit, $action)
             "
         );
 
-    // Number of entries
-    $cnt = my_query(
+        // Number of entries
+        $cnt = my_query(
             "
             SELECT    COUNT(*)
             FROM      pokemon
             "
         );
-
+    }
     // Number of database entries found.
     $sum = $cnt->fetch_row();
     $count = $sum['0'];
@@ -995,50 +1028,53 @@ function edit_pokedex_keys($limit, $action)
         );
     }
 
+    // Empty backs and next keys
+    $keys_back = array();
+    $keys_next = array();
+
     // Add back key.
     if ($limit > 0) {
         $new_limit = $limit - $entries;
         $empty_back_key = array();
-        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . "(-" . $entries . ")");
-        $key_back = $key_back[0];
-        $keys = array_merge($key_back, $keys);
+        $back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . " (-" . $entries . ")");
+        $keys_back[] = $back[0][0];
     }
 
     // Add skip back key.
     if ($limit - $skip > 0) {
         $new_limit = $limit - $skip - $entries;
         $empty_back_key = array();
-        $key_back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . "(-" . $skip . ")");
-        $key_back = $key_back[0];
-        $keys = array_merge($key_back, $keys);
+        $back = universal_key($empty_back_key, $new_limit, $module, $action, getTranslation('back') . " (-" . $skip . ")");
+        $keys_back[] = $back[0][0];
     }
 
     // Add next key.
     if (($limit + $entries) < $count) {
         $new_limit = $limit + $entries;
         $empty_next_key = array();
-        $key_next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . "(+" . $entries . ")");
-        $key_next = $key_next[0];
-        $keys = array_merge($keys, $key_next);
+        $next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . " (+" . $entries . ")");
+        $keys_next[] = $next[0][0];
     }
 
     // Add skip next key.
     if (($limit + $skip + $entries) < $count) {
         $new_limit = $limit + $skip + $entries;
         $empty_next_key = array();
-        $key_next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . "(+" . $skip . ")");
-        $key_next = $key_next[0];
-        $keys = array_merge($keys, $key_next);
+        $next = universal_key($empty_next_key, $new_limit, $module, $action, getTranslation('next') . " (+" . $skip . ")");
+        $keys_next[] = $next[0][0];
     }
 
     // Exit key
     $empty_exit_key = array();
     $key_exit = universal_key($empty_exit_key, "0", "exit", "0", getTranslation('abort'));
-    $key_exit = $key_exit[0];
-    $keys = array_merge($keys, $key_exit);
 
     // Get the inline key array.
     $keys = inline_key_array($keys, 1);
+    $keys_back = inline_key_array($keys_back, 2);
+    $keys_next = inline_key_array($keys_next, 2);
+    $keys = array_merge($keys_back, $keys);
+    $keys = array_merge($keys, $keys_next);
+    $keys = array_merge($keys, $key_exit);
 
     return $keys;
 }
@@ -1268,6 +1304,9 @@ function universal_key($keys, $id, $action, $arg, $text = '0')
                 'callback_data' => $id . ':' . $action . ':' . $arg
             )
         ];
+
+    // Write to log.
+    //debug_log($keys);
 
     return $keys;
 }
@@ -1879,7 +1918,7 @@ function keys_vote($raid)
                 'callback_data' => $raid['id'] . ':vote_refresh:0'
             ],
             [
-                'text'          => getTranslation('here'),
+                'text'          => EMOJI_HERE . getTranslation('here'),
                 'callback_data' => $raid['id'] . ':vote_status:arrived'
             ],
             [
@@ -2297,6 +2336,7 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
         $now = $raids_active[$raid_id]['ts_now'];
         $tz = $raids_active[$raid_id]['timezone'];
         $start_time = $raids_active[$raid_id]['ts_start'];
+        $end_time = $raids_active[$raid_id]['ts_end'];
         $time_left = floor($raids_active[$raid_id]['t_left'] / 60);
 
         // Build message and add each gym in this format - link gym_name to raid poll chat_id + message_id if possible
@@ -2315,15 +2355,39 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
 
         // Raid has not started yet - adjust time left message
         if ($now < $start_time) {
-            $weekday_now = date('N', $now);
-            $weekday_start = date('N', $start_time);
-            $raid_day = getTranslation('weekday_' . $weekday_start);
-            if ($weekday_now == $weekday_start) {
-                $msg .= getTranslation('raid_egg_opens') . ' ' . unix2tz($start_time, $tz) . CR;
-            } else {
-                $msg .= getTranslation('raid_egg_opens_day') . ' ' .  $raid_day . ' ' . getTranslation('raid_egg_opens_at') . ' ' . unix2tz($start_time, $tz) . CR;
-            }
+            // Now
+            $week_now = date('W', $now);
+            $year_now = date('Y', $now);
 
+            // Start
+            $week_start = date('W', $start_time);
+            $weekday_start = date('N', $start_time);
+            $day_start = date('j', $start_time);
+            $month_start = date('m', $start_time);
+            $year_start = date('Y', $start_time);
+            $raid_day = getTranslation('weekday_' . $weekday_start);
+            $raid_month = getTranslation('month_' . $month_start);
+
+            // Days until the raid starts
+            $date_now = new DateTime(date('Y-m-d', $now));
+            $date_raid = new DateTime(date('Y-m-d', $start_time));
+            $days_to_raid = $date_raid->diff($date_now)->format("%a");
+
+            // Is the raid in the same week?
+            if($week_now == $week_start && $date_now == $date_raid) {
+                // Output: Raid egg opens up 17:00
+                $msg .= '<b>' . getTranslation('raid_egg_opens') . ' ' . unix2tz($start_time, $tz) . '</b>' . CR;
+            } else {
+                if($days_to_raid > 7) {
+                    // Output: Raid egg opens on Friday, 13 April (2018)
+                    $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day . ', ' . $day_start . ' ' . $raid_month . (($year_start > $year_now) ? $year_start : '');
+                } else {
+                    // Output: Raid egg opens on Friday
+                    $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day;
+                }
+                // Adds 'at 17:00' to the output.
+                $msg .= ' ' . getTranslation('raid_egg_opens_at') . ' ' . unix2tz($start_time, $tz) . '</b>' . CR;
+            }
         // Raid has started already
         } else {
             // Add time left message.
@@ -2353,7 +2417,7 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
 
         // Add to message.
         if ($att['count'] > 0) {
-            $msg .= EMOJI_GROUP . '<b> ' . ($att['count'] + $att['extra']) . '</b> — ';
+            $msg .= EMOJI_GROUP . '<b> ' . ($att['count'] + $att['extra_mystic'] + $att['extra_valor'] + $att['extra_instinct']) . '</b> — ';
             $msg .= ((($att['count_mystic'] + $att['extra_mystic']) > 0) ? TEAM_B . ($att['count_mystic'] + $att['extra_mystic']) . '  ' : '');
             $msg .= ((($att['count_valor'] + $att['extra_valor']) > 0) ? TEAM_R . ($att['count_valor'] + $att['extra_valor']) . '  ' : '');
             $msg .= ((($att['count_instinct'] + $att['extra_instinct']) > 0) ? TEAM_Y . ($att['count_instinct'] + $att['extra_instinct']) . '  ' : '');
@@ -2726,10 +2790,12 @@ function show_raid_poll($raid)
             }
 
             // Add users: TEAM -- LEVEL -- NAME -- ARRIVED -- EXTRAPEOPLE
-            $msg .= ($row['team'] === NULL) ? (' └ ' . $GLOBALS['teams']['unknown'] . ' ') : (' └ ' . $GLOBALS['teams'][$row['team']] . ' ');
+            $msg .= ($row['arrived']) ? (EMOJI_HERE . ' ') : '└ ';
+            //$msg .= ($row['team'] === NULL) ? ('└ ' . $GLOBALS['teams']['unknown'] . ' ') : ('└ ' . $GLOBALS['teams'][$row['team']] . ' ');
+            $msg .= ($row['team'] === NULL) ? ($GLOBALS['teams']['unknown'] . ' ') : ($GLOBALS['teams'][$row['team']] . ' ');
             $msg .= ($row['level'] != 0) ? ('<b>'.$row['level'].'</b> ') : '';
             $msg .= '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a> ';
-            $msg .= ($row['arrived']) ? ('[' . getTranslation('here') . '] ') : '';
+            //$msg .= ($row['arrived']) ? ('[' . getTranslation('here') . '] ') : '';
             $msg .= ($row['extra_mystic']) ? ('+' . $row['extra_mystic'] . TEAM_B . ' ') : '';
             $msg .= ($row['extra_valor']) ? ('+' . $row['extra_valor'] . TEAM_R . ' ') : '';
             $msg .= ($row['extra_instinct']) ? ('+' . $row['extra_instinct'] . TEAM_Y . ' ') : '';
@@ -2777,12 +2843,22 @@ function show_raid_poll($raid)
             $cnt_cancel_done['count_done'] = $cnt_row_cancel_done['count_done'] + $cnt_row_cancel_done['extra_mystic'] + $cnt_row_cancel_done['extra_valor'] + $cnt_row_cancel_done['extra_instinct'];
         }
     }
+    
+    // Set canceled count to avoid undefined index notices.
+    if(!isset($cnt_cancel_done['count_cancel'])) {
+        $cnt_cancel_done['count_cancel'] = 0;
+    }
+
+    // Set done count to avoid undefined index notices.
+    if(!isset($cnt_cancel_done['count_done'])) {
+        $cnt_cancel_done['count_done'] = 0;
+    }
 
     // Write to log.
     debug_log($cnt_cancel_done);
 
     // Canceled or done?
-    if($cnt_cancel_done['count_cancel'] > 0 || $cnt_cancel_done['count_done'] > 0) {
+    if((isset($cnt_cancel_done['count_cancel']) && $cnt_cancel_done['count_cancel'] > 0) || (isset($cnt_cancel_done['count_done']) && $cnt_cancel_done['count_done'] > 0)) {
         // Get done and canceled attendances
         $rs_att = my_query(
             "
@@ -2819,7 +2895,7 @@ function show_raid_poll($raid)
             }
 
             // Add users: TEAM -- LEVEL -- NAME -- CANCELED/DONE -- EXTRAPEOPLE
-            $msg .= ($row['team'] === NULL) ? (' └ ' . $GLOBALS['teams']['unknown'] . ' ') : (' └ ' . $GLOBALS['teams'][$row['team']] . ' ');
+            $msg .= ($row['team'] === NULL) ? ('└ ' . $GLOBALS['teams']['unknown'] . ' ') : ('└ ' . $GLOBALS['teams'][$row['team']] . ' ');
             $msg .= ($row['level'] != 0) ? ('<b>'.$row['level'].'</b> ') : '';
             $msg .= '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a> ';
             $msg .= ($row['cancel'] == 1) ? ('[' . unix2tz($row['ts_att'], $raid['timezone']) . '] ') : '';

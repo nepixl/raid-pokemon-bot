@@ -23,7 +23,7 @@ if ($arg != "minutes" && $arg != "clocktime") {
     my_query(
         "
         UPDATE    raids
-            SET       pokemon = '{$data['arg']}'
+          SET     pokemon = '{$data['arg']}'
           WHERE   id = {$id}
         "
     );

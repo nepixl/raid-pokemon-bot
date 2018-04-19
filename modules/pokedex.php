@@ -12,12 +12,13 @@ $limit = $data['id'];
 // Get the action.
 $action = $data['arg'];
 
-if ($update['message']['chat']['type'] == 'private' || $update['callback_query']['message']['chat']['type'] == 'private') {
+if ($update['callback_query']['message']['chat']['type'] == 'private') {
     // Set message.
     $msg = getTranslation('pokedex_list_of_all') . CR . CR . '<b>' . getTranslation('pokedex_edit_pokemon') . '</b>';
 
     // Get pokemon.
-    $keys = edit_pokedex_keys($limit, $action);
+    $all_pokemon = ($action == 1) ? true : false;
+    $keys = edit_pokedex_keys($limit, $action, $all_pokemon);
 
     // Empty keys?
     if (!$keys) {
@@ -33,3 +34,5 @@ if ($update['message']['chat']['type'] == 'private' || $update['callback_query']
     // Answer callback.
     answerCallbackQuery($update['callback_query']['id'], $callback_response);
 } 
+
+exit();

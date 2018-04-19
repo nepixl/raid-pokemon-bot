@@ -182,7 +182,7 @@ if (isset($update['callback_query'])) {
     exit();
 
 // Message is required to check for commands.
-} else if (isset($update['message'])) {
+} else if (isset($update['message']) && $update['message']['chat']['type'] == 'private') {
     // Check access to the bot
     bot_access_check($update);
     // Check message text for a leading slash.

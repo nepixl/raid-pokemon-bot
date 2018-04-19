@@ -410,7 +410,7 @@
 	},
 	"select_raid_boss" : {
 		"NL": "Selecteer Raid baas",
-		"DE": "Raid Boss auswählen",
+		"DE": "Raid-Boss auswählen",
 		"EN": "Select Raid boss",
 		"PT-BR": "Escolha o Pokémon chefe da raid"
 	},
@@ -596,14 +596,14 @@
 	},
 	"pokedex_start" : {
 		"NL": "Raid bazen lijst aanpassen",
-		"DE": "Raid Boss Pokemon anzeigen und bearbeiten",
+		"DE": "Raid-Boss / Pokemon anzeigen und bearbeiten",
 		"EN": "List and edit raid boss pokemon",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_raid_pokemon" : {
-		"NL": "Lijst met Pokemon raid bazen",
-		"DE": "Raid Boss Pokemon anzeigen",
-		"EN": "List raid boss pokemon",
+		"NL": "Lijst alle Raid bazen",
+		"DE": "Alle Raid-Bosse anzeigen",
+		"EN": "List of all raid bosses",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_list_of_all" : {
@@ -619,9 +619,9 @@
 		"PT-BR": "Erro! Nenhum pokemon encontrado!"
 	},
 	"pokedex_edit_pokemon" : {
-		"NL": "Selecteer een Pokemon Raid baas om hem te bewerken",
-		"DE": "Zum Bearbeiten Pokemon Raid Boss auswählen:",
-		"EN": "Select pokemon raid boss to edit:",
+		"NL": "Selecteer een Pokemon / Raid baas om hem te bewerken",
+		"DE": "Zum Bearbeiten Pokemon / Raid-Boss auswählen:",
+		"EN": "Select pokemon / raid boss to edit:",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_raid_level" : {
@@ -737,6 +737,12 @@
 		"DE": "Koordinaten erfolgreich übermittelt!",
 		"EN": "Coordinates successfully submitted!",
 		"PT-BR": "Coordenadas enviadas com sucesso!"
+	},
+	"update_raid_boss" : {
+		"NL": "Raid baas vernieuwen",
+		"DE": "Raid-Boss aktualisieren",
+		"EN": "Update raid boss",
+		"PT-BR": "Atualizar Chefe da raid"
 	},
 	"update_pokemon" : {
 		"NL": "Pokemon vernieuwen",

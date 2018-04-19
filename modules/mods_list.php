@@ -9,7 +9,7 @@ debug_log('mods_list()');
 // Set the id.
 $user_id = $data['arg'];
 
-if ($update['message']['chat']['type'] == 'private' || $update['callback_query']['message']['chat']['type'] == 'private') {
+if ($update['callback_query']['message']['chat']['type'] == 'private') {
     // Build message string.
     $msg = '';
     $msg .= getTranslation('mods_info_about_mod') . CR;
@@ -30,3 +30,5 @@ if ($update['message']['chat']['type'] == 'private' || $update['callback_query']
     answerCallbackQuery($update['callback_query']['id'], $callback_response);
 
 }
+
+exit();

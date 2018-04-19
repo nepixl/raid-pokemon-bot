@@ -16,8 +16,14 @@ $keys = array();
 $keys = [
     [
         [
-            'text'          => getTranslation('update_pokemon'),
+            'text'          => getTranslation('update_raid_boss'),
             'callback_data' => '0:pokedex:0'
+        ]
+    ],
+    [
+        [
+            'text'          => getTranslation('update_pokemon'),
+            'callback_data' => '0:pokedex:1'
         ]
     ],
     [
@@ -34,4 +40,4 @@ $msg = '<b>' . getTranslation('pokedex_start') . ':</b>';
 // Send message.
 send_message($update['message']['chat']['id'], $msg, $keys, ['reply_markup' => ['selective' => true, 'one_time_keyboard' => true]]);
 
-exit;
+exit();

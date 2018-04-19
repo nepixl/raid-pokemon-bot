@@ -9,7 +9,7 @@ debug_log('mods_add()');
 // Set the id.
 $user_id = $data['arg'];
 
-if ($update['message']['chat']['type'] == 'private' || $update['callback_query']['message']['chat']['type'] == 'private') {
+if ($update['callback_query']['message']['chat']['type'] == 'private') {
     // Update the user.
     my_query(
         "
@@ -35,5 +35,6 @@ if ($update['message']['chat']['type'] == 'private' || $update['callback_query']
 
     // Answer callback.
     answerCallbackQuery($update['callback_query']['id'], $callback_response);
-
 }
+
+exit();
