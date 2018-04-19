@@ -1,8 +1,10 @@
 <?php
 // Write to log.
 debug_log('edit_poke()');
-debug_log($update);
-debug_log($data);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check raid access.
 raid_access_check($update, $data);
@@ -13,27 +15,26 @@ $id = $data['id'];
 // Get the argument.
 $arg = $data['arg'];
 
+// Set raid level.
+$raid_level = '0';
+
 // Update pokemon in the raid table.
 if ($arg != "minutes" && $arg != "clocktime") {
     my_query(
         "
         UPDATE    raids
-            SET       pokemon = '{$data['arg']}'
+          SET     pokemon = '{$data['arg']}'
           WHERE   id = {$id}
         "
     );
-}
 
-// Get pokemon of level X
-$X_pokemons = [];
-$X_list = $GLOBALS['pokemon']['X'];
-foreach($X_list as $pokemon) {
-    $X_pokemons[] = strtolower($pokemon);
-    debug_log('Adding pokemon to list of ex-raid pokemon: ' . $pokemon);
+    // Get level of pokemon
+    $raid_level = get_raid_level($data['arg']);
+    debug_log('Pokemon raid level: ' . $raid_level);
 }
 
 // Pokemon in level X?
-if(in_array(strtolower($arg), $X_pokemons)) {
+if($raid_level == 'X') {
     // Init empty keys array.
     $keys = array();
 

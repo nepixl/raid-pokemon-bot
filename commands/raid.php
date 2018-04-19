@@ -1,4 +1,11 @@
 <?php
+// Write to log.
+debug_log('RAID()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
 /**
  * Mimic inline message to create raid poll from external notifier.
  *
@@ -74,7 +81,6 @@ if (!empty($data[8])) {
 
 // Insert new raid or update existing raid/ex-raid?
 $raid_id = raid_duplication_check($name,($endtime + $countdown));
-$ex_raid = false;
 
 if ($raid_id > 0) {
     // Get current pokemon from database for raid.
@@ -93,22 +99,11 @@ if ($raid_id > 0) {
     debug_log('Current Pokemon in database for this raid: ' . $poke_name);
 
     // Make sure it's not an Ex-Raid before updating the pokemon.
-    $pokemonlist = $GLOBALS['pokemon'];
-    foreach($pokemonlist as $level => $levelmons) {
-        if($level == "X") {
-            foreach($levelmons as $key => $pokemon) {
-                if(strtolower($pokemon) == strtolower($poke_name)) {
-                    $ex_raid = true;
-    		    debug_log('Current pokemon is an ex-raid pokemon: ' . $poke_name);
-    		    debug_log('Pokemon "' .$poke_name . '" will NOT be updated to "' . $boss . '"!');
-                    break 2;
-                }
-            }
-        }
-    }
-
-    if ($ex_raid) {
+    $raid_level = get_raid_level($poke_name);
+    if($raid_level == 'X') {
         // Ex-Raid! Update only team in raids table.
+        debug_log('Current pokemon is an ex-raid pokemon: ' . $poke_name);
+        debug_log('Pokemon "' .$poke_name . '" will NOT be updated to "' . $boss . '"!');
         my_query(
             "
             UPDATE    raids
@@ -133,21 +128,8 @@ if ($raid_id > 0) {
     // Debug log
     debug_log('Updated raid ID: ' . $raid_id);
 
-    // Build query.
-    $rs = my_query(
-        "
-        SELECT    *,
-                          UNIX_TIMESTAMP(end_time)                        AS ts_end,
-                          UNIX_TIMESTAMP(start_time)                      AS ts_start,
-                          UNIX_TIMESTAMP(NOW())                           AS ts_now,
-                          UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-            FROM      raids
-              WHERE   id = {$raid_id}
-        "
-    );
-
-    // Get row.
-    $raid = $rs->fetch_assoc();
+    // Get raid data.
+    $raid = get_raid($raid_id);
 
     //Debug
     // Set text.
@@ -158,7 +140,7 @@ if ($raid_id > 0) {
     //sendMessage($update['message']['chat']['id'], $text);
 
     // Exit now after update of raid and message.
-    exit;
+    exit();
 }
 
 // Address found.
@@ -174,7 +156,7 @@ if (!empty($address)) {
 		              user_id = {$update['message']['from']['id']},
 		              lat = '{$lat}',
 		              lon = '{$lon}',
-		              first_seen = NOW(),
+		              first_seen = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:00'),
 		              start_time = DATE_ADD(first_seen, INTERVAL {$countdown} MINUTE),
 		              end_time = DATE_ADD(start_time, INTERVAL {$endtime} MINUTE),
 		              gym_team = '{$db->real_escape_string($team)}',
@@ -193,7 +175,7 @@ if (!empty($address)) {
 		              user_id = {$update['message']['from']['id']},
 		              lat = '{$lat}',
 		              lon = '{$lon}',
-		              first_seen = NOW(),
+		              first_seen = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:00'),
 		              start_time = DATE_ADD(first_seen, INTERVAL {$countdown} MINUTE),
 		              end_time = DATE_ADD(start_time, INTERVAL {$endtime} MINUTE),
 		              gym_team = '{$db->real_escape_string($team)}',
@@ -209,24 +191,11 @@ $id = my_insert_id();
 // Write to log.
 debug_log('ID=' . $id);
 
-// Build query.
-$rs = my_query(
-    "
-    SELECT    *,
-		      UNIX_TIMESTAMP(end_time)                        AS ts_end,
-		      UNIX_TIMESTAMP(start_time)                      AS ts_start,
-		      UNIX_TIMESTAMP(NOW())                           AS ts_now,
-		      UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-	FROM      raids
-	  WHERE   id = {$id}
-    "
-);
+// Get raid data.
+$raid = get_raid($id)
 
-// Get row.
-$raid = $rs->fetch_assoc();
-
+// Send location.
 if (RAID_LOCATION == true) {
-    // Send location.
     //$loc = send_location($update['message']['chat']['id'], $raid['lat'], $raid['lon']);
     $loc = send_venue($update['message']['chat']['id'], $raid['lat'], $raid['lon'], "", !empty($raid['address']) ? $raid['address'] . ', ID = ' . $raid['id'] : $raid['pokemon'] . ', ' . $raid['id']); // DO NOT REMOVE " ID = " --> NEEDED FOR CLEANUP PREPARATION!
 
@@ -268,4 +237,4 @@ if ($update['message']['chat']['type'] == 'private' || $update['callback_query']
     send_message($update['message']['chat']['id'], $text, $keys, ['reply_to_message_id' => $reply_to, 'reply_markup' => ['selective' => true, 'one_time_keyboard' => true], 'disable_web_page_preview' => 'true']);
 }
 
-exit;
+exit();

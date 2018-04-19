@@ -1,7 +1,10 @@
 <?php
 // Write to log.
-debug_log('OVERVIEW_DELETE');
-debug_log($data);
+debug_log('overview_delete()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Delete or list to deletion?
 $chat_id = 0;

@@ -1,11 +1,13 @@
 <?php
+// Write to log.
+debug_log('edit_left()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
 // Check raid access.
 raid_access_check($update, $data);
-
-// Write to log.
-debug_log('raid_edit_left()');
-debug_log($update);
-debug_log($data);
 
 // Set the id.
 $id = $data['id'];
@@ -43,20 +45,7 @@ if ($update['callback_query']['message']['chat']['type'] == 'private') {
     $keys = array_merge($keys, $keys_share);
 
     // Get raid times.
-    $rs = my_query(
-        "
-        SELECT    *, 
-                              UNIX_TIMESTAMP(start_time)                      AS ts_start,
-                              UNIX_TIMESTAMP(end_time)                        AS ts_end,
-                              UNIX_TIMESTAMP(NOW())                           AS ts_now,
-                              UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-                FROM      raids
-                  WHERE   id = {$data['id']}
-        "
-    );
-
-    // Fetch the row.
-    $raid = $rs->fetch_assoc();
+    $raid = get_raid($data['id']);
 
     // Build message string.
     $msg = '';
@@ -83,20 +72,7 @@ if ($update['callback_query']['message']['chat']['type'] == 'private') {
 
 } else {
     // Get raid times.
-    $rs = my_query(
-        "
-        SELECT    *,
-			      UNIX_TIMESTAMP(start_time)                      AS ts_start,
-			      UNIX_TIMESTAMP(end_time)                        AS ts_end,
-			      UNIX_TIMESTAMP(NOW())                           AS ts_now,
-			      UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-		FROM      raids
-		  WHERE   id = {$data['id']}
-        "
-    );
-
-    // Fetch the row.
-    $raid = $rs->fetch_assoc();
+    $raid = get_raid($data['id']);
 
     // Get text and keys.
     $text = show_raid_poll($raid);

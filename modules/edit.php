@@ -1,10 +1,13 @@
 <?php
-// Check raid access.
-raid_access_check($update, $data);
-
 // Write to log.
 debug_log('edit()');
-debug_log($update);
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
+// Check raid access.
+raid_access_check($update, $data);
 
 // Set the id.
 $raid_id = $data['id'];
@@ -12,11 +15,8 @@ $raid_id = $data['id'];
 // Set the raid level.
 $raid_level = $data['arg'];
 
-// Set the pokkemon list
-$pokemonlist = $GLOBALS['pokemon'];
-
 // Get the keys.
-$keys = pokemon_keys($raid_id, $raid_level, $pokemonlist, "edit_poke");
+$keys = pokemon_keys($raid_id, $raid_level, "edit_poke");
 
 // No keys found.
 if (!$keys) {

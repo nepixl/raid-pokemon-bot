@@ -239,7 +239,7 @@ function answerInlineQuery($query_id, $contents)
         $results[] = [
             'type'                  => 'article',
             'id'                    => $query_id . $key,
-            'title'                 => ucfirst($row['pokemon']) . ' ' . unix2tz($row['ts_end'], $row['timezone']),
+            'title'                 => get_local_pokemon_name($row['pokemon']) . ' ' . getTranslation('from') . ' ' . unix2tz($row['ts_start'], $row['timezone'])  . ' ' . getTranslation('to') . ' ' . unix2tz($row['ts_end'], $row['timezone']),
             'description'           => strval($row['gym_name']),
             'input_message_content' => $input_message_content,
             'reply_markup'          => [
@@ -295,15 +295,15 @@ function editMessageText($id_val, $text_val, $markup_val, $chat_id = NULL, $merg
     }
 
     // Write to log.
-    debug_log($merge_args, 'K');
-    debug_log($response, 'K');
+    //debug_log($merge_args, 'K');
+    //debug_log($response, 'K');
 
     if (is_array($merge_args) && count($merge_args)) {
         $response = array_merge_recursive($response, $merge_args);
     }
 
     // Write to log.
-    debug_log($response, 'K');
+    //debug_log($response, 'K');
 
     // Encode response to json format.
     $json_response = json_encode($response);
@@ -590,12 +590,27 @@ function curl_json_request($json)
  */
 function getTranslation($text)
 {
-	debug_log($text);
-	
-	$str = file_get_contents('./language.json');
-	
-	$json = json_decode($str, true);
-	$translation = $json[$text][LANGUAGE];	
-	
-	return $translation;
+    debug_log($text,'T:');
+    $translation = '';
+
+    // Pokemon name or other translation?
+    if(strpos($text, 'pokemon_id_') === 0) {
+        // Make sure file exists
+        if(file_exists('./pokemon_' . strtolower(LANGUAGE) . '.json')) {
+            // Get ID from string - e.g. 150 from pokemon_id_150
+            $pokemon_id = substr($text, strrpos($text, '_') + 1);
+            $str = file_get_contents('./pokemon_' . strtolower(LANGUAGE) . '.json');
+
+            // Index starts at 0, so pokemon_id minus 1 for the correct name!
+            $json = json_decode($str, true);
+            $translation = $json[$pokemon_id - 1];
+        }
+    } else {
+        $str = file_get_contents('./language.json');
+
+        $json = json_decode($str, true);
+        $translation = $json[$text][LANGUAGE];
+    }
+
+    return $translation;
 }

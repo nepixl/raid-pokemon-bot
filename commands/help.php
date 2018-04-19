@@ -13,4 +13,3 @@ $msg = '
 ';
 $msg = 'This is a private bot.'; // temp
 sendMessage($update['message']['from']['id'], $msg);
-	

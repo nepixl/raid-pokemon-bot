@@ -1,6 +1,10 @@
 <?php
 // Write to log.
-debug_log('DELETE');
+debug_log('DELETE()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check access.
 bot_access_check($update, BOT_ACCESS);

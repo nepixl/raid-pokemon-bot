@@ -18,11 +18,9 @@ CREATE TABLE `attendance` (
   `attend_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
   `team` enum('mystic','valor','instinct') DEFAULT NULL,
-  `extra_people` int(10) unsigned DEFAULT NULL,
-  `extra_1_team` enum('mystic','valor','instinct') DEFAULT NULL,
-  `extra_2_team` enum('mystic','valor','instinct') DEFAULT NULL,
-  `extra_3_team` enum('mystic','valor','instinct') DEFAULT NULL,
-  `extra_4_team` enum('mystic','valor','instinct') DEFAULT NULL,
+  `extra_mystic` int(10) unsigned DEFAULT '0',
+  `extra_valor` int(10) unsigned DEFAULT '0',
+  `extra_instinct` int(10) unsigned DEFAULT '0',
   `arrived` tinyint(1) unsigned DEFAULT '0',
   `raid_done` tinyint(1) unsigned DEFAULT '0',
   `cancel` tinyint(1) unsigned DEFAULT '0',
@@ -60,7 +58,22 @@ CREATE TABLE `overview` (
   `chat_id` bigint(20) NOT NULL,
   `message_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pokemon` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pokedex_id` int(10) unsigned NOT NULL,
+  `pokemon_name` varchar(12) DEFAULT NULL,
+  `raid_level` enum('0','1','2','3','4','5','X') DEFAULT '0',
+  `min_cp` int(10) unsigned NOT NULL,
+  `max_cp` int(10) unsigned NOT NULL,
+  `min_weather_cp` int(10) unsigned NOT NULL,
+  `max_weather_cp` int(10) unsigned NOT NULL,
+  `weather` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;

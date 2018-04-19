@@ -1,4 +1,11 @@
 <?php
+// Write to log.
+debug_log('vote_level()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
 // Get action.
 $action = $data['arg'];
 
@@ -8,7 +15,7 @@ if ($action == 'up') {
     my_query(
         "
         UPDATE    users
-        SET       level = level+1
+        SET       level = IF(level = 0, 30, level+1)
           WHERE   user_id = {$update['callback_query']['from']['id']}
             AND   level < 40
         "
@@ -30,3 +37,5 @@ if ($action == 'down') {
 
 // Send vote response.
 send_response_vote($update, $data);
+
+exit();

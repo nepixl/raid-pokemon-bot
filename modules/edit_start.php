@@ -1,8 +1,10 @@
 <?php
 // Write to log.
-debug_log('raid_edit_start()');
-debug_log($update);
-debug_log($data);
+debug_log('edit_start()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check raid access.
 raid_access_check($update, $data);

@@ -1,13 +1,13 @@
 <?php
 // Write to log.
-debug_log('LIST');
+debug_log('LIST()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check access.
 bot_access_check($update, BOT_ACCESS);
-
-// Get the userid and chattype
-$userid = $update['message']['from']['id'];
-$chattype = $update['message']['chat']['type'];
 
 // Init empty keys array.
 $keys = array();
@@ -17,7 +17,7 @@ $keys = [
     [
         [
             'text'          => getTranslation('list'),
-            'callback_data' => $userid . ',' . $chattype . ':raids_list:0'
+            'callback_data' => '0:raids_list:0'
         ]
     ],
     [

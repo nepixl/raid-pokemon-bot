@@ -4,15 +4,39 @@ define('CR',  "\n");
 define('CR2', "\n");
 
 // Icons.
-define('TEAM_B',        iconv('UCS-4LE', 'UTF-8', pack('V', 0x1f499)));
+define('TEAM_B',        iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F499)));
 define('TEAM_R',        iconv('UCS-4LE', 'UTF-8', pack('V', 0x2764)));
-define('TEAM_Y',        iconv('UCS-4LE', 'UTF-8', pack('V', 0x1f49B)));
-define('TEAM_CANCEL',   iconv('UCS-4LE', 'UTF-8', pack('V', 0x1f494)));
-define('TEAM_DONE',     iconv('UCS-4LE', 'UTF-8', pack('V', 0x1f4aa)));
-define('TEAM_UNKNOWN',  iconv('UCS-4LE', 'UTF-8', pack('V', 0x1f680)));
-define('EMOJI_REFRESH', iconv('UCS-4LE', 'UTF-8', pack('V', 0x1f504)));
-define('EMOJI_GROUP',   iconv('UCS-4LE', 'UTF-8', pack('V', 0x1f465)));
+define('TEAM_Y',        iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F49B)));
+define('TEAM_CANCEL',   iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F494)));
+define('TEAM_DONE',     iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F4AA)));
+define('TEAM_UNKNOWN',  iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F680)));
+define('EMOJI_REFRESH', iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F504)));
+define('EMOJI_HERE',    iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F4CD)));
+define('EMOJI_GROUP',   iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F465)));
 define('EMOJI_WARN',    iconv('UCS-4LE', 'UTF-8', pack('V', 0x26A0)));
+define('EMOJI_DISK',    iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F4BE)));
+
+// Weather Icons.
+define('EMOJI_W_SUNNY',            iconv('UCS-4LE', 'UTF-8', pack('V', 0x2600)));
+define('EMOJI_W_CLEAR',            iconv('UCS-4LE', 'UTF-8', pack('V', 0x2728)));
+define('EMOJI_W_RAIN',             iconv('UCS-4LE', 'UTF-8', pack('V', 0x2614)));
+define('EMOJI_W_PARTLY_CLOUDY',    iconv('UCS-4LE', 'UTF-8', pack('V', 0x26C5)));
+define('EMOJI_W_CLOUDY',           iconv('UCS-4LE', 'UTF-8', pack('V', 0x2601)));
+define('EMOJI_W_WINDY',            iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F32A)));
+define('EMOJI_W_SNOW',             iconv('UCS-4LE', 'UTF-8', pack('V', 0x26C4)));
+define('EMOJI_W_FOG',              iconv('UCS-4LE', 'UTF-8', pack('V', 0x1F32B)));
+
+// Weather.
+$weather = array(
+   '1' => EMOJI_W_SUNNY,
+   '2' => EMOJI_W_CLEAR,
+   '3' => EMOJI_W_RAIN,
+   '4' => EMOJI_W_PARTLY_CLOUDY,
+   '5' => EMOJI_W_CLOUDY,
+   '6' => EMOJI_W_WINDY,
+   '7' => EMOJI_W_SNOW,
+   '8' => EMOJI_W_FOG
+);
 
 // Teams.
 $teams = array(
@@ -23,66 +47,11 @@ $teams = array(
     'cancel'    => TEAM_CANCEL
 );
 
-// Raid boss pokemon.
-$pokemon = array(
-    'X' => array(
-        getTranslation('mewtwo')
-    ),
-    '5' => array(
-//        getTranslation('articuno'),
-//        getTranslation('lugia'),
-//        getTranslation('moltres'),
-//        getTranslation('zapdos'),
-//        getTranslation('mew'),
-        getTranslation('mewtwo'),
-//        getTranslation('hooh'),
-//        getTranslation('celebi'),
-//        getTranslation('raikou'),
-//        getTranslation('entei'),
-//        getTranslation('suicune'),
-//        getTranslation('groudon'),
-//        getTranslation('rayquaza'),
-//        getTranslation('kyogre'),
-//        getTranslation('latios'),
-        getTranslation('latias'),
-//        getTranslation('deoxys'),
-//        getTranslation('jirachi'),
-//        getTranslation('regirock'),
-//        getTranslation('regice'),
-//        getTranslation('registeel'),
-        getTranslation('egg_5')
-    ),
-    '4' => array(
-        getTranslation('tyranitar'),
-//        getTranslation('lapras'),
-//        getTranslation('snorlax'),
-//        getTranslation('feraligatr'),
-        getTranslation('absol'),
-        getTranslation('aggron'),
-//        getTranslation('charizard'),
-        getTranslation('walrein'),
-        getTranslation('houndoom'),
-        getTranslation('egg_4')
-    ),
-    '3' => array(
-        getTranslation('machamp'),
-        getTranslation('jynx'),
-//        getTranslation('azumarill'),
-        getTranslation('piloswine'),
-//        getTranslation('starmie'),
-//        getTranslation('aerodactyl'),
-//        getTranslation('claydol'),
-//        getTranslation('alakazam'),
-        getTranslation('gengar'),
-        getTranslation('pinsir'),
-        getTranslation('granbull'),
-        getTranslation('egg_3')
-    ),
-    '2' => array(
-        getTranslation('egg_2')
-    ),
-    '1' => array(
-        getTranslation('egg_1')
-    )
+// Raid eggs.
+$eggs = array(
+    '9995',  // Level 5
+    '9994',  // Level 4
+    '9993',  // Level 3
+    '9992',  // Level 2
+    '9991'   // Level 1
 );
-

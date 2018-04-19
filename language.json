@@ -1,4 +1,10 @@
 {
+	"Xstars" : {
+		"NL": "Ex-Raid",
+		"DE": "Ex-Raid",
+		"EN": "Ex-Raid",
+		"PT-BR": "Ex-Raid"
+	},
 	"5stars" : {
 		"NL": "5 Sterren Raid",
 		"DE": "5 Sterne Raid",
@@ -29,6 +35,12 @@
 		"EN": "1 Star Raid",
 		"PT-BR": "Raid nível 1"
 	},
+	"0stars" : {
+		"NL": "0 Sterren Raid",
+		"DE": "0 Sterne Raid",
+		"EN": "0 Star Raid",
+		"PT-BR": "Raid nível 0"
+	},
 	"back" : {
 		"NL": "Terug",
 		"DE": "Zurück",
@@ -36,10 +48,16 @@
 		"PT-BR": "Voltar"
 	},
 	"next" : {
-		"NL": "Next",
+		"NL": "Volgende",
 		"DE": "Weiter",
 		"EN": "Next",
 		"PT-BR": "Próximo"
+	},
+	"reset" : {
+		"NL": "Reset",
+		"DE": "Reset",
+		"EN": "Reset",
+		"PT-BR": "TRANSLATE"
 	},
 	"alone" : {
 		"NL": "Alleen",
@@ -78,43 +96,49 @@
 		"EN": "Vote updated",
 		"PT-BR": "Votos atualizados"
 	},
-	"monday" : {
+	"vote_time_first" : {
+		"NL": "TRANSLATE",
+		"DE": "Zuerst für eine Uhrzeit abstimmen!",
+		"EN": "Vote for a time first!",
+		"PT-BR": "TRANSLATE"
+	},
+	"weekday_1" : {
 		"NL": "Maandag",
 		"DE": "Montag",
 		"EN": "Monday",
 		"PT-BR": "Segunda-feira"
 	},
-	"tuesday" : {
+	"weekday_2" : {
 		"NL": "Dinsdag",
 		"DE": "Dienstag",
 		"EN": "Tuesday",
 		"PT-BR": "Terça-feira"
 	},
-	"wednesday" : {
+	"weekday_3" : {
 		"NL": "Woensdag",
 		"DE": "Mittwoch",
 		"EN": "Wednesday",
 		"PT-BR": "Quarta-feira"
 	},
-	"thursday" : {
+	"weekday_4" : {
 		"NL": "Donderdag",
 		"DE": "Donnerstag",
 		"EN": "Thursday",
 		"PT-BR": "Quinta-feira"
 	},
-	"friday" : {
+	"weekday_5" : {
 		"NL": "Vrijdag",
 		"DE": "Freitag",
 		"EN": "Friday",
 		"PT-BR": "Sexta-feira"
 	},
-	"saturday" : {
+	"weekday_6" : {
 		"NL": "Zaterdag",
 		"DE": "Samstag",
 		"EN": "Saturday",
 		"PT-BR": "Sábado"
 	},
-	"sunday" : {
+	"weekday_7" : {
 		"NL": "Zondag",
 		"DE": "Sonntag",
 		"EN": "Sunday",
@@ -145,7 +169,7 @@
 		"PT-BR": "Abril"
 	},
 	"month_05" : {
-		"NL": "Meer",
+		"NL": "Maart",
 		"DE": "Mai",
 		"EN": "May",
 		"PT-BR": "Mais"
@@ -195,7 +219,8 @@
 	"still" : {
 		"NL": "nog",
 		"DE": "noch",
-		"EN": "still"		
+		"EN": "still",
+		"PT-BR": "ainda"
 	},
 	"raid_egg_opens" : {
 		"NL": "Raid ei gaat open",
@@ -275,186 +300,6 @@
 		"EN": "No participants",
 		"PT-BR": "Sem participantes"		
 	},
-	"mew" : {
-		"NL": "Mew",
-		"DE": "Mew",
-		"EN": "Mew",
-		"PT-BR": "Mew"
-	},
-	"mewtwo" : {
-		"NL": "Mewtwo",
-		"DE": "Mewtu",
-		"EN": "Mewtwo",
-		"PT-BR": "Mewtwo"
-	},
-	"lugia" : {
-		"NL": "Lugia",
-		"DE": "Lugia",
-		"EN": "Lugia",
-		"PT-BR": "Lugia"
-	},
-	"zapdos" : {
-		"NL": "Zapdos",
-		"DE": "Zapdos",
-		"EN": "Zapdos",
-		"PT-BR": "Zapdos"
-	},
-	"hooh" : {
-		"NL": "Ho-oh",
-		"DE": "Ho-oh",
-		"EN": "Ho-oh",
-		"PT-BR": "Ho-oh"
-	},
-	"celebi" : {
-		"NL": "Celebi",
-		"DE": "Celebi",
-		"EN": "Celebi",
-		"PT-BR": "Celebi"
-	},
-	"raikou" : {
-		"NL": "Raikou",
-		"DE": "Raikou",
-		"EN": "Raikou",
-		"PT-BR": "Raikou"
-	},
-	"entei" : {
-		"NL": "Entei",
-		"DE": "Entei",
-		"EN": "Entei",
-		"PT-BR": "Entei"
-	},
-	"suicune" : {
-		"NL": "Suicune",
-		"DE": "Suicune",
-		"EN": "Suicune",
-		"PT-BR": "Suicune"
-	},
-	"moltres" : {
-		"NL": "Moltres",
-		"DE": "Lavados",
-		"EN": "Moltres",
-		"PT-BR": "Moltres"
-	},
-	"articuno" : {
-		"NL": "Articuno",
-		"DE": "Arktos",
-		"EN": "Articuno",
-		"PT-BR": "Articuno"
-	},
-	"groudon" : {
-    		"NL": "Groudon",
-    		"DE": "Groudon",
-    		"EN": "Groudon",
-		"PT-BR": "Groudon"
-  	},
-  	"kyogre" : {
-    		"NL": "Kyogre",
-    		"DE": "Kyogre",
-    		"EN": "Kyogre",
-		"PT-BR": "Kyogre"
-  	},
-	"rayquaza" : {
-    		"NL": "Rayquaza",
-    		"DE": "Rayquaza",
-    		"EN": "Rayquaza",
-		"PT-BR": "Rayquaza"
-	},
-  	"latios" : {
-    		"NL": "Latios",
-    		"DE": "Latios",
-    		"EN": "Latios",
-		"PT-BR": "Latios"
-  	},
-  	"latias" : {
-    		"NL": "Latias",
-    		"DE": "Latias",
-    		"EN": "Latias",
-		"PT-BR": "Latias"
-  	},
-  	"deoxys" : {
-    		"NL": "Deoxys",
-    		"DE": "Deoxys",
-    		"EN": "Deoxys",
-		"PT-BR": "Deoxys"
-  	},
-  	"jirachi" : {
-    		"NL": "Jirachi",
-    		"DE": "Jirachi",
-    		"EN": "Jirachi",
-		"PT-BR": "Jirachi"
-  	},
-  	"regirock" : {
-    		"NL": "Regirock",
-    		"DE": "Regirock",
-    		"EN": "Regirock",
-		"PT-BR": "Regirock"
-  	},
-  	"regice" : {
-    		"NL": "Regice",
-    		"DE": "Regice",
-    		"EN": "Regice",
-		"PT-BR": "Regice"
-  	},
-  	"registeel" : {
-    		"NL": "Registeel",
-    		"DE": "Registeel",
-    		"EN": "Registeel",
-		"PT-BR": "Registeel"
-  	},
-  	  	"jynx" : {
-    		"NL": "Jynx",
-    		"DE": "Rossana",
-    		"EN": "Jynx",
-		"PT-BR": "Jynx"
-  	},
-  	"azumarill" : {
-    		"NL": "Azumarill",
-    		"DE": "Azumarill",
-    		"EN": "Azumarill",
-		"PT-BR": "Azumarill"
-  	},
-	"piloswine" : {
-    		"NL": "Piloswine",
-    		"DE": "Keifel",
-    		"EN": "Piloswine",
-		"PT-BR": "Piloswine"
-  	},
-  	"salamence" : {
-    		"NL": "Salamence",
-    		"DE": "Brutalanda",
-    		"EN": "Salamence",
-		"PT-BR": "Salamence"
-  	},
-  	"feraligatr" : {
-    		"NL": "Feraligatr",
-    		"DE": "Impergator",
-    		"EN": "Feraligatr",
-		"PT-BR": "Feraligatr"
-  	},
-  	"meganium" : {
-    		"NL": "Meganium",
-    		"DE": "Meganie",
-    		"EN": "Meganium",
-		"PT-BR": "Meganium"
-  	},
-  	"typhlosion" : {
-    		"NL": "Typhlosion",
-    		"DE": "Tornupto",
-    		"EN": "Typhlosion",
-		"PT-BR": "Typhlosion"
-  	},
-  	"houndoom" : {
-    		"NL": "Houndoom",
-    		"DE": "Hundemon",
-    		"EN": "Houndoom",
-		"PT-BR": "Houndoom"
-  	},
-  	"walrein" : {
-    		"NL": "Walrein",
-    		"DE": "Walraisa",
-    		"EN": "Walrein",
-		"PT-BR": "Walrein"
-  	},
 	"egg_5" : {
 		"NL": "Level 5 Ei",
 		"DE": "Level 5 Ei",
@@ -484,156 +329,6 @@
 		"DE": "Level 1 Ei",
 		"EN": "Level 1 Egg",
 		"PT-BR": "Ovo de Nível 1"
-	},
-	"lapras" : {
-		"NL": "Lapras",
-		"DE": "Lapras",
-		"EN": "Lapras",
-		"PT-BR": "Lapras"
-	},
-	"nidoqueen" : {
-		"NL": "Nidoqueen",
-		"DE": "Nidoqueen",
-		"EN": "Nidoqueen",
-		"PT-BR": "Nidoqueen"
-	},
-	"nidoking" : {
-		"NL": "Nidoking",
-		"DE": "Nidoking",
-		"EN": "Nidoking",
-		"PT-BR": "Nidoking"		
-	},
-	"absol" : {
-		"NL": "Absol",
-		"DE": "Absol",
-		"EN": "Absol",
-		"PT-BR": "Absol"
-	},
-	"aggron" : {
-		"NL": "Aggron",
-		"DE": "Stolloss",
-		"EN": "Aggron",
-		"PT-BR": "Aggron"
-	},
-	"tyranitar" : {
-		"NL": "Tyranitar",
-		"DE": "Despotar",
-		"EN": "Tyranitar",
-		"PT-BR": "Tyranitar"
-	},
-	"snorlax" : {
-		"NL": "Snorlax",
-		"DE": "Relaxo",
-		"EN": "Snorlax",
-		"PT-BR": "Snorlax"
-	},
-	"golem" : {
-		"NL": "Golem",
-		"DE": "Geowaz",
-		"EN": "Golem",
-		"PT-BR": "Golem"
-	},
-	"rhydon" : {
-		"NL": "Rhydon",
-		"DE": "Rizeros",
-		"EN": "Rhydon",
-		"PT-BR": "Rhydon"
-	},
-	"porygon" : {
-		"NL": "Porygon",
-		"DE": "Porygon",
-		"EN": "Porygon",
-		"PT-BR": "Porygon"
-	},
-	"gengar" : {
-		"NL": "Gengar",
-		"DE": "Gengar",
-		"EN": "Gengar",
-		"PT-BR": "Gengar"
-	},
-	"poliwrath" : {
-		"NL": "Poliwrath",
-		"DE": "Quappo",
-		"EN": "Poliwrath",
-		"PT-BR": "Poliwrath"
-	},
-	"victreebel" : {
-		"NL": "Victreebel",
-		"DE": "Sarzenia",
-		"EN": "Victreebel",
-		"PT-BR": "Victreebel"
-	},
-	"arcanine" : {
-		"NL": "Arcanine",
-		"DE": "Arkani",
-		"EN": "Arcanine",
-		"PT-BR": "Arcanine"
-	},
-	"starmie" : {
-		"NL": "Starmie",
-		"DE": "Starmie",
-		"EN": "Starmie",
-		"PT-BR": "Starmie"
-	},
-	"charizard" : {
-		"NL": "Charizard",
-		"DE": "Glurak",
-		"EN": "Charizard",
-		"PT-BR": "Charizard"
-	},
-	"aerodactyl" : {
-		"NL": "Aerodactyl",
-		"DE": "Aerodactyl",
-		"EN": "Aerodactyl",
-		"PT-BR": "Aerodactyl"
-	},
-        "claydol" : {
-		"NL": "Claydol",
-		"DE": "Lepumentas",
-		"EN": "Claydol",
-		"PT-BR": "Claydol"
-	},
-	"machamp" : {
-		"NL": "Machamp",
-		"DE": "Machomei",
-		"EN": "Machamp",
-		"PT-BR": "Machamp"
-	},
-	"alakazam" : {
-		"NL": "Alakazam",
-		"DE": "Simsala",
-		"EN": "Alakazam",
-		"PT-BR": "Alakazam"
-	},
-	"scyther" : {
-		"NL": "Scyther",
-		"DE": "Sichlor",
-		"EN": "Scyther",
-		"PT-BR": "Schyther"
-	},
-	"omastar" : {
-		"NL": "Omastar",
-		"DE": "Amoroso",
-		"EN": "Omastar",
-		"PT-BR": "Omastar"
-	},
-	"ninetails" : {
-		"NL": "Ninetails",
-		"DE": "Vulnona",
-		"EN": "Ninetails",
-		"PT-BR": "Ninetails"
-	},
-	"pinsir" : {
-		"NL": "Pinsir",
-		"DE": "Pinsir",
-		"EN": "Pinsir",
-		"PT-BR": "Pinsir"
-	},
-	"granbull" : {
-		"NL": "Granbull",
-		"DE": "Granbull",
-		"EN": "Granbull",
-		"PT-BR": "Granbull"
 	},
 	"forest" : {
 		"NL": "Ergens in het bos",
@@ -715,7 +410,7 @@
 	},
 	"select_raid_boss" : {
 		"NL": "Selecteer Raid baas",
-		"DE": "Raid Boss auswählen",
+		"DE": "Raid-Boss auswählen",
 		"EN": "Select Raid boss",
 		"PT-BR": "Escolha o Pokémon chefe da raid"
 	},
@@ -730,10 +425,9 @@
 		"DE": "Raid gespeichert:",
 		"EN": "Raid saved:",
 		"PT-BR": "Raid salva:"
-		
 	},
 	"raid_boss" : {
-		"NL": "#Raid baas",
+		"NL": "Raid baas",
 		"DE": "Raid-Boss",
 		"EN": "Raid boss",
 		"PT-BR": "Chefe da raid"
@@ -900,6 +594,114 @@
 		"EN": "Pokemon saved: ",
 		"PT-BR": "Pokemon salvo "
 	},
+	"pokedex_start" : {
+		"NL": "Raid bazen lijst aanpassen",
+		"DE": "Raid-Boss / Pokemon anzeigen und bearbeiten",
+		"EN": "List and edit raid boss pokemon",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_raid_pokemon" : {
+		"NL": "Lijst alle Raid bazen",
+		"DE": "Alle Raid-Bosse anzeigen",
+		"EN": "List of all raid bosses",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_list_of_all" : {
+		"NL": "Lijst met alle pokemon.",
+		"DE": "Liste aller Pokemon.",
+		"EN": "List of all pokemon.",
+		"PT-BR": "Lista de todos os pokemon."
+	},
+	"pokedex_not_found" : {
+		"NL": "Error! Geen Pokemon gevonden!",
+		"DE": "Fehler! Keine Pokemon gefunden!",
+		"EN": "Error! No pokemon found!",
+		"PT-BR": "Erro! Nenhum pokemon encontrado!"
+	},
+	"pokedex_edit_pokemon" : {
+		"NL": "Selecteer een Pokemon / Raid baas om hem te bewerken",
+		"DE": "Zum Bearbeiten Pokemon / Raid-Boss auswählen:",
+		"EN": "Select pokemon / raid boss to edit:",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_raid_level" : {
+		"NL": "Raid level",
+		"DE": "Raid Level",
+		"EN": "Raid level",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_new_raid_level" : {
+		"NL": "Nieuw Raid level",
+		"DE": "Neues Raid Level",
+		"EN": "New raid level",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_current_raid_level" : {
+		"NL": "Actuele Raid level:",
+		"DE": "Aktuelles Raid Level:",
+		"EN": "Current raid level:",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_select_action" : {
+		"NL": "Selecteer een eigenschap om deze aan te passen:",
+		"DE": "Eigenschaft zum Ändern auswählen:",
+		"EN": "Select feature to be changed:",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_cp" : {
+		"NL": "CP:",
+		"DE": "WP:",
+		"EN": "CP:",
+		"PT-BR": "CP:"
+	},
+	"pokedex_min_cp" : {
+		"NL": "Min CP",
+		"DE": "Min WP",
+		"EN": "Min CP",
+		"PT-BR": "Min CP"
+	},
+	"pokedex_max_cp" : {
+		"NL": "Max CP",
+		"DE": "Max WP",
+		"EN": "Max CP",
+		"PT-BR": "Max CP"
+	},
+	"pokedex_min_weather_cp" : {
+		"NL": "Min boosted CP",
+		"DE": "Min boosted WP",
+		"EN": "Min boosted CP",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_max_weather_cp" : {
+		"NL": "Max boosted CP",
+		"DE": "Max boosted WP",
+		"EN": "Max boosted CP",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_current_cp" : {
+		"NL": "Actuele CP:",
+		"DE": "Aktuelle WP:",
+		"EN": "Current CP:",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_weather" : {
+		"NL": "Weer",
+		"DE": "Wetter",
+		"EN": "Weather",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_current_weather" : {
+		"NL": "Actuele weer:",
+		"DE": "Aktuelles Wetter:",
+		"EN": "Current weather:",
+		"PT-BR": "TRANSLATE"
+	},
+	"pokedex_new_weather" : {
+		"NL": "Nieuw weer:",
+		"DE": "Neues Wetter:",
+		"EN": "New weather:",
+		"PT-BR": "TRANSLATE"
+	},
 	"how_long_raid" : {
 		"NL": "Hoe lang <b>duurt</b> de Raid?",
 		"DE": "Wie lange <b>dauert</b> der Raid?",
@@ -935,6 +737,12 @@
 		"DE": "Koordinaten erfolgreich übermittelt!",
 		"EN": "Coordinates successfully submitted!",
 		"PT-BR": "Coordenadas enviadas com sucesso!"
+	},
+	"update_raid_boss" : {
+		"NL": "Raid baas vernieuwen",
+		"DE": "Raid-Boss aktualisieren",
+		"EN": "Update raid boss",
+		"PT-BR": "Atualizar Chefe da raid"
 	},
 	"update_pokemon" : {
 		"NL": "Pokemon vernieuwen",

@@ -1,14 +1,16 @@
 <?php
 // Write to log.
-debug_log('EXIT()');
-debug_log($update);
-debug_log($data);
+debug_log('exit()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Set empty keys.
 $keys = [];
 
 // Build message string.
-$msg = getTranslation('action_aborted');
+$msg = ($data['arg'] == 1) ? (getTranslation('done') . '!') : (getTranslation('action_aborted'));
 
 // Edit the message.
 edit_message($update, $msg, $keys);

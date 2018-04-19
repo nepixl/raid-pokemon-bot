@@ -1,10 +1,10 @@
 <?php
 // Write to log.
-debug_log('NEW');
+debug_log('NEW()');
 
-// Get the userid and chattype
-$userid = $update['message']['from']['id'];
-$chattype = $update['message']['chat']['type'];
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Get lat and lon from message text. (remove: "/new ")
 $coords = trim(substr($update['message']['text'], 4));
@@ -21,7 +21,7 @@ $keys = [
 	    [
 	        [
 	            'text'          => getTranslation('create_a_raid'),
-	            'callback_data' => $userid . ',' . $chattype . ':raid_create:' . $coords,
+	            'callback_data' => '0:raid_create:' . $coords
 	        ]
 	    ]
 	];

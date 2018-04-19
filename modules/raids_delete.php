@@ -1,8 +1,10 @@
 <?php
 // Write to log.
-debug_log('RAIDS_DELETE');
-debug_log($update);
-debug_log($data);
+debug_log('raids_delete()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
 
 // Check raid access.
 raid_access_check($update, $data);

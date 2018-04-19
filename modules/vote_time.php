@@ -1,8 +1,15 @@
 <?php
+// Write to log.
+debug_log('vote_time()');
+
+// For debug.
+//debug_log($update);
+//debug_log($data);
+
 // Check if the user has voted for this raid before.
 $rs = my_query(
     "
-    SELECT    *
+    SELECT    user_id
     FROM      attendance
       WHERE   raid_id = {$data['id']}
         AND   user_id = {$update['callback_query']['from']['id']}
@@ -36,7 +43,7 @@ if (!empty($answer)) {
     // Get users data.
     $rs = my_query(
         "
-        SELECT    *
+        SELECT    team
         FROM      users
           WHERE   user_id = {$update['callback_query']['from']['id']}
         "
@@ -62,3 +69,5 @@ if (!empty($answer)) {
 
 // Send vote response.
 send_response_vote($update, $data);
+
+exit();
