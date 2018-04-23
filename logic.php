@@ -2849,7 +2849,7 @@ function show_raid_poll($raid)
               $msg .= '<b>00</b> ';
             else {
               
-              if ( count($row['level']) == 1 )
+              if ($row['level'] < 10)
                 $msg .= '<b>0'.$row['level'].'</b> ';
               else
                 $msg .= '<b>'.$row['level'].'</b> ';
@@ -2955,7 +2955,7 @@ function show_raid_poll($raid)
               $msg .= '<b>00</b> ';
             else {
               
-              if ( count($row['level']) == 1 )
+              if ( $row['level'] < 10 )
                 $msg .= '<b>0'.$row['level'].'</b> ';
               else
                 $msg .= '<b>'.$row['level'].'</b> ';
