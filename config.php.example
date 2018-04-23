@@ -7,7 +7,7 @@ define('CURL_PROXYSERVER',  'http://your.proxyserver.com:8080');
 
 define('DEBUG',             true);
 define('CONFIG_LOGFILE',    '/var/log/tg-bots/dev-raid-bot.log');
-define('CONFIG_HASH',       ' = hash(sha_512,tg_bot_key) ');
+define('CONFIG_HASH',       'aaaabbbbccccddddeeeeffff1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff1111222233334444555566667777888899990000');
 
 define('DB_HOST',           'localhost');
 define('DB_NAME',           'your_database_name');
@@ -27,11 +27,16 @@ define('SHARE_CHATS',       '');
 define('RAID_LOCATION',     false); // send location as message in addition to raid poll message
 define('RAID_SLOTS',        '15'); // minutes
 define('RAID_LAST_START',   '10'); // minutes before RAID ends
+define('RAID_ANYTIME',      false); 
+define('RAID_VOTE_ICONS',   true); // show icons for status vote buttons
+define('RAID_VOTE_TEXT',    false); // show text for status vote buttons
+define('RAID_LATE_MSG',     true); // show late hint message
+define('RAID_LATE_TIME',    '3'); // minutes which may be waited
 
-define ('RAID_EGG_DURATION',    '60'); //minutes till egg comes out
-define ('RAID_POKEMON_DURATION_LONG', '90'); //minutes till pokemon leave
-define ('RAID_POKEMON_DURATION_SHORT', '45'); //minutes till pokemon leave
-define ('RAID_DURATION_CLOCK_STYLE',    true); // True: Clocktime style, e.g. "18:34" --- False: Minute style, e.g. "still 0:34"
+define('RAID_EGG_DURATION',    '60'); //minutes till egg comes out
+define('RAID_POKEMON_DURATION_LONG', '90'); //minutes till pokemon leave
+define('RAID_POKEMON_DURATION_SHORT', '45'); //minutes till pokemon leave
+define('RAID_DURATION_CLOCK_STYLE',    true); // True: Clocktime style, e.g. "18:34" --- False: Minute style, e.g. "still 0:34"
 
 define('CLEANUP',           false); // must be true for cleanup
 define('CLEANUP_LOGFILE',   '/var/log/tg-bots/dev-raid-bot-cleanup.log');

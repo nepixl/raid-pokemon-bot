@@ -31,7 +31,8 @@ if (!empty($answer)) {
         SET       attend_time = FROM_UNIXTIME({$data['arg']}),
                   cancel = 0,
                   arrived = 0,
-                  raid_done = 0
+                  raid_done = 0,
+                  late = 0
           WHERE   raid_id = {$data['id']}
             AND   user_id = {$update['callback_query']['from']['id']}
         "

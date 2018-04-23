@@ -24,6 +24,7 @@ CREATE TABLE `attendance` (
   `arrived` tinyint(1) unsigned DEFAULT '0',
   `raid_done` tinyint(1) unsigned DEFAULT '0',
   `cancel` tinyint(1) unsigned DEFAULT '0',
+  `late` tinyint(1) unsigned DEFAULT '0',
   `pokemon` varchar(12) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `raid_id` (`raid_id`)
