@@ -30,7 +30,7 @@ if ($action == 'down') {
         UPDATE    users
         SET       level = level-1
           WHERE   user_id = {$update['callback_query']['from']['id']}
-            AND   level > 0
+            AND   level > 5
         "
     );
 }
