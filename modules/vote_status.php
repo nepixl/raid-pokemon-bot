@@ -34,6 +34,7 @@ if (!empty($answer)) {
         SET       arrived = 0,
                   raid_done = 0,
                   cancel = 0,
+                  late = 0,
                   $status = 1
           WHERE   raid_id = {$data['id']}
             AND   user_id = {$update['callback_query']['from']['id']}

@@ -1783,15 +1783,26 @@ function keys_vote($raid)
 	$timePerSlot = 60*RAID_SLOTS;
 	$timeBeforeEnd = 60*RAID_LAST_START;
         $col = 1;
+
+        // Attend raid at any time
+        if(RAID_ANYTIME == true)
+        {
+            $keys_time[] = array(
+                'text'          => getTranslation('anytime'),
+                'callback_data' => $raid['id'] . ':vote_time:0'
+            );
+        }
+
         // Old stuff, left for possible future use or in case of bugs:
         //for ($i = ceil($now / $timePerSlot) * $timePerSlot; $i <= ($end_time - $timeBeforeEnd); $i = $i + $timePerSlot) {
         for ($i = ceil($start_time / $timePerSlot) * $timePerSlot; $i <= ($end_time - $timeBeforeEnd); $i = $i + $timePerSlot) {
+/*
             if ($col++ >= 4) {
                 $keys[] = $keys_time;
                 $keys_time = [];
                 $col = 1;
             }
-
+*/
 	    // Plus 60 seconds, so vote button for e.g. 10:00 will disappear after 10:00:59 / at 10:01:00 and not right after 09:59:59 / at 10:00:00
 	    if (($i + 60) > $now) {
 		// Display vote buttons for now + 1 additional minute
@@ -1818,7 +1829,10 @@ function keys_vote($raid)
             }
         }
 
-        $keys[] = $keys_time;
+        // Add time keys.
+        $keys_time = inline_key_array($keys_time, 4);
+        $keys = array_merge($keys, $keys_time);
+        //$keys[] = $keys_time;
 
         // Init keys pokemon array.
         $keys_poke = [];
@@ -1902,7 +1916,7 @@ function keys_vote($raid)
             if($count >= 2) {
                 // Add button if raid boss does not matter
                 $keys_poke[] = array(
-                    'text'          => getTranslation('any'),
+                    'text'          => getTranslation('any_pokemon'),
                     'callback_data' => $raid['id'] . ':vote_pokemon:0'
                 );
 
@@ -1912,21 +1926,47 @@ function keys_vote($raid)
             }
         }
 
+        // Show icon, icon + text or just text.
+        // Icon.
+        if(RAID_VOTE_ICONS == true && RAID_VOTE_TEXT == false) {
+            $text_here = EMOJI_HERE;
+            $text_late = EMOJI_LATE;
+            $text_done = TEAM_DONE;
+            $text_cancel = TEAM_CANCEL;
+        // Icon + text.
+        } else if(RAID_VOTE_ICONS == true && RAID_VOTE_TEXT == true) {
+            $text_here = EMOJI_HERE . getTranslation('here');
+            $text_late = EMOJI_LATE . getTranslation('late');
+            $text_done = TEAM_DONE . getTranslation('done');
+            $text_cancel = TEAM_CANCEL . getTranslation('cancellation');
+        // Text.
+        } else {
+            $text_here = getTranslation('here');
+            $text_late = getTranslation('late');
+            $text_done = getTranslation('done');
+            $text_cancel = getTranslation('cancellation');
+        }
+        
+        // Add status keys.
         $keys[] = [
             [
                 'text'          => EMOJI_REFRESH,
                 'callback_data' => $raid['id'] . ':vote_refresh:0'
             ],
             [
-                'text'          => EMOJI_HERE . getTranslation('here'),
+                'text'          => $text_here,
                 'callback_data' => $raid['id'] . ':vote_status:arrived'
             ],
             [
-                'text'          => getTranslation('done'),
+                'text'          => $text_late,
+                'callback_data' => $raid['id'] . ':vote_status:late'
+            ],
+            [
+                'text'          => $text_done,
                 'callback_data' => $raid['id'] . ':vote_status:raid_done'
             ],
             [
-                'text'          => getTranslation('cancellation'),
+                'text'          => $text_cancel,
                 'callback_data' => $raid['id'] . ':vote_status:cancel'
             ],
         ];
@@ -2643,8 +2683,9 @@ function show_raid_poll($raid)
                         sum(extra_mystic)           AS extra_mystic,
                         sum(extra_valor)            AS extra_valor,
                         sum(extra_instinct)         AS extra_instinct,
-                        sum(pokemon = '0')          AS count_any_pokemon,
-                        sum(pokemon = '{$raid['pokemon']}') AS count_raid_pokemon,
+                        sum(IF(late = '1', (late = '1') + extra_mystic + extra_valor + extra_instinct, 0)) AS count_late,
+                        sum(pokemon = '0')                   AS count_any_pokemon,
+                        sum(pokemon = '{$raid['pokemon']}')  AS count_raid_pokemon,
                         attend_time
         FROM            attendance
           WHERE         raid_id = {$raid['id']}
@@ -2659,10 +2700,12 @@ function show_raid_poll($raid)
     // Init empty count array and count sum.
     $cnt = array();
     $cnt_all = 0;
+    $cnt_latewait = 0;
 
     while ($cnt_row = $rs_cnt->fetch_assoc()) {
         $cnt[$cnt_row['ts_att']] = $cnt_row;
         $cnt_all = $cnt_all + $cnt_row['count'];
+        $cnt_latewait = $cnt_latewait + $cnt_row['count_late'];
     }
 
     // Write to log.
@@ -2683,8 +2726,9 @@ function show_raid_poll($raid)
                             sum(extra_mystic)           AS extra_mystic,
                             sum(extra_valor)            AS extra_valor,
                             sum(extra_instinct)         AS extra_instinct,
-                            sum(pokemon = '0')          AS count_any_pokemon,
-                            sum(pokemon = '{$raid['pokemon']}') AS count_raid_pokemon,
+                            sum(IF(late = '1', (late = '1') + extra_mystic + extra_valor + extra_instinct, 0)) AS count_late,
+                            sum(pokemon = '0')                   AS count_any_pokemon,
+                            sum(pokemon = '{$raid['pokemon']}')  AS count_raid_pokemon,
                             attend_time,
                             pokemon
             FROM            attendance
@@ -2737,11 +2781,16 @@ function show_raid_poll($raid)
             $current_att_time = $row['ts_att'];
             $current_pokemon = $row['pokemon'];
 
+            // Add hint for late attendances.
+            if(RAID_LATE_MSG && $previous_att_time == 'FIRST_RUN' && $cnt_latewait > 0) {
+                $msg .= CR . EMOJI_LATE . '<i>' . getTranslation('late_participants') . CR . RAID_LATE_TIME . ' ' . getTranslation('late_participants_wait') . '</i>' . CR;
+            }
+
             // Add section/header for time
             if($previous_att_time != $current_att_time) {
                 // Add to message.
                 $count_att_time_extrapeople = $cnt[$current_att_time]['extra_mystic'] + $cnt[$current_att_time]['extra_valor'] + $cnt[$current_att_time]['extra_instinct'];
-                $msg .= CR . '<b>' . unix2tz($current_att_time, $raid['timezone']) . '</b>' . ' [' . ($cnt[$current_att_time]['count'] + $count_att_time_extrapeople) . ']';
+                $msg .= CR . '<b>' . (($current_att_time == 0) ? (getTranslation('anytime')) : (unix2tz($current_att_time, $raid['timezone']))) . '</b>' . ' [' . ($cnt[$current_att_time]['count'] + $count_att_time_extrapeople) . ']';
 
                 // Add attendance counts by team.
                 if ($cnt[$current_att_time]['count'] > 0) {
@@ -2749,13 +2798,15 @@ function show_raid_poll($raid)
                     $count_mystic = $cnt[$current_att_time]['count_mystic'] + $cnt[$current_att_time]['extra_mystic'];
                     $count_valor = $cnt[$current_att_time]['count_valor'] + $cnt[$current_att_time]['extra_valor'];
                     $count_instinct = $cnt[$current_att_time]['count_instinct'] + $cnt[$current_att_time]['extra_instinct'];
+                    $count_late = $cnt[$current_att_time]['count_late'];
 
                     // Add to message.
                     $msg .= ' — ';
                     $msg .= (($count_mystic > 0) ? TEAM_B . $count_mystic . '  ' : '');
                     $msg .= (($count_valor > 0) ? TEAM_R . $count_valor . '  ' : '');
                     $msg .= (($count_instinct > 0) ? TEAM_Y . $count_instinct . '  ' : '');
-                    $msg .= (($cnt[$current_att_time]['count_no_team'] > 0) ? TEAM_UNKNOWN . $cnt[$current_att_time]['count_no_team'] : '');
+                    $msg .= (($cnt[$current_att_time]['count_no_team'] > 0) ? TEAM_UNKNOWN . $cnt[$current_att_time]['count_no_team'] . '  ' : '');
+                    $msg .= (($count_late > 0) ? EMOJI_LATE . $count_late . '  ' : '');
                 }
                 $msg .= CR;
             }
@@ -2778,6 +2829,7 @@ function show_raid_poll($raid)
                     $poke_count_mystic = $current_att_time_poke['count_mystic'] + $current_att_time_poke['extra_mystic'];
                     $poke_count_valor = $current_att_time_poke['count_valor'] + $current_att_time_poke['extra_valor'];
                     $poke_count_instinct = $current_att_time_poke['count_instinct'] + $current_att_time_poke['extra_instinct'];
+                    $poke_count_late = $current_att_time_poke['count_late'];
 
                     // Add to message.
                     $msg .= ' [' . ($current_att_time_poke['count'] + $count_att_time_poke_extrapeople) . '] — ';
@@ -2785,17 +2837,16 @@ function show_raid_poll($raid)
                     $msg .= (($poke_count_valor > 0) ? TEAM_R . $poke_count_valor . '  ' : '');
                     $msg .= (($poke_count_instinct > 0) ? TEAM_Y . $poke_count_instinct . '  ' : '');
                     $msg .= (($current_att_time_poke['count_no_team'] > 0) ? TEAM_UNKNOWN . ($current_att_time_poke['count_no_team']) : '');
+                    $msg .= (($poke_count_late > 0) ? EMOJI_LATE . $poke_count_late . '  ' : '');
                     $msg .= CR;
                 }
             }
 
             // Add users: TEAM -- LEVEL -- NAME -- ARRIVED -- EXTRAPEOPLE
-            $msg .= ($row['arrived']) ? (EMOJI_HERE . ' ') : '└ ';
-            //$msg .= ($row['team'] === NULL) ? ('└ ' . $GLOBALS['teams']['unknown'] . ' ') : ('└ ' . $GLOBALS['teams'][$row['team']] . ' ');
+            $msg .= ($row['arrived']) ? (EMOJI_HERE . ' ') : (($row['late']) ? (EMOJI_LATE . ' ') : '└ ');
             $msg .= ($row['team'] === NULL) ? ($GLOBALS['teams']['unknown'] . ' ') : ($GLOBALS['teams'][$row['team']] . ' ');
             $msg .= ($row['level'] != 0) ? ('<b>'.$row['level'].'</b> ') : '';
             $msg .= '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a> ';
-            //$msg .= ($row['arrived']) ? ('[' . getTranslation('here') . '] ') : '';
             $msg .= ($row['extra_mystic']) ? ('+' . $row['extra_mystic'] . TEAM_B . ' ') : '';
             $msg .= ($row['extra_valor']) ? ('+' . $row['extra_valor'] . TEAM_R . ' ') : '';
             $msg .= ($row['extra_instinct']) ? ('+' . $row['extra_instinct'] . TEAM_Y . ' ') : '';
@@ -2804,11 +2855,6 @@ function show_raid_poll($raid)
             // Prepare next result
             $previous_att_time = $current_att_time;
             $previous_pokemon = $current_pokemon; 
-        }
-    } else {
-        // Proper format :)
-        if($raid_level != 'X') {
-            $msg .= CR;
         }
     }
 
@@ -2898,8 +2944,8 @@ function show_raid_poll($raid)
             $msg .= ($row['team'] === NULL) ? ('└ ' . $GLOBALS['teams']['unknown'] . ' ') : ('└ ' . $GLOBALS['teams'][$row['team']] . ' ');
             $msg .= ($row['level'] != 0) ? ('<b>'.$row['level'].'</b> ') : '';
             $msg .= '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a> ';
-            $msg .= ($row['cancel'] == 1) ? ('[' . unix2tz($row['ts_att'], $raid['timezone']) . '] ') : '';
-            $msg .= ($row['raid_done'] == 1) ? ('[' . unix2tz($row['ts_att'], $raid['timezone']) . '] ') : '';
+            $msg .= ($row['cancel'] == 1) ? ('[' . (($row['ts_att'] == 0) ? (getTranslation('anytime')) : (unix2tz($row['ts_att'], $raid['timezone']))) . '] ') : '';
+            $msg .= ($row['raid_done'] == 1) ? ('[' . (($row['ts_att'] == 0) ? (getTranslation('anytime')) : (unix2tz($row['ts_att'], $raid['timezone']))) . '] ') : '';
             $msg .= ($row['extra_mystic']) ? ('+' . $row['extra_mystic'] . TEAM_B . ' ') : '';
             $msg .= ($row['extra_valor']) ? ('+' . $row['extra_valor'] . TEAM_R . ' ') : '';
             $msg .= ($row['extra_instinct']) ? ('+' . $row['extra_instinct'] . TEAM_Y . ' ') : '';
@@ -2909,7 +2955,7 @@ function show_raid_poll($raid)
 
     // Add no attendance found message.
     if ($cnt_all + $cnt_cancel_done['count_cancel'] + $cnt_cancel_done['count_done'] == 0) {
-        $msg .= getTranslation('no_participants_yet') . CR;
+        $msg .= CR . getTranslation('no_participants_yet') . CR;
     }
 
     // Display creator.
@@ -2938,7 +2984,7 @@ function show_raid_poll_small($raid)
     $msg = '';
     // Pokemon
     if(!empty($raid['pokemon'])) {
-        $msg .= '<b>' . get_local_pokemon_name($raid['pokemon']) . '</b> ';
+        $msg .= '<b>' . get_local_pokemon_name($raid['pokemon']) . '</b> ' . CR;
     }
     // Start time and end time
     if(!empty($raid['ts_start']) && !empty($raid['ts_end'])) {

@@ -76,7 +76,12 @@
 		"DE": "Bin da",
 		"EN": "Here",
 		"PT-BR": "Aqui"
-		
+	},
+	"late" : {
+		"NL": "Laat",
+		"DE": "Spät dran",
+		"EN": "Late",
+		"PT-BR": "TRANSLATE"
 	},
 	"done" : {
 		"NL": "Klaar",
@@ -97,7 +102,7 @@
 		"PT-BR": "Votos atualizados"
 	},
 	"vote_time_first" : {
-		"NL": "TRANSLATE",
+		"NL": "Kies eerst een tijd!",
 		"DE": "Zuerst für eine Uhrzeit abstimmen!",
 		"EN": "Vote for a time first!",
 		"PT-BR": "TRANSLATE"
@@ -299,6 +304,18 @@
 		"DE": "Keine Teilnehmer",
 		"EN": "No participants",
 		"PT-BR": "Sem participantes"		
+	},
+	"late_participants" : {
+		"NL": "TRANSLATE",
+		"DE": "Einige Teilnehmer verspäten sich!",
+		"EN": "Some participants are late!",
+		"PT-BR": "TRANSLATE"		
+	},
+	"late_participants_wait" : {
+		"NL": "TRANSLATE",
+		"DE": "Minuten werden evtl. gewartet!",
+		"EN": "Minutes may be waited!",
+		"PT-BR": "TRANSLATE"		
 	},
 	"egg_5" : {
 		"NL": "Level 5 Ei",
@@ -942,11 +959,11 @@
 		"EN": "The process was aborted!",
 		"PT-BR": "O processo foi abortado!"
 	},
-	"any" : {
-		"NL": "Elk",
-		"DE": "Egal",
-		"EN": "Any",
-		"PT-BR": "Qualquer"
+	"anytime" : {
+		"NL": "Elke tijd",
+		"DE": "Jederzeit",
+		"EN": "Anytime",
+		"PT-BR": "TRANSLATE"
 	},
 	"any_pokemon" : {
 		"NL": "Elke raid baas",
