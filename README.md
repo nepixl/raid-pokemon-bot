@@ -115,7 +115,7 @@ Command raid bosses: `mysql -u USERNAME -p DATABASENAME < raid-boss-pokedex.sql`
 
 ## Webhooks
 
-Set Telegram webhook via https://your-hostname/bot-dir/webhooks.html
+Set Telegram webhook via https://your-hostname/bot-dir/webhook.html
 
 ## Google maps API
 
