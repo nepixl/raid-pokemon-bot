@@ -192,7 +192,7 @@ $id = my_insert_id();
 debug_log('ID=' . $id);
 
 // Get raid data.
-$raid = get_raid($id)
+$raid = get_raid($id);
 
 // Send location.
 if (RAID_LOCATION == true) {

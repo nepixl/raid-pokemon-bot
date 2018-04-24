@@ -1,4 +1,18 @@
-# Installation
+# About
+
+Telegram bot for organizing raids in Pokemon Go. Developers are welcome to join https://t.me/RaidBotSupport
+
+# Screenshots
+
+#### Example raid poll with the ex-raid notice:
+![Example raid poll](/screenshots/raid-poll-example-with-ex-raid-message.png?raw=true "Example raid poll")
+
+#### Example raid poll showing the users teams & levels (if they've set it), status (late, cancel and done), attend times and preferred pokemons (if raid boss is still a raid egg) the users voted for:
+![Example raid poll](/screenshots/raid-poll-example-with-late.png?raw=true "Example raid poll")
+![Example raid poll](/screenshots/raid-poll-example-with-cancel.png?raw=true "Example raid poll")
+![Example raid poll](/screenshots/raid-poll-example-with-done.png?raw=true "Example raid poll")
+
+# Installation and configuration
 
 ## Webserver
 
@@ -62,6 +76,20 @@ Set `RAID_LOCATION` to true to send back the location as message in addition to 
 Set `RAID_SLOTS` to the amount of minutes which shall be between the voting slots.
 
 Set `RAID_LAST_START` to the minutes for the last start option before the a raid ends.
+
+Set `RAID_ANYTIME` to true to allow attendance of the raid at any time. If set to false, users have to pick a specific time.
+
+## Raid poll design and layout
+
+There are several options to configure the design and layout of the raid polls:
+
+Set `RAID_VOTE_ICONS` to true to show the icons for the status vote buttons.
+
+Set `RAID_VOTE_TEXT` to true to show the text for the status vote buttons.
+
+Set `RAID_LATE_MSG` to true to enable the message hinting that some participants are late.
+
+Set `RIAD_LATE_TIME` to the amount of minutes the local community will may be wait for the late participants.
 
 ## Proxy
 
@@ -177,14 +205,14 @@ Example for public access: `define('BOT_ACCESS', '');`
 
 With BOT_ADMINS and BOT_ACCESS being used to restrict access, there are several access roles / types. When you do not configure BOT_ACCESS, everyone will have access to your bot (public access).  
 
-Set `BOT_ADMINS` and `BOT_ACCESS` to the name (@Telegram_Groupname) or id (-100123456789) of one or multiple by comma separated individual telegram chat names/ids, groups, supergroups or channels.
+Set `BOT_ADMINS` and `BOT_ACCESS` to id (-100123456789) of one or multiple by comma separated individual telegram chat names/ids, groups, supergroups or channels.
 
 Please note, when you're setting groups, supergroups or channels only administrators (not members!) from these chats will gain access to the bot! So make sure this requirement is fulfilled or add their individual telegram usernames/ids instead.
 
 Example for restricted access:  
-`define('BOT_ADMINS', '@YOUR_USERNAME,111222333');`
+`define('BOT_ADMINS', '111222333,111555999');`
 
-`define('BOT_ACCESS', '111222333,@Bot_Access_Groupname,-100112233445,@Superadmins_Bot_Groups');`
+`define('BOT_ACCESS', '111222333,-100224466889,-100112233445,111555999');`
 
 ## Access overview
 
@@ -220,36 +248,51 @@ Telegram Users can only vote on raid polls, but have no access to other bot func
 |           |            |                                  |               |            |            |            |          |
 |           | Help       | Show `/help`                     | Yes           | Yes        | Yes        | Yes        |          |
 
-# Updates
-
-Currently constantly new features, bug fixes and improvements are added to the bot. Since we do not have an update mechanism yet, when updating the bot, please always do the following:
- - Add new config variables which got added to the config.php.example to your own config.php!
- - If new tables and/or columns got added or changed inside raid-pokemon-bot.sql, please add/alter these tables/columns at your existing installation!
 
 # Usage
 
 ## Bot commands
-#### Command: No command - just send your location to the bot
+### Command: No command - just send your location to the bot
 
 The bot will guide you through the creation of the raid poll by asking you for the raid level, the pokemon raid boss, the time until the raids starts and the time left for the raid. Afterwards you can set the gym name and gym team by using the /gym and /team commands.
 
 
-#### Command: /start
+### Command: /start
 
 The bot will guide you through the creation of the raid poll by asking you for the gym, raid level, the pokemon raid boss, the time until the raid starts and the time left for the raid. Afterwards you can set the gym team by using the /team command.
 
+#### Screenshots
+#### Send `/start` to the bot to create a raid by gym selection:
+![Command: /start](/screenshots/command-start.png?raw=true "Command: /start")
 
-#### Command: /help
+#### Select the gym via the first letter:
+![Command: /start](/screenshots/commands-start-select-gym-first-letter.png?raw=true "Command: /start")
+![Command: /start](/screenshots/commands-start-select-gym-letter-d.png?raw=true "Command: /start")
+
+#### Select the raid level and raid boss:
+![Command: /start](/screenshots/commands-start-select-raid-level.png?raw=true "Command: /start")
+![Command: /start](/screenshots/commands-start-select-raid-boss.png?raw=true "Command: /start")
+
+#### Select the start time (clock time or minutes) and the duration of the raid:
+![Command: /start](/screenshots/commands-start-select-starttime-clock.png?raw=true "Command: /start")
+![Command: /start](/screenshots/commands-start-select-starttime-minutes.png?raw=true "Command: /start")
+
+![Command: /start](/screenshots/commands-start-select-raid-duration.png?raw=true "Command: /start")
+
+#### Raid poll is created. Delete or share it:
+![Command: /start](/screenshots/commands-start-raid-saved.png?raw=true "Command: /start")
+
+### Command: /help
 
 The bot will answer you "This is a private bot" so you can verify the bot is working and accepting input.
 
 
-#### Command: /mods
+### Command: /mods
 
 The bot allows you to set some users as moderators. You can list, add and delete moderators from the bot. Note that when you have restricted the access to your bot via BOT_ADMINS and BOT_ACCESS, you need to add the users as administrators of a chat or their Telegram IDs to either BOT_ADMINS or BOT_ACCESS. Otherwise they won't have access to the bot, even though you have added them as moderators! 
 
 
-#### Command: /raid
+### Command: /raid
 
 Create a new raid by gomap-notifier or other input. The raid command expects 8 parameters and an optional 9th parameter as input seperated by comma.
 
@@ -257,22 +300,51 @@ Additionally the raid command checks for existing raids, so sending the same com
 
 Parameters: Pokemon raid boss id, latitude, longitude, raid duration in minutes, gym team, gym name, district or street, district or street, raid pre-hatch egg countdown in minutes (optional)
 
-Example input: `/raid 244,52.514545,13.350095,60,Mystic,Siegessäule,Großer Stern,10557 Berlin,30`
+Example input: `/raid 244,52.516263,13.377755,45,Mystic,Brandenburger Tor,Pariser Platz 1, 10117 Berlin,30`
 
 
-#### Command: /pokemon
+### Command: /pokemon
 
 Update pokemon of an existing raid poll. With this command you can change the pokemon raid boss from e.g. "Level 5 Egg" to "Lugia" once the egg has hatched.
 
 Based on your access to the bot, you may can only change the pokemon raid boss of raid polls you created yourself and cannot modify the pokemon of raid polls from other bot users.
 
 
-#### Command: /pokedex
+### Command: /pokedex
 
 Show and update any pokemon raid boss. You can change the raid level (select raid level 0 to disable a raid boss), pokemon CP values and weather information of any pokemon raid boss.
 
+#### Screenshots
+#### Manage pokemons / raid bosses via the `/pokedex` command:
 
-#### Command: /new
+![Command: /pokedex](/screenshots/command-pokedex.png?raw=true "Command: /pokedex")
+
+#### All raid bosses:
+
+![Command: /pokedex](/screenshots/commands-pokedex-all-raid-bosses.png?raw=true "Command: /pokedex")
+
+#### Select and edit a specific pokemon / raid boss:
+
+![Command: /pokedex](/screenshots/commands-pokedex-list-raid-boss-pokemon.png?raw=true "Command: /pokedex")
+![Command: /pokedex](/screenshots/commands-pokedex-edit-raid-boss-pokemon.png?raw=true "Command: /pokedex")
+
+#### Edit the raid level:
+
+![Command: /pokedex](/screenshots/commands-pokedex-set-raid-level.png?raw=true "Command: /pokedex")
+![Command: /pokedex](/screenshots/commands-pokedex-saved-new-raid-level.png?raw=true "Command: /pokedex")
+
+#### Edit the CP values, e.g. Max CP:
+
+![Command: /pokedex](/screenshots/commands-pokedex-enter-max-cp.png?raw=true "Command: /pokedex")
+![Command: /pokedex](/screenshots/commands-pokedex-save-max-cp.png?raw=true "Command: /pokedex")
+![Command: /pokedex](/screenshots/commands-pokedex-saved-new-max-cp.png?raw=true "Command: /pokedex")
+
+#### Edit the weather:
+
+![Command: /pokedex](/screenshots/commands-pokedex-set-weather.png?raw=true "Command: /pokedex")
+
+
+### Command: /new
 
 The bot expects latitude and longitude seperated by comma and will then guide you through the creation of the raid poll.
 
@@ -281,26 +353,46 @@ This command was implemented since the Telegram Desktop Client does not allow to
 Example input: `/new 52.514545,13.350095`
 
 
-#### Command: /list 
+### Command: /list 
 
 The bot will allow you to via a list of the last 20 active raids, share and delete all raids which got shared to channels as a raid overview.
 
+#### Screenshots
+#### List existing raid polls with the `/list` command:
 
-#### Command: /delete
+![Command: /list](/screenshots/command-list.png?raw=true "Command: /list")
+
+![Command: /list](/screenshots/commands-list-active-raids.png?raw=true "Command: /list")
+
+#### Share overview message with all raids shared to channel "Chat-Name" to the channel:
+
+![Command: /list](/screenshots/commands-list-share-overview.png?raw=true "Command: /list")
+
+#### Delete the shared overview message:
+
+![Command: /list](/screenshots/commands-list-delete-overview.png?raw=true "Command: /list")
+
+### Command: /delete
 
 Delete an existing raid poll. With this command you can delete a raid poll from telegram and the database. Use with care!
 
 Based on your access to the bot, you may can only delete raid polls you created yourself and cannot delete raid polls from other bot users.
 
+#### Screenshots
+#### Delete an existing raid poll with the `/delete` command:
 
-#### Command: /team
+![Command: /delete](/screenshots/command-delete.png?raw=true "Command: /delete")
+
+![Command: /delete](/screenshots/commands-delete-raid-deleted.png?raw=true "Command: /delete")
+
+### Command: /team
 
 The bot will set the team to Mystic/Valor/Instinct for the last created raid based on your input.
 
 Example input: `/team Mystic`
 
 
-#### Command: /gym
+### Command: /gym
 
 The bot will set the name of gym to your input.
 
@@ -310,7 +402,13 @@ Example input: `/gym Siegessäule`
 
 Check your bot logfile and other related log files, e.g. apache/httpd log, php log, and so on.
 
-# TODO:
+# Updates
+
+Currently constantly new features, bug fixes and improvements are added to the bot. Since we do not have an update mechanism yet, when updating the bot, please always do the following:
+ - Add new config variables which got added to the config.php.example to your own config.php!
+ - If new tables and/or columns got added or changed inside raid-pokemon-bot.sql, please add/alter these tables/columns at your existing installation!
+
+# TODO
 
 * New gyms: Adding gyms to database without creating a raid via /raid
 * Delete incomplete raids automatically: When a bot user starts to create a raid via /start, but does not finish the raid creation, incomplete raid data is stored in the raids table. A method to automatically delete them without interfering with raids just being created would be nice.
@@ -325,4 +423,4 @@ Export command: `mysqldump -u USERNAME -p --no-data --skip-add-drop-table --skip
 
 #### raid-boss-pokedex.sql
 
-Export command: `mysqldump -u root -p --skip-extended-insert --skip-comments dev_bot pokemon > raid-boss-pokedex.sql`
+Export command: `mysqldump -u USERNAME -p --skip-extended-insert --skip-comments DATABASENAME pokemon > raid-boss-pokedex.sql`

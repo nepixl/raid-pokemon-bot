@@ -2845,16 +2845,7 @@ function show_raid_poll($raid)
             // Add users: TEAM -- LEVEL -- NAME -- ARRIVED -- EXTRAPEOPLE
             $msg .= ($row['arrived']) ? (EMOJI_HERE . ' ') : (($row['late']) ? (EMOJI_LATE . ' ') : '└ ');
             $msg .= ($row['team'] === NULL) ? ($GLOBALS['teams']['unknown'] . ' ') : ($GLOBALS['teams'][$row['team']] . ' ');
-            if ($row['level'] == 0)
-              $msg .= '<b>00</b> ';
-            else {
-              
-              if ($row['level'] < 10)
-                $msg .= '<b>0'.$row['level'].'</b> ';
-              else
-                $msg .= '<b>'.$row['level'].'</b> ';
-                
-            }
+            $msg .= ($row['level'] == 0) ? ('<b>00</b> ') : (($row['level'] < 10) ? ('<b>0' . $row['level'] . '</b> ') : ('<b>' . $row['level'] . '</b> '));
             $msg .= '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a> ';
             $msg .= ($row['extra_mystic']) ? ('+' . $row['extra_mystic'] . TEAM_B . ' ') : '';
             $msg .= ($row['extra_valor']) ? ('+' . $row['extra_valor'] . TEAM_R . ' ') : '';
@@ -2951,16 +2942,7 @@ function show_raid_poll($raid)
 
             // Add users: TEAM -- LEVEL -- NAME -- CANCELED/DONE -- EXTRAPEOPLE
             $msg .= ($row['team'] === NULL) ? ('└ ' . $GLOBALS['teams']['unknown'] . ' ') : ('└ ' . $GLOBALS['teams'][$row['team']] . ' ');
-            if ($row['level'] == 0)
-              $msg .= '<b>00</b> ';
-            else {
-              
-              if ( $row['level'] < 10 )
-                $msg .= '<b>0'.$row['level'].'</b> ';
-              else
-                $msg .= '<b>'.$row['level'].'</b> ';
-                
-            }
+            $msg .= ($row['level'] == 0) ? ('<b>00</b> ') : (($row['level'] < 10) ? ('<b>0' . $row['level'] . '</b> ') : ('<b>' . $row['level'] . '</b> '));
             $msg .= '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a> ';
             $msg .= ($row['cancel'] == 1) ? ('[' . (($row['ts_att'] == 0) ? (getTranslation('anytime')) : (unix2tz($row['ts_att'], $raid['timezone']))) . '] ') : '';
             $msg .= ($row['raid_done'] == 1) ? ('[' . (($row['ts_att'] == 0) ? (getTranslation('anytime')) : (unix2tz($row['ts_att'], $raid['timezone']))) . '] ') : '';

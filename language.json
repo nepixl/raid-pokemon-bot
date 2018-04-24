@@ -36,10 +36,10 @@
 		"PT-BR": "Raid nível 1"
 	},
 	"0stars" : {
-		"NL": "0 Sterren Raid",
-		"DE": "0 Sterne Raid",
-		"EN": "0 Star Raid",
-		"PT-BR": "Raid nível 0"
+		"NL": "Uitgeschakeld",
+		"DE": "Deaktiviert",
+		"EN": "Disabled",
+		"PT-BR": "TRANSLATE"
 	},
 	"back" : {
 		"NL": "Terug",
@@ -614,7 +614,7 @@
 	"pokedex_start" : {
 		"NL": "Raid bazen lijst aanpassen",
 		"DE": "Raid-Boss / Pokemon anzeigen und bearbeiten",
-		"EN": "List and edit raid boss pokemon",
+		"EN": "List and edit raid boss / pokemon",
 		"PT-BR": "TRANSLATE"
 	},
 	"pokedex_raid_pokemon" : {
