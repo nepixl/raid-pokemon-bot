@@ -1,4 +1,24 @@
-# Installation
+# About
+
+Telegram bot for organizing raids in Pokemon Go. Developers are welcome to join https://t.me/RaidBotSupport
+
+# Screenshots
+
+## Raid poll
+
+## Raid poll creation
+
+## Raid poll removal
+
+## Overview
+
+## Pokedex
+
+## Moderators
+
+## Egg to pokemon
+
+# Installation and configuration
 
 ## Webserver
 
@@ -62,6 +82,20 @@ Set `RAID_LOCATION` to true to send back the location as message in addition to 
 Set `RAID_SLOTS` to the amount of minutes which shall be between the voting slots.
 
 Set `RAID_LAST_START` to the minutes for the last start option before the a raid ends.
+
+Set `RAID_ANYTIME` to true to allow attendance of the raid at any time. If set to false, users have to pick a specific time.
+
+## Raid poll design and layout
+
+There are several options to configure the design and layout of the raid polls:
+
+Set `RAID_VOTE_ICONS` to true to show the icons for the status vote buttons.
+
+Set `RAID_VOTE_TEXT` to true to show the text for the status vote buttons.
+
+Set `RAID_LATE_MSG` to true to enable the message hinting that some participants are late.
+
+Set `RIAD_LATE_TIME` to the amount of minutes the local community will may be wait for the late participants.
 
 ## Proxy
 
@@ -177,14 +211,14 @@ Example for public access: `define('BOT_ACCESS', '');`
 
 With BOT_ADMINS and BOT_ACCESS being used to restrict access, there are several access roles / types. When you do not configure BOT_ACCESS, everyone will have access to your bot (public access).  
 
-Set `BOT_ADMINS` and `BOT_ACCESS` to the name (@Telegram_Groupname) or id (-100123456789) of one or multiple by comma separated individual telegram chat names/ids, groups, supergroups or channels.
+Set `BOT_ADMINS` and `BOT_ACCESS` to id (-100123456789) of one or multiple by comma separated individual telegram chat names/ids, groups, supergroups or channels.
 
 Please note, when you're setting groups, supergroups or channels only administrators (not members!) from these chats will gain access to the bot! So make sure this requirement is fulfilled or add their individual telegram usernames/ids instead.
 
 Example for restricted access:  
-`define('BOT_ADMINS', '@YOUR_USERNAME,111222333');`
+`define('BOT_ADMINS', '111222333,111555999');`
 
-`define('BOT_ACCESS', '111222333,@Bot_Access_Groupname,-100112233445,@Superadmins_Bot_Groups');`
+`define('BOT_ACCESS', '111222333,-100224466889,-100112233445,111555999');`
 
 ## Access overview
 
@@ -325,4 +359,4 @@ Export command: `mysqldump -u USERNAME -p --no-data --skip-add-drop-table --skip
 
 #### raid-boss-pokedex.sql
 
-Export command: `mysqldump -u root -p --skip-extended-insert --skip-comments dev_bot pokemon > raid-boss-pokedex.sql`
+Export command: `mysqldump -u USERNAME -p --skip-extended-insert --skip-comments DATABASENAME pokemon > raid-boss-pokedex.sql`
