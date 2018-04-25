@@ -2252,11 +2252,10 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
             // Add update timestamp to msg.
             $msg .= '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), $tz, 'H:i:s') . '</i>'.CR;
         
-	//add custom message out the config in to the msg.	
-        if(PIN_MESSAGE == "") {
-	} else {
-		$msg .=PIN_MESSAGE.CR;
-	}
+        //add custom message out the config in to the msg.	
+        if(isset(PIN_MESSAGE) && !empty(PIN_MESSAGE)) {
+          $msg .=PIN_MESSAGE.CR;
+        }
 
             // Share or refresh?
             if ($action == 'share') {
@@ -2422,14 +2421,14 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
             // Is the raid in the same week?
             if($week_now == $week_start && $date_now == $date_raid) {
                 // Output: Raid egg opens up 17:00
-                $msg .= '<b>' . getTranslation('raid_egg_opens') . ' ' . unix2tz($start_time, $tz) . '</b>' . CR;
+                $msg .= $pokemon . ' — <b>' . getTranslation('raid_egg_opens') . ' ' . unix2tz($start_time, $tz) . '</b>' . CR;
             } else {
                 if($days_to_raid > 7) {
                     // Output: Raid egg opens on Friday, 13 April (2018)
-                    $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day . ', ' . $day_start . ' ' . $raid_month . (($year_start > $year_now) ? $year_start : '');
+                    $msg .= $pokemon . ' — <b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day . ', ' . $day_start . ' ' . $raid_month . (($year_start > $year_now) ? $year_start : '');
                 } else {
                     // Output: Raid egg opens on Friday
-                    $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day;
+                    $msg .= $pokemon . ' — <b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day;
                 }
                 // Adds 'at 17:00' to the output.
                 $msg .= ' ' . getTranslation('raid_egg_opens_at') . ' ' . unix2tz($start_time, $tz) . '</b>' . CR;
