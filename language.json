@@ -6,34 +6,34 @@
 		"PT-BR": "Ex-Raid"
 	},
 	"5stars" : {
-		"NL": "5 Sterren Raid",
-		"DE": "5 Sterne Raid",
-		"EN": "5 Star Raid",
-		"PT-BR": "Raid nível 5"
+		"NL": "5 Sterren",
+		"DE": "5 Sterne",
+		"EN": "5 Star",
+		"PT-BR": "Nível 5"
 	},
 	"4stars" : {
-		"NL": "4 Sterren Raid",
-		"DE": "4 Sterne Raid",
-		"EN": "4 Star Raid",
-		"PT-BR": "Raid nível 4"
+		"NL": "4 Sterren",
+		"DE": "4 Sterne",
+		"EN": "4 Star",
+		"PT-BR": "Nível 4"
 	},
 	"3stars" : {
-		"NL": "3 Sterren Raid",
-		"DE": "3 Sterne Raid",
-		"EN": "3 Star Raid",
-		"PT-BR": "Raid nível 3"
+		"NL": "3 Sterren",
+		"DE": "3 Sterne",
+		"EN": "3 Star",
+		"PT-BR": "Nível 3"
 	},
 	"2stars" : {
-		"NL": "2 Sterren Raid",
-		"DE": "2 Sterne Raid",
-		"EN": "2 Star Raid",
-		"PT-BR": "Raid nível 2"
+		"NL": "2 Sterren",
+		"DE": "2 Sterne",
+		"EN": "2 Star",
+		"PT-BR": "Nível 2"
 	},
 	"1stars" : {
-		"NL": "1 Sterren Raid",
-		"DE": "1 Sterne Raid",
-		"EN": "1 Star Raid",
-		"PT-BR": "Raid nível 1"
+		"NL": "1 Sterren",
+		"DE": "1 Sterne",
+		"EN": "1 Star",
+		"PT-BR": "Nível 1"
 	},
 	"0stars" : {
 		"NL": "Uitgeschakeld",
@@ -228,15 +228,15 @@
 		"PT-BR": "ainda"
 	},
 	"raid_egg_opens" : {
-		"NL": "Raid ei gaat open",
-		"DE": "Raid-Ei öffnet sich um",
-		"EN": "Raid egg opens up",
+		"NL": "Gaat open",
+		"DE": "Öffnet sich um",
+		"EN": "Opens up",
 		"PT-BR": "Ovo eclode"
 	},
 	"raid_egg_opens_day" : {
-		"NL": "Raid ei gaat open",
-		"DE": "Raid-Ei öffnet sich am",
-		"EN": "Raid egg opens on",
+		"NL": "Gaat open",
+		"DE": "Öffnet sich am",
+		"EN": "Opens on",
 		"PT-BR": "Ovo eclode em"
 	},
 	"raid_egg_opens_at" : {
