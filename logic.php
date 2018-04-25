@@ -2250,7 +2250,9 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
 	    $keys = array();
 
             // Add update timestamp to msg.
-            $msg .= '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), $tz, 'H:i:s') . '</i>';
+            $msg .= '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), $tz, 'H:i:s') . '</i>'.CR;
+            
+            $msg .=PIN_MESSAGE.CR;
 
             // Share or refresh?
             if ($action == 'share') {

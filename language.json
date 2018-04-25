@@ -306,13 +306,13 @@
 		"PT-BR": "Sem participantes"		
 	},
 	"late_participants" : {
-		"NL": "TRANSLATE",
+		"NL": "Let op er zijn spelers later!",
 		"DE": "Einige Teilnehmer verspäten sich!",
 		"EN": "Some participants are late!",
 		"PT-BR": "TRANSLATE"		
 	},
 	"late_participants_wait" : {
-		"NL": "TRANSLATE",
+		"NL": "Graag even wachten.",
 		"DE": "Minuten werden evtl. gewartet!",
 		"EN": "Minutes may be waited!",
 		"PT-BR": "TRANSLATE"		

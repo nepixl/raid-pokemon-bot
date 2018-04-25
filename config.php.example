@@ -47,3 +47,5 @@ define('CLEANUP_DATABASE',  true);
 define('CLEANUP_TIME_DB',   '10080'); // minutes after RAID ended
 
 define('LANGUAGE', 'EN'); // language for the text EN, DE or NL
+
+define('PIN_MESSAGE',    ''); //Add text under the pinned message.
