@@ -2253,7 +2253,7 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
             $msg .= '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), $tz, 'H:i:s') . '</i>'.CR;
         
         //add custom message out the config in to the msg.	
-        if(isset(PIN_MESSAGE) && !empty(PIN_MESSAGE)) {
+        if ( PIN_MESSAGE != "" ) {
           $msg .=PIN_MESSAGE.CR;
         }
 
