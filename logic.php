@@ -2203,7 +2203,7 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
             }
 
             // Set the message.
-            $msg = '<b>' . getTranslation('raid_overview_for_chat') . ' ' . $chat_title . ':</b>' .  CR . CR;
+            $msg = '<b>' . getTranslation('raid_overview_for_chat') . ' ' . $chat_title . ' von '. unix2tz(time(), $tz, 'H:i') . ':</b>' .  CR . CR;
             $msg .= getTranslation('no_active_raids');
             $msg .= CR . CR . '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), TIMEZONE, 'H:i:s') . '</i>';
 
@@ -2248,9 +2248,6 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
         if ($previous !== 'FIRST_RUN' && $previous !== $current) {
             // Add keys.
 	    $keys = array();
-
-            // Add update timestamp to msg.
-            $msg .= '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), $tz, 'H:i:s') . '</i>'.CR;
         
         //add custom message out the config in to the msg.	
         if ( PIN_MESSAGE != "" ) {
