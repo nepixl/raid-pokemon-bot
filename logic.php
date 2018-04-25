@@ -2171,6 +2171,8 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
     // Init previous chat_id and raid_id
     $previous = 'FIRST_RUN';
     $previous_raid = 'FIRST_RAID';
+    
+    $tz = TIMEZONE;
 
     // Any active raids currently?
     if (empty($raids_active)) {
