@@ -2205,7 +2205,6 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
             // Set the message.
             $msg = '<b>' . getTranslation('raid_overview_for_chat') . ' ' . $chat_title . ' von '. unix2tz(time(), $tz, 'H:i') . ':</b>' .  CR . CR;
             $msg .= getTranslation('no_active_raids');
-            $msg .= CR . CR . '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), TIMEZONE, 'H:i:s') . '</i>';
 
             // Edit the message, but disable the web preview!
             debug_log('Updating overview:' . CR . 'Chat_ID: ' . $chat_id . CR . 'Message_ID: ' . $message_id);
@@ -2367,7 +2366,7 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
                 debug_log('Username of the chat: ' . $chat_obj['result']['username']);
             }
 
-            $msg = '<b>' . getTranslation('raid_overview_for_chat') . ' ' . $chat_obj['result']['title'] . ':</b>' .  CR . CR;
+            $msg = '<b>' . getTranslation('raid_overview_for_chat') . ' ' . $chat_obj['result']['title'] . ' von '. unix2tz(time(), $tz, 'H:i') . ':</b>' .  CR . CR;
         }
 
         // Set variables for easier message building.
