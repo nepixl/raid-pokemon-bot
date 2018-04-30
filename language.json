@@ -1,4 +1,112 @@
 {
+	"pokestop" : {
+		"NL": "Pokestop",
+		"DE": "Pokestop",
+		"EN": "Pokestop",
+		"PT-BR": "TRANSLATE"
+	},
+        "pokestops_not_found" : {
+                "NL": "Error! Geen Pokestops gevonden!",
+                "DE": "Fehler! Keine Pokestops gefunden!",
+                "EN": "Error! No pokestops found!",
+                "PT-BR": "Erro! Nenhum pokestops encontrado!"
+        },
+        "unnamed_pokestop" : {
+                "NL": "TRANSLATE",
+                "DE": "Unbekannter Pokestop",
+                "EN": "Unknown Pokestop",
+                "PT-BR": "TRANSLATE"
+        },
+	"quest" : {
+		"NL": "TRANSLATE",
+		"DE": "Forschung",
+		"EN": "Quest",
+		"PT-BR": "TRANSLATE"
+	},
+        "quest_by_pokestop" : {
+                "NL": "TRANSLATE",
+                "DE": "Lege eine Forschung per Pokestop-Auswahl an:",
+                "EN": "Make a quest per pokestop selection:",
+                "PT-BR": "TRANSLATE"
+        },
+        "quest_select_type" : {
+                "NL": "TRANSLATE",
+                "DE": "Art der Forschung auswählen:",
+                "EN": "Select the quest type:",
+                "PT-BR": "TRANSLATE"
+        },
+        "quest_select_qty_action" : {
+                "NL": "TRANSLATE",
+                "DE": "Aufgabe der Forschung auswählen:",
+                "EN": "Select the task of the quest:",
+                "PT-BR": "TRANSLATE"
+        },
+        "quest_saved" : {
+                "NL": "TRANSLATE",
+                "DE": "Forschung gespeichert:",
+                "EN": "Quest saved:",
+                "PT-BR": "TRANSLATE"
+        },
+        "quests_today" : {
+                "NL": "TRANSLATE",
+                "DE": "Heutige Forschungen:",
+                "EN": "Today's quests:",
+                "PT-BR": "TRANSLATE"
+        },
+        "no_quests_today" : {
+                "NL": "TRANSLATE",
+                "DE": "Heute gibt es noch keine Forschungen!",
+                "EN": "Today there are no quests yet!",
+                "PT-BR": "TRANSLATE"
+        },
+        "quest_already_submitted" : {
+                "NL": "TRANSLATE",
+                "DE": "Forschung für diesen Pokestop ist bereits vorhanden!",
+                "EN": "Quest for this pokestop was already submitted!",
+                "PT-BR": "TRANSLATE"
+        },
+        "select_quest_to_delete" : {
+                "NL": "TRANSLATE",
+                "DE": "Zum Löschen Forschung auswählen:",
+                "EN": "Select quest to delete:",
+                "PT-BR": "TRANSLATE"
+        },
+        "delete_this_quest" : {
+                "NL": "Verwijder deze TRANSLATE?",
+                "DE": "Diese Forschung wirklich löschen?",
+                "EN": "Really delete this quest?",
+                "PT-BR": "Realmente deletar esta TRANSLATE?"
+        },
+        "quest_deletion_was_canceled" : {
+                "NL": "TRANSLATE",
+                "DE": "Löschung der Forschung wurde abgebrochen!",
+                "EN": "Deletion of the quest was canceled!",
+                "PT-BR": "TRANSLATE"
+        },
+        "quest_successfully_deleted" : {
+                "NL": "TRANSLATE",
+                "DE": "Forschung wurde erfolgreich gelöscht!",
+                "EN": "Quest was successfully deleted!",
+                "PT-BR": "TRANSLATE"
+        },
+	"reward" : {
+		"NL": "TRANSLATE",
+		"DE": "Belohnung",
+		"EN": "Reward",
+		"PT-BR": "TRANSLATE"
+	},
+        "reward_select_type" : {
+                "NL": "TRANSLATE",
+                "DE": "Art der Belohnung auswählen:",
+                "EN": "Select the reward type:",
+                "PT-BR": "TRANSLATE"
+        },
+        "reward_select_qty_reward" : {
+                "NL": "TRANSLATE",
+                "DE": "Belohnung auswählen:",
+                "EN": "Select reward:",
+                "PT-BR": "TRANSLATE"
+        },
 	"Xstars" : {
 		"NL": "Ex-Raid",
 		"DE": "Ex-Raid",
@@ -174,7 +282,7 @@
 		"PT-BR": "Abril"
 	},
 	"month_05" : {
-		"NL": "Maart",
+		"NL": "Mei",
 		"DE": "Mai",
 		"EN": "May",
 		"PT-BR": "Mais"
@@ -306,15 +414,15 @@
 		"PT-BR": "Sem participantes"		
 	},
 	"late_participants" : {
-		"NL": "Let op er zijn spelers later!",
-		"DE": "Einige Teilnehmer verspäten sich!",
-		"EN": "Some participants are late!",
+		"NL": "Let op er zijn spelers later.",
+		"DE": "Einige Teilnehmer verspäten sich.",
+		"EN": "Some participants are late.",
 		"PT-BR": "TRANSLATE"		
 	},
 	"late_participants_wait" : {
-		"NL": "Graag even wachten.",
-		"DE": "Minuten werden evtl. gewartet!",
-		"EN": "Minutes may be waited!",
+		"NL": "A.u.b RAID_LATE_TIME minuten wachten!",
+		"DE": "Bitte RAID_LATE_TIME Minuten warten!",
+		"EN": "Please wait RAID_LATE_TIME minutes!",
 		"PT-BR": "TRANSLATE"		
 	},
 	"egg_5" : {

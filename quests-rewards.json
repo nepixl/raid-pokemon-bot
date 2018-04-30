@@ -1,0 +1,32 @@
+{
+	"quest_action_1" : {
+		"NL": "TRANSLATE",
+		"DE": "Ei aus:Eier aus",
+		"EN": "Egg:Eggs",
+		"PT-BR": "TRANSLATE"
+	},
+	"quest_type_1" : {
+		"NL": "TRANSLATE",
+		"DE": "Brüte",
+		"EN": "Hatch",
+		"PT-BR": "TRANSLATE"
+	},
+        "reward_type_1" : {
+                "NL": "TRANSLATE",
+                "DE": "Pokemon:Pokemon",
+                "EN": "Pokemon:Pokemon",
+                "PT-BR": "TRANSLATE"
+        },
+        "reward_type_2" : {
+                "NL": "TRANSLATE",
+                "DE": "Pokeball:Pokebälle",
+                "EN": "Pokeball:Pokeballs",
+                "PT-BR": "TRANSLATE"
+        },
+        "reward_type_3" : {
+                "NL": "TRANSLATE",
+                "DE": "Beere:Beeren",
+                "EN": "Berry:Berries",
+                "PT-BR": "TRANSLATE"
+        }
+}

@@ -143,7 +143,7 @@ if ($raid_id != 0) {
         ];
 
         // Add keys to share.
-        $keys_share = share_keys($raid['id'], $userid);
+        $keys_share = share_raid_keys($raid['id'], $userid);
         $keys = array_merge($keys, $keys_share);
     } else {
 	// Set message string

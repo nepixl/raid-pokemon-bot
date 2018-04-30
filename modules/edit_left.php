@@ -41,7 +41,7 @@ if ($update['callback_query']['message']['chat']['type'] == 'private') {
     ];
 
     // Add keys to share.
-    $keys_share = share_keys($id, $userid);
+    $keys_share = share_raid_keys($id, $userid);
     $keys = array_merge($keys, $keys_share);
 
     // Get raid times.

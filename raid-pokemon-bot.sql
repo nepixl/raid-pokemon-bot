@@ -32,7 +32,18 @@ CREATE TABLE `attendance` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `cleanup` (
+CREATE TABLE `cleanup_quests` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `quest_id` int(10) unsigned NOT NULL,
+  `chat_id` bigint(20) NOT NULL,
+  `message_id` bigint(20) unsigned NOT NULL,
+  `cleaned` int(10) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cleanup_raids` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `raid_id` int(10) unsigned NOT NULL,
   `chat_id` bigint(20) NOT NULL,
@@ -73,6 +84,48 @@ CREATE TABLE `pokemon` (
   `min_weather_cp` int(10) unsigned NOT NULL,
   `max_weather_cp` int(10) unsigned NOT NULL,
   `weather` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pokestops` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pokestop_name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
+  `lat` varchar(11) DEFAULT NULL,
+  `lon` varchar(11) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `quests` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) DEFAULT NULL,
+  `quest_date` datetime DEFAULT NULL,
+  `pokestop_id` int(10) unsigned NOT NULL,
+  `quest_id` int(10) unsigned NOT NULL,
+  `reward_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `quests_questlist` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `quest_type` int(10) unsigned NOT NULL,
+  `quest_quantity` int(10) unsigned NOT NULL,
+  `quest_action` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `quests_rewardlist` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `reward_type` int(10) unsigned NOT NULL,
+  `reward_quantity` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

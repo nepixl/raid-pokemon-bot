@@ -84,7 +84,7 @@ if (isset($update['cleanup']) && CLEANUP == true) {
 	}
         // Run cleanup
         cleanup_log('Calling cleanup process now!');
-        run_cleanup($telegram, $database);
+        run_raids_cleanup($telegram, $database);
     } else {
         cleanup_log('Error! Wrong cleanup secret supplied!', '!');
     }
@@ -97,6 +97,29 @@ $userUpdate = update_user($update);
 
 // Write to log.
 debug_log('Update user: ' . $userUpdate);
+
+
+// TEST START XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+/*
+$quest_1 = 1;
+$quest_2 = 2;
+$quest_3 = 3;
+debug_log('Quest 1:');
+$q1 = get_quest($quest_1);
+$msg1 = get_formatted_quest($q1);
+sendMessage($update['message']['chat']['id'], $msg1);
+
+debug_log('Quest 2:');
+$q2 = get_quest($quest_2);
+$msg2 = get_formatted_quest($q2);
+sendMessage($update['message']['chat']['id'], $msg2);
+
+debug_log('Quest 3:');
+$q3 = get_quest($quest_3);
+$msg3 = get_formatted_quest($q3);
+sendMessage($update['message']['chat']['id'], $msg3);
+*/
+// TEST END XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 // Callback query received.
 if (isset($update['callback_query'])) {
@@ -151,7 +174,7 @@ if (isset($update['callback_query'])) {
     exit();
 
 // Cleanup collection from channel/supergroup messages.
-} else if (isset($update['channel_post']['chat']['type']) && ($update['channel_post']['chat']['type'] == "channel" || $update['message']['chat']['type'] == "supergroup")) {
+} else if ((isset($update['channel_post']) && $update['channel_post']['chat']['type'] == "channel") || (isset($update['message']) && $update['message']['chat']['type'] == "supergroup")) {
     // Write to log.
     debug_log('Collecting cleanup preparation information...');
     // Init raid_id.
@@ -178,7 +201,7 @@ if (isset($update['callback_query'])) {
 
     // Write cleanup info to database.
     debug_log('Calling cleanup preparation now!');
-    insert_cleanup($chat_id, $message_id, $raid_id);
+    insert_raid_cleanup($chat_id, $message_id, $raid_id);
     exit();
 
 // Message is required to check for commands.

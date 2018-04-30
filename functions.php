@@ -431,7 +431,7 @@ function delete_message($chat_id, $message_id)
 
 /**
  * GetChat
- * @param $chatid
+ * @param $chat_id
  */
 function get_chat($chat_id)
 {
@@ -457,7 +457,7 @@ function get_chat($chat_id)
 
 /**
  * GetChatAdministrators
- * @param $chatid
+ * @param $chat_id
  */
 function get_admins($chat_id)
 {
@@ -465,6 +465,34 @@ function get_admins($chat_id)
     $reply_content = [
         'method'     => 'getChatAdministrators',
         'chat_id'    => $chat_id,
+        'parse_mode' => 'HTML',
+    ];
+
+    // Encode data to json.
+    $reply_json = json_encode($reply_content);
+
+    // Set header to json.
+    header('Content-Type: application/json');
+
+    // Write to log.
+    debug_log($reply_json, '>');
+
+    // Send request to telegram api.
+    return curl_json_request($reply_json);
+}
+
+/**
+ * GetChatMember
+ * @param $chat_id
+ * @param $user_id
+ */
+function get_chatmember($chat_id, $user_id)
+{
+    // Create response content array.
+    $reply_content = [
+        'method'     => 'getChatMember',
+        'chat_id'    => $chat_id,
+        'user_id'    => $user_id,
         'parse_mode' => 'HTML',
     ];
 
@@ -555,7 +583,7 @@ function curl_json_request($json)
 	        // Trigger cleanup preparation process when necessary id's are not empty and numeric
 	        if (!empty($chat_id) && !empty($message_id) && !empty($raid_id)) {
 		    debug_log('Calling cleanup preparation now!');
-		    insert_cleanup($chat_id, $message_id, $raid_id);
+		    insert_raid_cleanup($chat_id, $message_id, $raid_id);
 	        } else {
 		    debug_log('Missing input! Cannot call cleanup preparation!');
 		}
@@ -593,7 +621,7 @@ function getTranslation($text)
     debug_log($text,'T:');
     $translation = '';
 
-    // Pokemon name or other translation?
+    // Pokemon name?
     if(strpos($text, 'pokemon_id_') === 0) {
         // Make sure file exists
         if(file_exists('./pokemon_' . strtolower(LANGUAGE) . '.json')) {
@@ -605,6 +633,13 @@ function getTranslation($text)
             $json = json_decode($str, true);
             $translation = $json[$pokemon_id - 1];
         }
+    // Quest or reward text?
+    } else if(strpos($text, 'quest_type_') === 0 || strpos($text, 'quest_action_') === 0 || strpos($text, 'reward_type_') === 0) {
+        $str = file_get_contents('./quests-rewards.json');
+
+        $json = json_decode($str, true);
+        $translation = $json[$text][LANGUAGE];
+    // Other translation
     } else {
         $str = file_get_contents('./language.json');
 
