@@ -107,7 +107,7 @@ Set database password to second part of your Telegram bot token
 
 Only allow localhost access
 
-Import `raid-pokemon-bot.sql` as default DB structure and `raid-boss-pokedex.sql` for the raid bosses.
+Import `raid-pokemon-bot.sql` as default DB structure and `raid-boss-pokedex.sql`for the raid bosses, you can find these files in the sql folder.
 
 Command DB structure: `mysql -u USERNAME -p DATABASENAME < raid-pokemon-bot.sql`
 
