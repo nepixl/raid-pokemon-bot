@@ -12,7 +12,7 @@ $pokestop_id = $data['id'];
 // Check if quest already exists for this pokestop.
 $rs = my_query(
     "
-    SELECT    pokestop_id, quest_id
+    SELECT    id, pokestop_id
     FROM      quests
       WHERE   quest_date = CURDATE()
         AND   pokestop_id = {$pokestop_id}
@@ -36,7 +36,7 @@ if (!$answer) {
 } else {
     // Quest already in the database for this pokestop.
     $msg = EMOJI_WARN . '<b> ' . getTranslation('quest_already_submitted') . ' </b>' . EMOJI_WARN . CR . CR;
-    $quest = get_quest($answer['quest_id']);
+    $quest = get_quest($answer['id']);
     $msg .= get_formatted_quest($quest);
 
     // Empty keys.

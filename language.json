@@ -72,10 +72,10 @@
                 "PT-BR": "TRANSLATE"
         },
         "delete_this_quest" : {
-                "NL": "Verwijder deze TRANSLATE?",
+                "NL": "TRANSLATE",
                 "DE": "Diese Forschung wirklich löschen?",
                 "EN": "Really delete this quest?",
-                "PT-BR": "Realmente deletar esta TRANSLATE?"
+                "PT-BR": "TRANSLATE"
         },
         "quest_deletion_was_canceled" : {
                 "NL": "TRANSLATE",

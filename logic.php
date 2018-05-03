@@ -466,10 +466,13 @@ function get_quest($quest_id)
     $rs = my_query(
         "
         SELECT     quests.*,
+                   users.name,
                    quests_questlist.quest_type, quests_questlist.quest_quantity, quests_questlist.quest_action,
-                   quests_rewardlist.reward_type, quests_rewardlist.reward_quantity, 
+                   quests_rewardlist.reward_type, quests_rewardlist.reward_quantity, quests_rewardlist.reward_pokedex_ids,
                    pokestops.pokestop_name, pokestops.lat, pokestops.lon, pokestops.address
         FROM       quests
+        LEFT JOIN  users
+        ON         quests.user_id = users.user_id
         LEFT JOIN  pokestops
         ON         quests.pokestop_id = pokestops.id
         LEFT JOIN  quests_questlist
@@ -493,13 +496,13 @@ function get_quest($quest_id)
  * @param $quest array
  * @return array
  */
-function get_formatted_quest($quest)
+function get_formatted_quest($quest, $add_creator = false, $add_timestamp = false)
 {
     /** Example:
      * Pokestop: Reward-Stop Number 1
      * Quest-Street 5, 13579 Poke-City
      * Quest: Hatch 1 Egg
-     * Reward: 10 Berries
+     * Reward: 1 Pokemon (Magikarp or Onix)
     */
 
     // Pokestop name and address.
@@ -523,14 +526,37 @@ function get_formatted_quest($quest)
     $reward_type_singular = $reward_type[0];
     $reward_type_plural = $reward_type[1];
     $qty_reward = $quest['reward_quantity'] . SP . (($quest['reward_quantity'] > 1) ? ($reward_type_plural) : ($reward_type_singular));
+    
+    // Reward pokemon forecast?
+    $msg_poke = '';
+    if($quest['reward_pokedex_ids'] != '0') {
+        $quest_pokemons = explode(',', $quest['reward_pokedex_ids']);
+        // Get local pokemon name
+        foreach($quest_pokemons as $pokedex_id) {
+            $msg_poke .= get_local_pokemon_name($pokedex_id);
+            $msg_poke .= ' / ';
+        }
+        // Trim last slash
+        $msg_poke = rtrim($msg_poke,' / ');
+        $msg_poke = (!empty($msg_poke) ? (SP . '(' . $msg_poke . ')') : '');
+    }
 
-    // Build quest text.
-    $text = '';
-    $text .= getTranslation('pokestop') . ':' . $pokestop_name . $pokestop_address . CR;
-    $text .= getTranslation('quest') . ': <b>' . getTranslation('quest_type_' . $quest['quest_type']) . SP . $qty_action . '</b>' . CR;
-    $text .= getTranslation('reward') . ': <b>' . $qty_reward . '</b>' . CR;
+    // Build quest message
+    $msg = '';
+    $msg .= getTranslation('pokestop') . ':' . $pokestop_name . $pokestop_address . CR;
+    $msg .= getTranslation('quest') . ': <b>' . getTranslation('quest_type_' . $quest['quest_type']) . SP . $qty_action . '</b>' . CR;
+    $msg .= getTranslation('reward') . ': <b>' . $qty_reward . '</b>' . $msg_poke . CR;
 
-    return $text;
+    // Display creator.
+    $msg .= ($quest['user_id'] && $add_creator == true) ? (CR . getTranslation('created_by') . ': <a href="tg://user?id=' . $quest['user_id'] . '">' . htmlspecialchars($quest['name']) . '</a>') : '';
+
+    // Add update time and quest id to message.
+    if($add_timestamp == true) {
+        $msg .= CR . '<i>' . getTranslation('updated') . ': ' . date('H:i:s') . '</i>';
+        $msg .= '  Q-ID = ' . $quest['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
+    }
+
+    return $msg;
 }
 
 /**
@@ -542,7 +568,7 @@ function get_todays_formatted_quests()
     // Get the quest data by id.
     $rs = my_query(
         "
-        SELECT     *
+        SELECT     id
         FROM       quests
         WHERE      quest_date = CURDATE()
         "
@@ -563,6 +589,9 @@ function get_todays_formatted_quests()
     // No quests today?
     if($count == 0) {
         $msg = getTranslation('no_quests_today');
+    } else {
+        // Add update time to message.
+        $msg .= '<i>' . getTranslation('updated') . ': ' . date('H:i:s') . '</i>';
     }
 
     return $msg;
@@ -1336,8 +1365,15 @@ function quest_type_keys($pokestop_id)
         );
     }
 
+    // Add back and abort navigation keys.
+    $nav_keys = array();
+    $nav_keys[] = universal_inner_key($keys, '0', 'exit', '0', getTranslation('abort'));
+
     // Get the inline key array.
     $keys = inline_key_array($keys, 2);
+    $keys[] = $nav_keys;
+
+    debug_log($keys);
 
     return $keys;
 }
@@ -1373,12 +1409,20 @@ function quest_qty_action_keys($pokestop_id, $quest_type)
         // Add keys.
         $keys[] = array(
             'text'          => $qty_action,
-            'callback_data' => $pokestop_id . ':quest_edit_reward:' . $quest['id']
+            'callback_data' => $pokestop_id . ':quest_edit_reward:' . $quest['id'] . ',' . $quest_type
         );
     }
 
+    // Add back and abort navigation keys.
+    $nav_keys = array();
+    $nav_keys[] = universal_inner_key($keys, $pokestop_id, 'quest_create', '0', getTranslation('back'));
+    $nav_keys[] = universal_inner_key($keys, '0', 'exit', '0', getTranslation('abort'));
+
     // Get the inline key array.
     $keys = inline_key_array($keys, 2);
+    $keys[] = $nav_keys;
+
+    debug_log($keys);
 
     return $keys;
 }
@@ -1387,9 +1431,10 @@ function quest_qty_action_keys($pokestop_id, $quest_type)
  * Reward type keys.
  * @param $pokestop_id
  * @param $quest_id
+ * @param $quest_type
  * @return array
  */
-function reward_type_keys($pokestop_id, $quest_id)
+function reward_type_keys($pokestop_id, $quest_id, $quest_type)
 {
     // Get all reward types from database
     $rs = my_query(
@@ -1410,12 +1455,20 @@ function reward_type_keys($pokestop_id, $quest_id)
         // Add keys.
         $keys[] = array(
             'text'          => $text,
-            'callback_data' => $pokestop_id . ',' . $quest_id . ':quest_edit_qty_reward:' . $reward['reward_type']
+            'callback_data' => $pokestop_id . ',' . $quest_id . ':quest_edit_qty_reward:' . $quest_type . ',' . $reward['reward_type']
         );
     }
 
+    // Add back and abort navigation keys.
+    $nav_keys = array();
+    $nav_keys[] = universal_inner_key($keys, $pokestop_id, 'quest_edit_type', $quest_type, getTranslation('back'));
+    $nav_keys[] = universal_inner_key($keys, '0', 'exit', '0', getTranslation('abort'));
+
     // Get the inline key array.
     $keys = inline_key_array($keys, 2);
+    $keys[] = $nav_keys;
+
+    debug_log($keys);
 
     return $keys;
 }
@@ -1424,10 +1477,11 @@ function reward_type_keys($pokestop_id, $quest_id)
  * Reward quantity and type keys.
  * @param $pokestop_id
  * @param $quest_id
+ * @param $quest_type
  * @param $reward_type
  * @return array
  */
-function reward_qty_type_keys($pokestop_id, $quest_id, $reward_type)
+function reward_qty_type_keys($pokestop_id, $quest_id, $quest_type, $reward_type)
 {
     // Get all reward types from database
     $rs = my_query(
@@ -1456,8 +1510,16 @@ function reward_qty_type_keys($pokestop_id, $quest_id, $reward_type)
         );
     }
 
+    // Add back and abort navigation keys.
+    $nav_keys = array();
+    $nav_keys[] = universal_inner_key($keys, $pokestop_id, 'quest_edit_reward', $quest_id . ',' . $quest_type, getTranslation('back'));
+    $nav_keys[] = universal_inner_key($keys, '0', 'exit', '0', getTranslation('abort'));
+
     // Get the inline key array.
     $keys = inline_key_array($keys, 2);
+    $keys[] = $nav_keys;
+
+    debug_log($keys);
 
     return $keys;
 }
@@ -1687,6 +1749,29 @@ function universal_key($keys, $id, $action, $arg, $text = '0')
                 'callback_data' => $id . ':' . $action . ':' . $arg
             )
         ];
+
+    // Write to log.
+    //debug_log($keys);
+
+    return $keys;
+}
+
+
+/**
+ * Universal key.
+ * @param $keys
+ * @param $id
+ * @param $action
+ * @param $arg
+ * @param $text
+ * @return array
+ */
+function universal_inner_key($keys, $id, $action, $arg, $text = '0')
+{
+    $keys = array(
+                'text'          => $text,
+                'callback_data' => $id . ':' . $action . ':' . $arg
+            );
 
     // Write to log.
     //debug_log($keys);

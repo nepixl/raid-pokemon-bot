@@ -32,6 +32,8 @@ if ($action == 0) {
 
     // Set message.
     $msg = EMOJI_WARN . '<b> ' . getTranslation('delete_this_quest') . ' </b>' . EMOJI_WARN . CR . CR;
+    $quest = get_quest($quest_id);
+    $msg .= get_formatted_quest($quest);
 } else if ($action == 1) {
     debug_log('Quest deletion for quest ID ' . $quest_id . ' was canceled!');
     // Set message.
@@ -52,7 +54,7 @@ if ($action == 0) {
 }
 
 // Edit message.
-edit_message($update, $msg, $keys, false);
+edit_message($update, $msg, $keys, ['disable_web_page_preview' => 'true']);
 
 // Build callback message string.
 $callback_response = 'OK';

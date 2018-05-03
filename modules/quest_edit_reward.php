@@ -9,15 +9,17 @@ debug_log('quest_edit_reward()');
 // Pokestop id.
 $pokestop_id = $data['id'];
 
-// Quest id.
-$quest_id = $data['arg'];
+// Quest id and type.
+$quest_id_type = explode(",", $data['arg']);
+$quest_id = $quest_id_type[0];
+$quest_type = $quest_id_type[1];
 
 // Build message string.
 $msg = '';
 $msg .= getTranslation('reward_select_type') . CR;
 
 // Create the keys.
-$keys = reward_type_keys($pokestop_id, $quest_id);
+$keys = reward_type_keys($pokestop_id, $quest_id, $quest_type);
 
 // Edit message.
 edit_message($update, $msg, $keys, false);

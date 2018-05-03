@@ -43,9 +43,13 @@ $msg .= get_formatted_quest($quest);
 
 // Init keys.
 $keys = array();
+$keys_share = array();
+$keys_delete = array();
 
-// Add keys to share.
-$keys = share_quest_keys($id, $userid);
+// Add keys to delete and share.
+$keys_delete = universal_key($keys, $id, 'quest_delete', '0', getTranslation('delete'));
+$keys_share = share_quest_keys($id, $userid);
+$keys = array_merge($keys_delete, $keys_share);
 
 // Edit message.
 edit_message($update, $msg, $keys, ['disable_web_page_preview' => 'true']);
