@@ -98,29 +98,6 @@ $userUpdate = update_user($update);
 // Write to log.
 debug_log('Update user: ' . $userUpdate);
 
-
-// TEST START XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-/*
-$quest_1 = 1;
-$quest_2 = 2;
-$quest_3 = 3;
-debug_log('Quest 1:');
-$q1 = get_quest($quest_1);
-$msg1 = get_formatted_quest($q1);
-sendMessage($update['message']['chat']['id'], $msg1);
-
-debug_log('Quest 2:');
-$q2 = get_quest($quest_2);
-$msg2 = get_formatted_quest($q2);
-sendMessage($update['message']['chat']['id'], $msg2);
-
-debug_log('Quest 3:');
-$q3 = get_quest($quest_3);
-$msg3 = get_formatted_quest($q3);
-sendMessage($update['message']['chat']['id'], $msg3);
-*/
-// TEST END XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
 // Callback query received.
 if (isset($update['callback_query'])) {
     // Init empty data array.
@@ -177,8 +154,9 @@ if (isset($update['callback_query'])) {
 } else if ((isset($update['channel_post']) && $update['channel_post']['chat']['type'] == "channel") || (isset($update['message']) && $update['message']['chat']['type'] == "supergroup")) {
     // Write to log.
     debug_log('Collecting cleanup preparation information...');
-    // Init raid_id.
+    // Init raid_id and quest_id.
     $raid_id = 0;
+    $quest_id = 0;
 
     // Channel 
     if(isset($update['channel_post'])) {
@@ -187,7 +165,10 @@ if (isset($update['callback_query'])) {
         $message_id = $update['channel_post']['message_id'];
 
 	// Get raid_id from text.
-        $raid_id = substr(strrchr($update['channel_post']['text'], "ID = "), 5);
+        $raid_id = substr(strrchr($update['channel_post']['text'], "R-ID = "), 7);
+
+        // Get quest_id from text.
+        $quest_id = substr(strrchr($update['channel_post']['text'], "Q-ID = "), 7);
 
     // Supergroup
     } else if ($update['message']['chat']['type'] == "supergroup") {
@@ -196,12 +177,19 @@ if (isset($update['callback_query'])) {
         $message_id = $update['message']['message_id'];
 
 	// Get raid_id from text.
-        $raid_id = substr(strrchr($update['message']['text'], "ID = "), 5);
+        $raid_id = substr(strrchr($update['message']['text'], "R-ID = "), 7);
+
+	// Get quest_id from text.
+        $quest_id = substr(strrchr($update['message']['text'], "Q-ID = "), 7);
     }
 
     // Write cleanup info to database.
     debug_log('Calling cleanup preparation now!');
-    insert_raid_cleanup($chat_id, $message_id, $raid_id);
+    if($raid_id != 0) {
+        insert_raid_cleanup($chat_id, $message_id, $raid_id);
+    } else if($quest_id != 0) {
+        insert_quest_cleanup($chat_id, $message_id, $quest_id);
+    }
     exit();
 
 // Message is required to check for commands.

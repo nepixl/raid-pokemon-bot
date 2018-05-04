@@ -25,7 +25,9 @@ $keys = [];
 // Send location.
 if (QUEST_LOCATION == true) {
     // Send location.
-    $loc = send_venue($chat, $quest['lat'], $quest['lon'], "", !empty($quest['address']) ? $quest['address'] . ', Q-ID = ' . $quest['id'] : $quest['pokestop_name'] . ', ' . $quest['id']); // DO NOT REMOVE " ID = " --> NEEDED FOR CLEANUP PREPARATION!
+    $msg_header = get_formatted_quest($quest, false, false, true);
+    $msg_text = !empty($quest['address']) ? $quest['address'] . ', Q-ID = ' . $quest['id'] : $quest['pokestop_name'] . ', ' . $quest['id']; // DO NOT REMOVE " Q-ID = " --> NEEDED FOR CLEANUP PREPARATION!
+    $loc = send_venue($chat, $quest['lat'], $quest['lon'], $msg_header, $msg_text);
 
     // Write to log.
     debug_log('location:');

@@ -112,21 +112,11 @@ CREATE TABLE `quests` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `quests_questlist` (
+CREATE TABLE `questlist` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `quest_type` int(10) unsigned NOT NULL,
   `quest_quantity` int(10) unsigned NOT NULL,
   `quest_action` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `quests_rewardlist` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `reward_type` int(10) unsigned NOT NULL,
-  `reward_quantity` int(10) unsigned NOT NULL,
-  `reward_pokedex_ids` varchar(20) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -148,6 +138,16 @@ CREATE TABLE `raids` (
   PRIMARY KEY (`id`),
   KEY `end_time` (`end_time`),
   KEY `user_id` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rewardlist` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `reward_type` int(10) unsigned NOT NULL,
+  `reward_quantity` int(10) unsigned NOT NULL,
+  `reward_pokedex_ids` varchar(20) DEFAULT '0',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

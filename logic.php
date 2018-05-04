@@ -25,10 +25,13 @@ function bot_access_check($update, $access_type = BOT_ACCESS, $return_result = f
 	$update_id = $update[$update_type]['from']['id'];
 
 	// Check each admin chat defined in $access_type 
+	$chats = explode(',', $all_chats);
+        $chats = array_unique($chats);
+
+        // Write to log.
 	debug_log('Telegram message type: ' . $update_type);
 	debug_log('Checking access for ID: ' . $update_id);
-	debug_log('Checking these chats now: ' . $all_chats);
-	$chats = explode(',', $all_chats);
+	debug_log('Checking these chats now: ' . implode(',', $chats));
    	foreach($chats as $chat) {
 	    // Get chat object 
             debug_log("Getting chat object for '" . $chat . "'");
@@ -39,7 +42,6 @@ function bot_access_check($update, $access_type = BOT_ACCESS, $return_result = f
 		debug_log('Proper chat object received, continuing with access check.');
 		$allow_access = false;
 		// ID matching $chat and private chat type?
-		//if ($chat_obj['result']['id'] == ($update['message']['from']['id'] || $update['callback_query']['from']['id']) && $chat_obj['result']['type'] == "private") {
 		if ($chat_obj['result']['id'] == $update_id && $chat_obj['result']['type'] == "private") {
 		    debug_log('Positive result on access check!');
 		    $allow_access = true;
@@ -59,21 +61,43 @@ function bot_access_check($update, $access_type = BOT_ACCESS, $return_result = f
 	    // Clear chat_obj since it did not match 
 	    $chat_obj = '';
 
-	    // Get administrators from chat
-            debug_log("Getting administrators from chat '" . $chat . "'");
-    	    $chat_obj = get_admins($chat);
-
-    	    // Make sure we get a proper response
-    	    if ($chat_obj['ok'] == true) { 
-	        foreach($chat_obj['result'] as $admin) {
-	                // If user is found as administrator allow access to the bot
-			// if ($admin['user']['id'] == $update['message']['from']['id'] || $admin['user']['id'] == $update['inline_query']['from']['id']) {
-	                if ($admin['user']['id'] == $update_id) {
-		            debug_log('Positive result on access check!');
-		            $allow_access = true;
-		            break 2;
-		        }
+            // Get chat member object and check status
+            debug_log("Getting user from chat '" . $chat . "'");
+            $chat_obj = get_chatmember($chat, $update_id);
+         
+            // Make sure we get a proper response
+            if ($chat_obj['ok'] == true) {
+                // Check user status
+                if ($chat_obj['result']['user']['id'] == $update_id && ($chat_obj['result']['status'] == 'creator' || $chat_obj['result']['status'] == 'administrator')) {
+		    debug_log('Positive result on access check!');
+                    $allow_access = true;
+                    break;
                 }
+            }
+	}
+
+        // Fallback: Get admins from chats via get_admins method.
+        if(!$allow_access) {
+            debug_log('Fallback method: Get admin list from the chats: ' . implode(',', $chats));
+   	    foreach($chats as $chat) {
+	        // Clear chat_obj since it did not match 
+	        $chat_obj = '';
+
+	        // Get administrators from chat
+                debug_log("Getting administrators from chat '" . $chat . "'");
+    	        $chat_obj = get_admins($chat);
+
+    	        // Make sure we get a proper response
+    	        if ($chat_obj['ok'] == true) { 
+	            foreach($chat_obj['result'] as $admin) {
+	                    // If user is found as administrator allow access to the bot
+	                    if ($admin['user']['id'] == $update_id) {
+		                debug_log('Positive result on access check!');
+		                $allow_access = true;
+		                break 2;
+		            }
+                    }
+	        }
 	    }
 	}
 
@@ -371,7 +395,7 @@ function get_raid($raid_id)
     // Get the raid data by id.
     $rs = my_query(
         "
-        SELECT     raids.*, users.name,
+        SELECT     raids.*, users.name
                    UNIX_TIMESTAMP(start_time)                      AS ts_start,
                    UNIX_TIMESTAMP(end_time)                        AS ts_end,
                    UNIX_TIMESTAMP(NOW())                           AS ts_now,
@@ -467,18 +491,18 @@ function get_quest($quest_id)
         "
         SELECT     quests.*,
                    users.name,
-                   quests_questlist.quest_type, quests_questlist.quest_quantity, quests_questlist.quest_action,
-                   quests_rewardlist.reward_type, quests_rewardlist.reward_quantity, quests_rewardlist.reward_pokedex_ids,
+                   questlist.quest_type, questlist.quest_quantity, questlist.quest_action,
+                   rewardlist.reward_type, rewardlist.reward_quantity, rewardlist.reward_pokedex_ids,
                    pokestops.pokestop_name, pokestops.lat, pokestops.lon, pokestops.address
         FROM       quests
         LEFT JOIN  users
         ON         quests.user_id = users.user_id
         LEFT JOIN  pokestops
         ON         quests.pokestop_id = pokestops.id
-        LEFT JOIN  quests_questlist
-        ON         quests.quest_id = quests_questlist.id
-        LEFT JOIN  quests_rewardlist
-        ON         quests.reward_id = quests_rewardlist.id
+        LEFT JOIN  questlist
+        ON         quests.quest_id = questlist.id
+        LEFT JOIN  rewardlist
+        ON         quests.reward_id = rewardlist.id
         WHERE      quests.id = {$quest_id}
         "
     );
@@ -494,9 +518,12 @@ function get_quest($quest_id)
 /**
  * Get quest and reward as formatted string.
  * @param $quest array
+ * @param $add_creator bool
+ * @param $add_timestamp bool
+ * @param $compact_format bool
  * @return array
  */
-function get_formatted_quest($quest, $add_creator = false, $add_timestamp = false)
+function get_formatted_quest($quest, $add_creator = false, $add_timestamp = false, $compact_format = false)
 {
     /** Example:
      * Pokestop: Reward-Stop Number 1
@@ -543,9 +570,13 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
 
     // Build quest message
     $msg = '';
-    $msg .= getTranslation('pokestop') . ':' . $pokestop_name . $pokestop_address . CR;
-    $msg .= getTranslation('quest') . ': <b>' . getTranslation('quest_type_' . $quest['quest_type']) . SP . $qty_action . '</b>' . CR;
-    $msg .= getTranslation('reward') . ': <b>' . $qty_reward . '</b>' . $msg_poke . CR;
+    if($compact_format == false) {
+        $msg .= getTranslation('pokestop') . ':' . $pokestop_name . $pokestop_address . CR;
+        $msg .= getTranslation('quest') . ': <b>' . getTranslation('quest_type_' . $quest['quest_type']) . SP . $qty_action . '</b>' . CR;
+        $msg .= getTranslation('reward') . ': <b>' . $qty_reward . '</b>' . $msg_poke . CR;
+    } else {
+        $msg .= getTranslation('quest_type_' . $quest['quest_type']) . SP . $qty_action . ' — ' . $qty_reward . $msg_poke;
+    }
 
     // Display creator.
     $msg .= ($quest['user_id'] && $add_creator == true) ? (CR . getTranslation('created_by') . ': <a href="tg://user?id=' . $quest['user_id'] . '">' . htmlspecialchars($quest['name']) . '</a>') : '';
@@ -1347,7 +1378,7 @@ function quest_type_keys($pokestop_id)
     $rs = my_query(
             "
             SELECT    quest_type
-            FROM      quests_questlist
+            FROM      questlist
             GROUP BY  quest_type
             "
         );
@@ -1390,7 +1421,7 @@ function quest_qty_action_keys($pokestop_id, $quest_type)
     $rs = my_query(
             "
             SELECT    *
-            FROM      quests_questlist
+            FROM      questlist
             WHERE     quest_type = '$quest_type'
             "
         );
@@ -1440,7 +1471,7 @@ function reward_type_keys($pokestop_id, $quest_id, $quest_type)
     $rs = my_query(
             "
             SELECT    reward_type
-            FROM      quests_rewardlist
+            FROM      rewardlist
             GROUP BY  reward_type
             "
         );
@@ -1487,7 +1518,7 @@ function reward_qty_type_keys($pokestop_id, $quest_id, $quest_type, $reward_type
     $rs = my_query(
             "
             SELECT    *
-            FROM      quests_rewardlist
+            FROM      rewardlist
             WHERE     reward_type = '$reward_type'
             "
         );
@@ -1904,6 +1935,69 @@ function share_quest_keys($quest_id, $user_id)
 }
 
 /**
+ * Insert quest cleanup info to database.
+ * @param $chat_id
+ * @param $message_id
+ * @param $quest_id
+ */
+function insert_quest_cleanup($chat_id, $message_id, $quest_id)
+{
+    // Log ID's of quest, chat and message
+    debug_log('Quest_ID: ' . $quest_id);
+    debug_log('Chat_ID: ' . $chat_id);
+    debug_log('Message_ID: ' . $message_id);
+
+    if ((is_numeric($chat_id)) && (is_numeric($message_id)) && (is_numeric($quest_id)) && ($quest_id > 0)) {
+        global $db;
+
+        // Get quest.
+        $quest = get_quest($quest_id);
+    
+        // Init found.
+        $found = false;
+
+        // Insert cleanup info to database
+        if ($quest) {
+            // Check if cleanup info is already in database or not
+            // Needed since raids can be shared to multiple channels / supergroups!
+            $rs = my_query(
+                "
+                SELECT    *
+                    FROM      cleanup_quests
+                    WHERE     quest_id = '{$quest_id}'
+                "
+            );
+
+            // Chat_id and message_id equal to info from database
+            while ($cleanup = $rs->fetch_assoc()) {
+                // Leave while loop if cleanup info is already in database
+                if(($cleanup['chat_id'] == $chat_id) && ($cleanup['message_id'] == $message_id)) {
+                    debug_log('Cleanup preparation info is already in database!');
+                    $found = true;
+                    break;
+                } 
+            }
+        }
+
+        // Insert into database when raid found but no cleanup info found
+        if ($quest && !$found) {
+            // Build query for cleanup table to add cleanup info to database
+            debug_log('Adding cleanup info to database:');
+            $rs = my_query(
+                "
+                INSERT INTO   cleanup_quests
+                SET           quest_id = '{$quest_id}',
+                                  chat_id = '{$chat_id}',
+                                  message_id = '{$message_id}'
+                "
+            );
+        }
+    } else {
+        debug_log('Invalid input for cleanup preparation!');
+    }
+}
+
+/**
  * Insert raid cleanup info to database.
  * @param $chat_id
  * @param $message_id
@@ -1920,21 +2014,8 @@ function insert_raid_cleanup($chat_id, $message_id, $raid_id)
         global $db;
 
         // Get raid times.
-        $rs = my_query(
-            "
-            SELECT    *, 
-                                  UNIX_TIMESTAMP(start_time)                      AS ts_start,
-                                  UNIX_TIMESTAMP(end_time)                        AS ts_end,
-                                  UNIX_TIMESTAMP(NOW())                           AS ts_now,
-                                  UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-                    FROM      raids
-                      WHERE   id = {$raid_id}
-            "
-        );
+        $raid = get_raid($raid_id);
     
-        // Fetch raid data.
-        $raid = $rs->fetch_assoc();
-	
 	// Init found.
 	$found = false;
 
@@ -3502,7 +3583,7 @@ function show_raid_poll($raid)
 
     // Add update time and raid id to message.
     $msg .= CR . '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), $raid['timezone'], 'H:i:s') . '</i>';
-    $msg .= '  ID = ' . $raid['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
+    $msg .= '  R-ID = ' . $raid['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
 
     // Return the message.
     return $msg;

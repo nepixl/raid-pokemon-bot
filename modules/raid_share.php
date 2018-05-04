@@ -25,7 +25,8 @@ $keys = keys_vote($raid);
 // Send location.
 if (RAID_LOCATION == true) {
     // Send location.
-    $loc = send_venue($chat, $raid['lat'], $raid['lon'], "", !empty($raid['address']) ? $raid['address'] . ', ID = ' . $raid['id'] : $raid['pokemon'] . ', ' . $raid['id']); // DO NOT REMOVE " ID = " --> NEEDED FOR CLEANUP PREPARATION!
+    $msg_text = !empty($raid['address']) ? $raid['address'] . ', R-ID = ' . $raid['id'] : $raid['pokemon'] . ', ' . $raid['id']); // DO NOT REMOVE " R-ID = " --> NEEDED FOR CLEANUP PREPARATION!
+    $loc = send_venue($chat, $raid['lat'], $raid['lon'], '', $msg_text);
 
     // Write to log.
     debug_log('location:');

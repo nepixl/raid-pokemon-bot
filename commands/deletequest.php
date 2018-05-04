@@ -10,16 +10,16 @@ debug_log('DELETEQUEST()');
 $rs = my_query(
         "
         SELECT     quests.*,
-                   quests_questlist.quest_type, quests_questlist.quest_quantity, quests_questlist.quest_action,
-                   quests_rewardlist.reward_type, quests_rewardlist.reward_quantity, 
+                   questlist.quest_type, questlist.quest_quantity, questlist.quest_action,
+                   rewardlist.reward_type, rewardlist.reward_quantity, 
                    pokestops.pokestop_name, pokestops.lat, pokestops.lon, pokestops.address
         FROM       quests
         LEFT JOIN  pokestops
         ON         quests.pokestop_id = pokestops.id
-        LEFT JOIN  quests_questlist
-        ON         quests.quest_id = quests_questlist.id
-        LEFT JOIN  quests_rewardlist
-        ON         quests.reward_id = quests_rewardlist.id
+        LEFT JOIN  questlist
+        ON         quests.quest_id = questlist.id
+        LEFT JOIN  rewardlist
+        ON         quests.reward_id = rewardlist.id
         WHERE      quest_date = CURDATE()
         ORDER BY   pokestops.pokestop_name
         "

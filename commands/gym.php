@@ -32,8 +32,8 @@ if ($update['message']['chat']['type'] == 'private' || $update['callback_query']
 
         $lines = explode(CR, $update['message']['reply_to_message']['text']);
         $last_line = array_pop($lines);
-        $pos = strpos($last_line, 'ID = ');
-        $id = intval(trim(substr($last_line, $pos + 5)));
+        $pos = strpos($last_line, 'R-ID = ');
+        $id = intval(trim(substr($last_line, $pos + 7)));
 
         // Write to log.
         debug_log('Gym ID=' . $id . ' name=' . $gym_name);

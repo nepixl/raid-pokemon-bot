@@ -548,14 +548,15 @@ function curl_json_request($json)
     } else {
 	// Result seems ok, get message_id and chat_id if supergroup or channel message
 	if (isset($response['result']['chat']['type']) && ($response['result']['chat']['type'] == "channel" || $response['result']['chat']['type'] == "supergroup")) {
-            // Init raid_id
+            // Init raid_id and quest_id
             $raid_id = 0;
+            $quest_id = 0;
 
 	    // Set chat and message_id
             $chat_id = $response['result']['chat']['id'];
             $message_id = $response['result']['message_id'];
 
-            // Get raid id from $json
+            // Get raid/quest id from $json
             $json_message = json_decode($json, true);
 
             // Write to log that message was shared with channel or supergroup
@@ -567,23 +568,32 @@ function curl_json_request($json)
                 $split_callback_data = explode(':', $json_message['reply_markup']['inline_keyboard']['0']['0']['callback_data']);
                 $raid_id = $split_callback_data[0];
 
-            // Check if it's a venue and get raid id
+            // Check if it's a venue and get raid/quest id
             } else if (!empty($response['result']['venue']['address'])) {
                 // Get raid_id from address.
-                $raid_id = substr(strrchr($response['result']['venue']['address'], "ID = "), 5);
+                $raid_id = substr(strrchr($response['result']['venue']['address'], 'R-ID = '), 7);
             }
 
-            // Trigger Cleanup when raid_id was found
-            if ($raid_id != 0) {
-                debug_log('Found Raid_ID for cleanup preparation from callback_data or venue!');
-                debug_log('Raid_ID: ' . $raid_id);
+            // Trigger Cleanup when raid_id/quest was found
+            if ($raid_id != 0 || $quest_id != 0) {
+                if($raid_id != 0) {
+                    debug_log('Found Raid_ID for cleanup preparation from callback_data or venue!');
+                    debug_log('Raid_ID: ' . $raid_id);
+                } else if($quest_id != 0) {
+                    debug_log('Found Quest_ID for cleanup preparation from callback_data or venue!');
+                    debug_log('Quest_ID: ' . $quest_id);
+                }
                 debug_log('Chat_ID: ' . $chat_id);
                 debug_log('Message_ID: ' . $message_id);
 
-	        // Trigger cleanup preparation process when necessary id's are not empty and numeric
+	        // Trigger raid cleanup preparation process when necessary id's are not empty and numeric
 	        if (!empty($chat_id) && !empty($message_id) && !empty($raid_id)) {
 		    debug_log('Calling cleanup preparation now!');
 		    insert_raid_cleanup($chat_id, $message_id, $raid_id);
+	        // Trigger quest cleanup preparation process when necessary id's are not empty and numeric
+	        } else if(!empty($chat_id) && !empty($message_id) && !empty($quest_id)) {
+		    debug_log('Calling cleanup preparation now!');
+		    insert_quest_cleanup($chat_id, $message_id, $quest_id);
 	        } else {
 		    debug_log('Missing input! Cannot call cleanup preparation!');
 		}
