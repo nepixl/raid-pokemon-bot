@@ -1,4 +1,7 @@
 <?php
+// Paths
+define('ROOT_PATH', __DIR__);
+
 // Carriage return.
 define('CR',  "\n");
 define('CR2', "\n");

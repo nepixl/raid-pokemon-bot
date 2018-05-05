@@ -18,6 +18,8 @@ require_once('geo_api.php');
 // Get api key from get parameters.
 $apiKey = $_GET['apikey'];
 
+//var_dump($apiKey);
+
 // Check if hashed api key is matching config.
 if (hash('sha512', $apiKey) == strtolower(CONFIG_HASH)) {
     // Split the api key.
@@ -29,7 +31,7 @@ if (hash('sha512', $apiKey) == strtolower(CONFIG_HASH)) {
 // Api key is wrong!
 } else {
     // Echo data.
-    sendMessageEcho(MAINTAINER_ID, $_SERVER['REMOTE_ADDR'] . ' ' . $_SERVER['HTTP_X_FORWARDED_FOR'] . ' ' . $apiKey);
+    sendMessageEcho(MAINTAINER_ID, $_SERVER['REMOTE_ADDR'] . ' ' . isset($_SERVER['HTTP_X_FORWARDED_FOR']) . ' ' . $apiKey);
     // And exit script.
     exit();
 }
@@ -147,7 +149,7 @@ if (isset($update['callback_query'])) {
     // Check access to the bot
     bot_access_check($update);
     // Create raid and exit.
-    include_once('modules/raid_create.php');
+    include_once(ROOT_PATH . '/modules/raid_create.php');
     exit();
 
 // Cleanup collection from channel/supergroup messages.
@@ -191,7 +193,7 @@ if (isset($update['callback_query'])) {
         $com = strtolower(str_replace('/', '', str_replace(BOT_NAME, '', explode(' ', $update['message']['text'])[0])));
 
         // Set command path.
-        $command = 'commands/' . basename($com) . '.php';
+        $command = ROOT_PATH . '/commands/' . basename($com) . '.php';
 
         // Write to log.
         debug_log($command);
