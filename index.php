@@ -18,8 +18,6 @@ require_once('geo_api.php');
 // Get api key from get parameters.
 $apiKey = $_GET['apikey'];
 
-//var_dump($apiKey);
-
 // Check if hashed api key is matching config.
 if (hash('sha512', $apiKey) == strtolower(CONFIG_HASH)) {
     // Split the api key.

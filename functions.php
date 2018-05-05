@@ -489,7 +489,7 @@ function get_admins($chat_id)
 function curl_json_request($json)
 {
 	$URL = 'https://api.telegram.org/bot' . API_KEY . '/';
-    $curl = curl_init($URL);
+	$curl = curl_init($URL);
 
     curl_setopt($curl, CURLOPT_HEADER, false);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
