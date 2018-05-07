@@ -313,8 +313,8 @@
 	},
 	"late_participants_wait" : {
 		"NL": "Graag even wachten.",
-		"DE": "Minuten werden evtl. gewartet!",
-		"EN": "Minutes may be waited!",
+		"DE": "Minuten werden gewartet!",
+		"EN": "Minutes be waited!",
 		"PT-BR": "TRANSLATE"		
 	},
 	"egg_5" : {
