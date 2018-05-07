@@ -11,6 +11,18 @@
                 "EN": "Error! No pokestops found!",
                 "PT-BR": "Erro! Nenhum pokestops encontrado!"
         },
+        "pokestops_not_found_command_text" : {
+                "NL": "TRANSLATE",
+                "DE": "Bitte /quest mit einem Teil oder dem vollständigen Namen des Pokestops aufrufen:",
+                "EN": "Please call /quest with a part or the complete name of the pokestop:",
+                "PT-BR": "TRANSLATE"
+        },
+        "pokestops_not_found_command_example" : {
+                "NL": "<code>/quest PokeCity Stop</code>",
+                "DE": "<code>/quest PokeStadt Stop</code>",
+                "EN": "<code>/quest PokeCity Stop</code>",
+                "PT-BR": "<code>/quest PokeCity Stop</code>"
+        },
         "unnamed_pokestop" : {
                 "NL": "TRANSLATE",
                 "DE": "Unbekannter Pokestop",

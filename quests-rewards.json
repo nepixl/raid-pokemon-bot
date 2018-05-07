@@ -36,18 +36,24 @@
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_type_7" : {
-		"NL": "Use A supereffective Charged Move in a gym",
+		"NL": "Use",
 		"DE": "Verwende",
-		"EN": "Use A supereffective Charged Move in a gym",
+		"EN": "Use",
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_type_8" : {
-		"NL": "Battle/Win",
-		"DE": "Kämpfe/Gewinne",
-		"EN": "Battle/Win",
+		"NL": "Battle",
+		"DE": "Kämpfe",
+		"EN": "Battle",
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_type_9" : {
+		"NL": "Win",
+		"DE": "Gewinne",
+		"EN": "Win",
+		"PT-BR": "TRANSLATE"
+	},
+	"quest_type_10" : {
 		"NL": "Power-up",
 		"DE": "Power-up",
 		"EN": "Power-up",
@@ -67,7 +73,7 @@
 	},
 	"quest_action_3" : {
 		"NL": "time:times",
-		"DE": "TRANSLATE",
+		"DE": "Mal:Mal",
 		"EN": "time:times",
 		"PT-BR": "TRANSLATE"
 	},
@@ -78,9 +84,9 @@
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_action_5" : {
-		"NL": "Electric type pokemon:Electric type pokemon",
+		"NL": "electric type pokemon:electric type pokemon",
 		"DE": "Pokemon vom Typ Elektro:Pokemon vom Typ Elektro",
-		"EN": "Electric type pokemon:Electric type pokemon",
+		"EN": "electric type pokemon:electric type pokemon",
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_action_6" : {
@@ -132,9 +138,9 @@
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_action_14" : {
-		"NL": "In a gym:In a gym",
-		"DE": "in einer Arena:mal in einer Arena",
-		"EN": "In a gym:In a gym",
+		"NL": "time in a gym:times in a gym",
+		"DE": "Mal in einer Arena:Mal in einer Arena",
+		"EN": "time in a gym:times in a gym",
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_action_15" : {
@@ -145,25 +151,25 @@
 	},
 	"quest_action_16" : {
 		"NL": "Oddish or Bellsprout:Oddish or Bellsprout",
-		"DE": "TRANSLATE",
+		"DE": "Myrapla oder Knofensa:Myrapla oder Knofensa",
 		"EN": "Oddish or Bellsprout:Oddish or Bellsprout",
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_action_17" : {
 		"NL": "Meoth or Skitty:Meoth or Skitty",
-		"DE": "TRANSLATE",
+		"DE": "Mauzi oder Eneco:Mauzi oder Eneco",
 		"EN": "Meoth or Skitty:Meoth or Skitty",
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_action_18" : {
 		"NL": "Pidgey or Murkrow:Pidgey or Murkrow",
-		"DE": "TRANSLATE",
+		"DE": "Taubsi oder Kramurx:Taubsi oder Kramurx",
 		"EN": "Pidgey or Murkrow:Pidgey or Murkrow",
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_action_19" : {
 		"NL": "Treeko or Mudkip:Treeko or Mudkip",
-		"DE": "TRANSLATE",
+		"DE": "Hydropi oder Geckarbor:Hydropi oder Geckarbor",
 		"EN": "Treeko or Mudkip:Treeko or Mudkip",
 		"PT-BR": "TRANSLATE"
 	},
@@ -198,9 +204,9 @@
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_action_25" : {
-		"NL": "grass-, Ground- or Fire-type:grass-, Ground- or Fire-type",
+		"NL": "Grass-, Ground- or Fire-type:Grass-, Ground- or Fire-type",
 		"DE": "Pokemon vom Typ Pflanze, Feuer oder Boden:Pokemon vom Typ Pflanze, Feuer oder Boden",
-		"EN": "grass-, Ground- or Fire-type:grass-, Ground- or Fire-type",
+		"EN": "Grass-, Ground- or Fire-type:Grass-, Ground- or Fire-type",
 		"PT-BR": "TRANSLATE"
 	},
 	"quest_action_26" : {
@@ -217,7 +223,7 @@
 	},
 	"quest_action_28" : {
 		"NL": "Candy for walking with your buddy:Candies for walking with your buddy",
-		"DE": "TRANSLATE",
+		"DE": "Bonbon durch Spazieren mit deinem Kumpel:Bonbons durch Spazieren mit deinem Kumpel",
 		"EN": "Candy for walking with your buddy:Candies for walking with your buddy",
 		"PT-BR": "TRANSLATE"
 	},
@@ -231,6 +237,12 @@
 		"NL": "Pokemon with weatherboost:Pokemon with weatherboost",
 		"DE": "Pokemon mit Wetterboost:Pokemon mit Wetterboost",
 		"EN": "Pokemon with weatherboost:Pokemon with weatherboost",
+		"PT-BR": "TRANSLATE"
+	},
+	"quest_action_31" : {
+		"NL": "time a supereffective charged move in a gym:times a supereffective charged move in a gym",
+		"DE": "Mal eine sehr effektive Lade-Attacke in einem Kampf:Mal eine sehr effektive Lade-Attacke in einem Kampf",
+		"EN": "time a supereffective charged move in a gym:times a supereffective charged move in a gym",
 		"PT-BR": "TRANSLATE"
 	},
         "reward_type_1" : {

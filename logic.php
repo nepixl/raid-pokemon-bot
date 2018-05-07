@@ -307,6 +307,33 @@ function raid_duplication_check($gym,$end)
 }
 
 /**
+ * Quest duplication check.
+ * @param $pokestop_id
+ * @return array
+ */
+function quest_duplication_check($pokestop_id)
+{
+    // Check if quest already exists for this pokestop.
+    // Exclude unnamed pokestops with pokestop_id 0.
+    $rs = my_query(
+        "
+        SELECT    id, pokestop_id
+        FROM      quests
+          WHERE   quest_date = CURDATE()
+            AND   pokestop_id > 0
+            AND   pokestop_id = {$pokestop_id}
+        "
+    );
+
+    // Get the row.
+    $quest = $rs->fetch_assoc();
+
+    debug_log($quest);
+
+    return $quest;
+}
+
+/**
  * Insert gym.
  * @param $gym_name
  * @param $latitude
@@ -491,9 +518,10 @@ function get_quest($quest_id)
         "
         SELECT     quests.*,
                    users.name,
+                   pokestops.pokestop_name, pokestops.lat, pokestops.lon, pokestops.address,
                    questlist.quest_type, questlist.quest_quantity, questlist.quest_action,
-                   rewardlist.reward_type, rewardlist.reward_quantity, rewardlist.reward_pokedex_ids,
-                   pokestops.pokestop_name, pokestops.lat, pokestops.lon, pokestops.address
+                   rewardlist.reward_type, rewardlist.reward_quantity,
+                   encounterlist.pokedex_ids
         FROM       quests
         LEFT JOIN  users
         ON         quests.user_id = users.user_id
@@ -503,6 +531,8 @@ function get_quest($quest_id)
         ON         quests.quest_id = questlist.id
         LEFT JOIN  rewardlist
         ON         quests.reward_id = rewardlist.id
+        LEFT JOIN  encounterlist
+        ON         quests.quest_id = encounterlist.quest_id
         WHERE      quests.id = {$quest_id}
         "
     );
@@ -556,8 +586,9 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
     
     // Reward pokemon forecast?
     $msg_poke = '';
-    if($quest['reward_pokedex_ids'] != '0') {
-        $quest_pokemons = explode(',', $quest['reward_pokedex_ids']);
+
+    if($quest['pokedex_ids'] != '0' && $quest['reward_type'] == 1) {
+        $quest_pokemons = explode(',', $quest['pokedex_ids']);
         // Get local pokemon name
         foreach($quest_pokemons as $pokedex_id) {
             $msg_poke .= get_local_pokemon_name($pokedex_id);
@@ -583,7 +614,8 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
 
     // Add update time and quest id to message.
     if($add_timestamp == true) {
-        $msg .= CR . '<i>' . getTranslation('updated') . ': ' . date('H:i:s') . '</i>';
+        $quest_date = explode(' ', $quest['quest_date']);
+        $msg .= CR . '<i>' . getTranslation('updated') . ': ' . $quest_date[0] . '</i>';
         $msg .= '  Q-ID = ' . $quest['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
     }
 
@@ -689,16 +721,24 @@ function delete_quest($quest_id)
  */
 function get_pokestop($pokestop_id)
 {
-    // Get pokestop from database
-    $rs = my_query(
-            "
-            SELECT    *
-            FROM      pokestops
-            WHERE     id = {$pokestop_id}
-            "
-        );
+    // Pokestop from database
+    if($pokestop_id != 0) {
+        // Get pokestop from database
+        $rs = my_query(
+                "
+                SELECT    *
+                FROM      pokestops
+                WHERE     id = {$pokestop_id}
+                "
+            );
 
-    $stop = $rs->fetch_assoc();
+        $stop = $rs->fetch_assoc();
+    // Unnamend pokestop
+    } else {
+        $stop = 0;
+    }
+
+    debug_log($stop);
 
     return $stop;
 }
@@ -718,6 +758,7 @@ function get_pokestop_list_keys($searchterm)
                 SELECT    id, pokestop_name
                 FROM      pokestops
                 WHERE     pokestop_name LIKE '%$searchterm%'
+                LIMIT     20
                 "
             );
 
@@ -726,15 +767,22 @@ function get_pokestop_list_keys($searchterm)
 
         // Add key for each found pokestop
         while ($stops = $rs->fetch_assoc()) {
+            // Pokestop name.
+            $pokestop_name = (!empty($stops['pokestop_name']) ? ($stops['pokestop_name']) : (getTranslation('unnamed_pokestop')));
+
             // Add keys.
             $keys[] = array(
-                'text'          => $stops['pokestop_name'],
+                'text'          => $pokestop_name,
                 'callback_data' => $stops['id'] . ':quest_create:0'
             );
         }
-
-        // Get the inline key array.
-        $keys = inline_key_array($keys, 2);
+        
+        if($keys) {
+            // Get the inline key array.
+            $keys = inline_key_array($keys, 2);
+        } else {
+            $keys = true;
+        }
     } else {
         // Return false.
         $keys = false;
@@ -1396,7 +1444,7 @@ function quest_type_keys($pokestop_id)
         );
     }
 
-    // Add back and abort navigation keys.
+    // Add abort navigation key.
     $nav_keys = array();
     $nav_keys[] = universal_inner_key($keys, '0', 'exit', '0', getTranslation('abort'));
 
@@ -1423,6 +1471,7 @@ function quest_qty_action_keys($pokestop_id, $quest_type)
             SELECT    *
             FROM      questlist
             WHERE     quest_type = '$quest_type'
+            ORDER BY  quest_quantity
             "
         );
 
@@ -1450,7 +1499,7 @@ function quest_qty_action_keys($pokestop_id, $quest_type)
     $nav_keys[] = universal_inner_key($keys, '0', 'exit', '0', getTranslation('abort'));
 
     // Get the inline key array.
-    $keys = inline_key_array($keys, 2);
+    $keys = inline_key_array($keys, 1);
     $keys[] = $nav_keys;
 
     debug_log($keys);

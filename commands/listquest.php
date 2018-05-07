@@ -1,6 +1,6 @@
 <?php
 // Write to log.
-debug_log('DELETEQUEST()');
+debug_log('LISTQUEST()');
 
 // For debug.
 //debug_log($update);
@@ -31,12 +31,12 @@ $keys = array();
 // Add key for quest
 while ($quests = $rs->fetch_assoc()) {
     // Pokestop name.
-    $pokestop_name = (!empty($quests['pokestop_name']) ? ($quests['pokestop_name']) : (getTranslation('unnamed_pokestop')));
+    $text = empty($quests['pokestop_name']) ? getTranslation('unnamed_pokestop') : $quests['pokestop_name'];
 
     // Add buttons to delete quests.
     $keys[] = array(
-        'text'          => $pokestop_name,
-        'callback_data' => $quests['id'] . ':quest_delete:0'
+        'text'          => $text,
+        'callback_data' => $quests['id'] . ':quest_edit:0'
     );
 
 }

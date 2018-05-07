@@ -19,7 +19,7 @@ $chat = $data['arg'];
 $quest = get_quest($id);
 
 // Get text and keys.
-$text = get_formatted_quest($quest);
+$text = get_formatted_quest($quest, true, true, false);
 $keys = [];
 
 // Send location.

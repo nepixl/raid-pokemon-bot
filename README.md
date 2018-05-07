@@ -89,7 +89,7 @@ Set `RAID_VOTE_TEXT` to true to show the text for the status vote buttons.
 
 Set `RAID_LATE_MSG` to true to enable the message hinting that some participants are late.
 
-Set `RIAD_LATE_TIME` to the amount of minutes the local community will may be wait for the late participants.
+Set `RAID_LATE_TIME` to the amount of minutes the local community will may be wait for the late participants.
 
 ## Proxy
 

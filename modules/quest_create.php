@@ -10,23 +10,10 @@ debug_log('quest_create()');
 $pokestop_id = $data['id'];
 
 // Check if quest already exists for this pokestop.
-$rs = my_query(
-    "
-    SELECT    id, pokestop_id
-    FROM      quests
-      WHERE   quest_date = CURDATE()
-        AND   pokestop_id = {$pokestop_id}
-    "
-);
-
-// Get the answer.
-$answer = $rs->fetch_assoc();
-
-// Write to log.
-debug_log($answer);
+$quest_in_db = quest_duplication_check($pokestop_id);
 
 // Quest already in database or new
-if (!$answer) {
+if (!$quest_in_db) {
     // Build message string.
     $msg = '';
     $msg .= getTranslation('quest_select_type') . CR;
@@ -36,7 +23,7 @@ if (!$answer) {
 } else {
     // Quest already in the database for this pokestop.
     $msg = EMOJI_WARN . '<b> ' . getTranslation('quest_already_submitted') . ' </b>' . EMOJI_WARN . CR . CR;
-    $quest = get_quest($answer['id']);
+    $quest = get_quest($quest_in_db['id']);
     $msg .= get_formatted_quest($quest);
 
     // Empty keys.

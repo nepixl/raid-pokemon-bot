@@ -572,6 +572,7 @@ function curl_json_request($json)
             } else if (!empty($response['result']['venue']['address'])) {
                 // Get raid_id from address.
                 $raid_id = substr(strrchr($response['result']['venue']['address'], 'R-ID = '), 7);
+                $quest_id = substr(strrchr($response['result']['venue']['address'], 'Q-ID = '), 7);
             }
 
             // Trigger Cleanup when raid_id/quest was found

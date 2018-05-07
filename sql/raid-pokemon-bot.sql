@@ -54,6 +54,15 @@ CREATE TABLE `cleanup_raids` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `encounterlist` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `quest_id` int(10) unsigned NOT NULL,
+  `pokedex_ids` varchar(20) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gyms` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `lat` varchar(11) DEFAULT NULL,
@@ -146,7 +155,6 @@ CREATE TABLE `rewardlist` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `reward_type` int(10) unsigned NOT NULL,
   `reward_quantity` int(10) unsigned NOT NULL,
-  `reward_pokedex_ids` varchar(20) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
