@@ -516,14 +516,16 @@ function get_chatmember($chat_id, $user_id)
  */
 function curl_json_request($json)
 {
-    $curl = curl_init('https://api.telegram.org/bot' . API_KEY . '/');
+	$URL = 'https://api.telegram.org/bot' . API_KEY . '/';
+	$curl = curl_init($URL);
 
     curl_setopt($curl, CURLOPT_HEADER, false);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
     curl_setopt($curl, CURLOPT_POST, true);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
-
+	//curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+	
     // Use Proxyserver for curl if configured
     if (CURL_USEPROXY == true) {
     	curl_setopt($curl, CURLOPT_PROXY, CURL_PROXYSERVER);
@@ -632,13 +634,19 @@ function getTranslation($text)
     debug_log($text,'T:');
     $translation = '';
 
+    // User language?
+    $language = LANGUAGE;
+    if ($language == '') {
+        $language = USERLANGUAGE;
+    }
+
     // Pokemon name?
     if(strpos($text, 'pokemon_id_') === 0) {
         // Make sure file exists
-        if(file_exists('./pokemon_' . strtolower(LANGUAGE) . '.json')) {
+        if(file_exists(ROOT_PATH . '/pokemon_' . strtolower($language) . '.json')) {
             // Get ID from string - e.g. 150 from pokemon_id_150
             $pokemon_id = substr($text, strrpos($text, '_') + 1);
-            $str = file_get_contents('./pokemon_' . strtolower(LANGUAGE) . '.json');
+            $str = file_get_contents(ROOT_PATH . '/pokemon_' . strtolower($language) . '.json');
 
             // Index starts at 0, so pokemon_id minus 1 for the correct name!
             $json = json_decode($str, true);
@@ -646,16 +654,16 @@ function getTranslation($text)
         }
     // Quest or reward text?
     } else if(strpos($text, 'quest_type_') === 0 || strpos($text, 'quest_action_') === 0 || strpos($text, 'reward_type_') === 0) {
-        $str = file_get_contents('./quests-rewards.json');
+        $str = file_get_contents(ROOT_PATH . '/quests-rewards.json');
 
         $json = json_decode($str, true);
-        $translation = $json[$text][LANGUAGE];
+        $translation = $json[$text][$language];
     // Other translation
     } else {
-        $str = file_get_contents('./language.json');
+        $str = file_get_contents(ROOT_PATH . '/language.json');
 
         $json = json_decode($str, true);
-        $translation = $json[$text][LANGUAGE];
+        $translation = $json[$text][$language];
     }
 
     return $translation;

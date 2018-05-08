@@ -40,30 +40,13 @@ if (!empty($answer)) {
 
 // User has not voted before.
 } else {
-
-    // Get users data.
-    $rs = my_query(
-        "
-        SELECT    team
-        FROM      users
-          WHERE   user_id = {$update['callback_query']['from']['id']}
-        "
-    );
-
-    // Get the row.
-    $row = $rs->fetch_assoc();
-
-    // Check if we found the users team.
-    $team = !empty($row['team']) ? "'" . $row['team'] . "'" : "NULL";
-
     // Create attendance.
     my_query(
         "
         INSERT INTO   attendance
         SET           raid_id = {$data['id']},
                       user_id = {$update['callback_query']['from']['id']},
-                      attend_time = FROM_UNIXTIME({$data['arg']}),
-                      team = {$team}
+                      attend_time = FROM_UNIXTIME({$data['arg']})
         "
     );
 }

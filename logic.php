@@ -422,7 +422,7 @@ function get_raid($raid_id)
     // Get the raid data by id.
     $rs = my_query(
         "
-        SELECT     raids.*, users.name
+        SELECT     raids.*, users.name,
                    UNIX_TIMESTAMP(start_time)                      AS ts_start,
                    UNIX_TIMESTAMP(end_time)                        AS ts_end,
                    UNIX_TIMESTAMP(NOW())                           AS ts_now,
@@ -2456,13 +2456,6 @@ function keys_vote($raid)
         // Old stuff, left for possible future use or in case of bugs:
         //for ($i = ceil($now / $timePerSlot) * $timePerSlot; $i <= ($end_time - $timeBeforeEnd); $i = $i + $timePerSlot) {
         for ($i = ceil($start_time / $timePerSlot) * $timePerSlot; $i <= ($end_time - $timeBeforeEnd); $i = $i + $timePerSlot) {
-/*
-            if ($col++ >= 4) {
-                $keys[] = $keys_time;
-                $keys_time = [];
-                $col = 1;
-            }
-*/
 	    // Plus 60 seconds, so vote button for e.g. 10:00 will disappear after 10:00:59 / at 10:01:00 and not right after 09:59:59 / at 10:00:00
 	    if (($i + 60) > $now) {
 		// Display vote buttons for now + 1 additional minute
@@ -2633,6 +2626,27 @@ function keys_vote($raid)
     }
 
     return $keys;
+}
+
+/**
+ * Get user language.
+ * @param $language_code
+ * @return string
+ */
+function get_user_language($language_code)
+{
+    $languages = $GLOBALS['languages'];
+
+    // Get languages from normal translation.
+    if(array_key_exists($language_code, $languages)) {
+        $userlanguage = $languages[$language_code];
+    } else {
+        $userlanguage = 'EN';
+    }
+
+    debug_log('User language: ' . $userlanguage);
+
+    return $userlanguage;
 }
 
 /**
@@ -3114,6 +3128,8 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
                             sum(extra_valor)            AS extra_valor,
                             sum(extra_instinct)         AS extra_instinct
             FROM            attendance
+            LEFT JOIN       users
+              ON            attendance.user_id = users.user_id
               WHERE         raid_id = {$raid_id}
                 AND         attend_time IS NOT NULL
                 AND         raid_done != 1
@@ -3356,6 +3372,8 @@ function show_raid_poll($raid)
                         sum(pokemon = '{$raid['pokemon']}')  AS count_raid_pokemon,
                         attend_time
         FROM            attendance
+        LEFT JOIN       users
+          ON            attendance.user_id = users.user_id
           WHERE         raid_id = {$raid['id']}
             AND         attend_time IS NOT NULL
             AND         raid_done != 1
@@ -3400,6 +3418,8 @@ function show_raid_poll($raid)
                             attend_time,
                             pokemon
             FROM            attendance
+            LEFT JOIN       users
+              ON            attendance.user_id = users.user_id
               WHERE         raid_id = {$raid['id']}
                 AND         attend_time IS NOT NULL
                 AND         raid_done != 1
@@ -3425,6 +3445,7 @@ function show_raid_poll($raid)
             SELECT      attendance.*,
                         users.name,
                         users.level,
+                        users.team,
                         UNIX_TIMESTAMP(attend_time) AS ts_att
             FROM        attendance
             LEFT JOIN   users
@@ -3434,7 +3455,7 @@ function show_raid_poll($raid)
                 AND     cancel != 1
               ORDER BY  attend_time,
                         pokemon,
-                        team,
+                        users.team,
                         arrived
             "
         );
@@ -3580,6 +3601,7 @@ function show_raid_poll($raid)
             SELECT      attendance.*,
                         users.name,
                         users.level,
+                        users.team,
                         UNIX_TIMESTAMP(attend_time) AS ts_att
             FROM        attendance
             LEFT JOIN   users
@@ -3713,6 +3735,8 @@ function show_raid_poll_small($raid)
                         sum(extra_valor)            AS extra_valor,
                         sum(extra_instinct)         AS extra_instinct
         FROM            attendance
+        LEFT JOIN       users
+          ON            attendance.user_id = users.user_id
           WHERE         raid_id = {$raid['id']}
             AND         attend_time IS NOT NULL
             AND         raid_done != 1

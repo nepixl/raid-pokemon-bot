@@ -29,7 +29,7 @@ if (hash('sha512', $apiKey) == strtolower(CONFIG_HASH)) {
 // Api key is wrong!
 } else {
     // Echo data.
-    sendMessageEcho(MAINTAINER_ID, $_SERVER['REMOTE_ADDR'] . ' ' . $_SERVER['HTTP_X_FORWARDED_FOR'] . ' ' . $apiKey);
+    sendMessageEcho(MAINTAINER_ID, $_SERVER['REMOTE_ADDR'] . ' ' . isset($_SERVER['HTTP_X_FORWARDED_FOR']) . ' ' . $apiKey);
     // And exit script.
     exit();
 }
@@ -39,6 +39,16 @@ $content = file_get_contents('php://input');
 
 // Decode the json string.
 $update = json_decode($content, true);
+
+// Get language from user.
+if (LANGUAGE == '') {
+    // Message or callback?
+    $language_code = (isset($update['message']['from']['language_code'])) ? ($update['message']['from']['language_code']) : ($update['callback_query']['from']['language_code']);
+
+    // Get and define userlanguage.
+    $userlanguage = get_user_language($language_code);
+    define('USERLANGUAGE', $userlanguage);
+}
 
 // Update var is false.
 if (!$update) {
@@ -147,7 +157,7 @@ if (isset($update['callback_query'])) {
     // Check access to the bot
     bot_access_check($update);
     // Create raid and exit.
-    include_once('modules/raid_create.php');
+    include_once(ROOT_PATH . '/modules/raid_create.php');
     exit();
 
 // Cleanup collection from channel/supergroup messages.
@@ -202,7 +212,7 @@ if (isset($update['callback_query'])) {
         $com = strtolower(str_replace('/', '', str_replace(BOT_NAME, '', explode(' ', $update['message']['text'])[0])));
 
         // Set command path.
-        $command = 'commands/' . basename($com) . '.php';
+        $command = ROOT_PATH . '/commands/' . basename($com) . '.php';
 
         // Write to log.
         debug_log($command);

@@ -16,8 +16,6 @@ CREATE TABLE `attendance` (
   `user_id` bigint(20) DEFAULT NULL,
   `raid_id` int(10) unsigned DEFAULT NULL,
   `attend_time` datetime DEFAULT NULL,
-  `end_time` datetime DEFAULT NULL,
-  `team` enum('mystic','valor','instinct') DEFAULT NULL,
   `extra_mystic` int(10) unsigned DEFAULT '0',
   `extra_valor` int(10) unsigned DEFAULT '0',
   `extra_instinct` int(10) unsigned DEFAULT '0',
