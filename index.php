@@ -39,9 +39,24 @@ $content = file_get_contents('php://input');
 
 // Decode the json string.
 $update = json_decode($content, true);
-if (LANGUAGE=='') {
+if (LANGUAGE == '') {
   
-  define('LANGUAGE', $update['callback_query']['from']['language_code']);
+  if (strpos($update['callback_query']['from']['language_code'],'de') == 0) {
+
+    define('LANGUAGE', 'DE'); 
+  }
+  else if (strpos($update['callback_query']['from']['language_code'],'nl') == 0) {
+
+    define('LANGUAGE', 'NL');
+  }
+  else if (strpos($update['callback_query']['from']['language_code'],'pt') == 0) {
+
+    define('LANGUAGE', 'PT-BR');
+  }
+  else {
+
+    define('LANGUAGE', 'EN');
+  }
 }
 
 // Update var is false.
