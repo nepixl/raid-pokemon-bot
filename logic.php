@@ -1884,7 +1884,7 @@ function share_raid_keys($raid_id, $user_id)
     debug_log('User is ' . (($mod == 1) ? '' : 'not ') . 'a moderator: ' . $user_id);
 
     // Add share button if not restricted.
-    if ((SHARE_MODERATORS == true && $mod == 1) || SHARE_USERS == true) {
+    if ((SHARE_RAID_MODERATORS == true && $mod == 1) || SHARE_RAID_USERS == true) {
         debug_log('Adding general share key to inline keys');
         // Set the keys.
         $keys[] = [
@@ -1896,9 +1896,9 @@ function share_raid_keys($raid_id, $user_id)
     }
 
     // Add buttons for predefined sharing chats.
-    if (!empty(SHARE_CHATS)) {
+    if (!empty(SHARE_RAID_CHATS)) {
         // Add keys for each chat.
-        $chats = explode(',', SHARE_CHATS);
+        $chats = explode(',', SHARE_RAID_CHATS);
         foreach($chats as $chat) {
             // Get chat object 
             debug_log("Getting chat object for '" . $chat . "'");
@@ -1946,7 +1946,7 @@ function share_quest_keys($quest_id, $user_id)
     debug_log('User is ' . (($mod == 1) ? '' : 'not ') . 'a moderator: ' . $user_id);
 
     // Add share button if not restricted.
-    if ((SHARE_MODERATORS == true && $mod == 1) || SHARE_USERS == true) {
+    if ((SHARE_QUEST_MODERATORS == true && $mod == 1) || SHARE_QUEST_USERS == true) {
         debug_log('Adding general share key to inline keys');
         // Set the keys.
         $keys[] = [
@@ -1958,9 +1958,9 @@ function share_quest_keys($quest_id, $user_id)
     }
         
     // Add buttons for predefined sharing chats.
-    if (!empty(SHARE_CHATS)) {
+    if (!empty(SHARE_QUEST_CHATS)) {
         // Add keys for each chat.
-        $chats = explode(',', SHARE_CHATS);
+        $chats = explode(',', SHARE_QUEST_CHATS);
         foreach($chats as $chat) {
             // Get chat object 
             debug_log("Getting chat object for '" . $chat . "'");
