@@ -612,6 +612,10 @@ function getTranslation($text)
 
         $json = json_decode($str, true);
         $translation = $json[$text][LANGUAGE];
+        if ($translation=='') {
+          
+          $translation = $json[$text]['EN'];
+        }
     }
 
     return $translation;

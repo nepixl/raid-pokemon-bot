@@ -39,6 +39,10 @@ $content = file_get_contents('php://input');
 
 // Decode the json string.
 $update = json_decode($content, true);
+if (LANGUAGE=='') {
+  
+  define('LANGUAGE', $update['callback_query']['from']['language_code']);
+}
 
 // Update var is false.
 if (!$update) {
