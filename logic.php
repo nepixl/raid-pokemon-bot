@@ -319,7 +319,7 @@ function quest_duplication_check($pokestop_id)
         "
         SELECT    id, pokestop_id
         FROM      quests
-          WHERE   quest_date = DATE_FORMAT(CURDATE(), '%Y-%m-%d') 
+          WHERE   quest_date = CURDATE() 
             AND   pokestop_id > 0
             AND   pokestop_id = {$pokestop_id}
         "
@@ -614,7 +614,8 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
 
     // Add update time and quest id to message.
     if($add_timestamp == true) {
-        $msg .= CR . '<i>' . getTranslation('updated') . ': ' . $quest['quest_date'] . '</i>';
+        $quest_date = explode(' ', $quest['quest_date']);
+        $msg .= CR . '<i>' . getTranslation('updated') . ': ' . $quest_date[0] . '</i>';
         $msg .= '  Q-ID = ' . $quest['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
     }
 
@@ -632,7 +633,7 @@ function get_todays_formatted_quests()
         "
         SELECT     id
         FROM       quests
-        WHERE      quest_date = DATE_FORMAT(CURDATE(), '%Y-%m-%d') 
+        WHERE      quest_date = CURDATE() 
         "
     );
 
@@ -2161,9 +2162,9 @@ function run_quests_cleanup ($telegram = 2, $database = 2) {
                 $rs = my_query(
                     "
                     SELECT  quest_date,
-                            DATE_FORMAT(CURDATE(), '%Y-%m-%d')   AS  today,
-                            UNIX_TIMESTAMP(quest_date)           AS  ts_questdate,
-                            UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-%d'))  AS  ts_today
+                            CURDATE()                   AS  today,
+                            UNIX_TIMESTAMP(quest_date)  AS  ts_questdate,
+                            UNIX_TIMESTAMP(CURDATE())   AS  ts_today
                     FROM    
                       WHERE id = {$current_quest_id}
                     ", true
