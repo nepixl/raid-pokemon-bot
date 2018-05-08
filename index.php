@@ -46,24 +46,23 @@ if (LANGUAGE == '') {
     
     $language = $update['callback_query']['from']['language_code'];
   }
-  debug_log($language, '!');
+
   if (strpos($language,'de') === 0) {
 
-    define('LANGUAGE', 'DE'); 
+    define('USERLANGUAGE', 'DE'); 
   }
   else if (strpos($language,'nl') === 0) {
 
-    define('LANGUAGE', 'NL');
+    define('USERLANGUAGE', 'NL');
   }
   else if (strpos($language,'pt') === 0) {
 
-    define('LANGUAGE', 'PT-BR');
+    define('USERLANGUAGE', 'PT-BR');
   }
   else {
 
-    define('LANGUAGE', 'EN');
+    define('USERLANGUAGE', 'EN');
   }
-  debug_log(LANGUAGE, '!!!');
 }
 
 // Update var is false.
