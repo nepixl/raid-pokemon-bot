@@ -41,15 +41,21 @@ $content = file_get_contents('php://input');
 $update = json_decode($content, true);
 if (LANGUAGE == '') {
   
-  if (strpos($update['callback_query']['from']['language_code'],'de') == 0) {
+  $language = $update['message']['from']['language_code'];
+  if ($language=='') {
+    
+    $language = $update['callback_query']['from']['language_code'];
+  }
+  debug_log($language, '!');
+  if (strpos($language,'de') === 0) {
 
     define('LANGUAGE', 'DE'); 
   }
-  else if (strpos($update['callback_query']['from']['language_code'],'nl') == 0) {
+  else if (strpos($language,'nl') === 0) {
 
     define('LANGUAGE', 'NL');
   }
-  else if (strpos($update['callback_query']['from']['language_code'],'pt') == 0) {
+  else if (strpos($language,'pt') === 0) {
 
     define('LANGUAGE', 'PT-BR');
   }
@@ -57,6 +63,7 @@ if (LANGUAGE == '') {
 
     define('LANGUAGE', 'EN');
   }
+  debug_log(LANGUAGE, '!!!');
 }
 
 // Update var is false.
