@@ -319,7 +319,7 @@ function quest_duplication_check($pokestop_id)
         "
         SELECT    id, pokestop_id
         FROM      quests
-          WHERE   quest_date = CURDATE()
+          WHERE   quest_date = DATE_FORMAT(CURDATE(), '%Y-%m-%d') 
             AND   pokestop_id > 0
             AND   pokestop_id = {$pokestop_id}
         "
@@ -614,8 +614,7 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
 
     // Add update time and quest id to message.
     if($add_timestamp == true) {
-        $quest_date = explode(' ', $quest['quest_date']);
-        $msg .= CR . '<i>' . getTranslation('updated') . ': ' . $quest_date[0] . '</i>';
+        $msg .= CR . '<i>' . getTranslation('updated') . ': ' . $quest['quest_date'] . '</i>';
         $msg .= '  Q-ID = ' . $quest['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
     }
 
@@ -633,7 +632,7 @@ function get_todays_formatted_quests()
         "
         SELECT     id
         FROM       quests
-        WHERE      quest_date = CURDATE()
+        WHERE      quest_date = DATE_FORMAT(CURDATE(), '%Y-%m-%d') 
         "
     );
 
@@ -2047,6 +2046,252 @@ function insert_quest_cleanup($chat_id, $message_id, $quest_id)
 }
 
 /**
+ * Run quests cleanup.
+ * @param $telegram
+ * @param $database
+ */
+function run_quests_cleanup ($telegram = 2, $database = 2) {
+    /* Check input
+     * 0 = Do nothing
+     * 1 = Cleanup
+     * 2 = Read from config
+    */
+
+    // Get cleanup values from config per default.
+    if ($telegram == 2) {
+        $telegram = (CLEANUP_QUEST_TELEGRAM == true) ? 1 : 0;
+    }
+
+    if ($database == 2) {
+        $database = (CLEANUP_QUEST_DATABASE == true) ? 1 : 0;
+    }
+
+    // Start cleanup when at least one parameter is set to trigger cleanup
+    if ($telegram == 1 || $database == 1) {
+        // Query for telegram cleanup without database cleanup
+        if ($telegram == 1 && $database == 0) {
+            // Get cleanup info.
+            $rs = my_query(
+                "
+                SELECT    * 
+                FROM      cleanup_quests
+                  WHERE   chat_id <> 0
+                  ORDER BY id DESC
+                  LIMIT 0, 250     
+                ", true
+            );
+        }
+        // Query for database cleanup without telegram cleanup
+        } else if ($telegram == 0 && $database == 1) {
+            // Get cleanup info.
+            $rs = my_query(
+                "
+                SELECT    * 
+                FROM      cleanup_quests
+                  WHERE   chat_id = 0
+                  LIMIT 0, 250
+                ", true
+            );
+        // Query for telegram and database cleanup
+        } else {
+            // Get cleanup info.
+            $rs = my_query(
+                "
+                SELECT    * 
+                FROM      cleanup_quests
+                  LIMIT 0, 250
+                ", true
+            );
+        }
+
+        // Init empty cleanup jobs array.
+        $cleanup_jobs = array();
+
+        // Fill array with cleanup jobs.
+        while ($rowJob = $rs->fetch_assoc()) {
+            $cleanup_jobs[] = $rowJob;
+        }
+
+        // Write to log.
+        cleanup_log($cleanup_jobs);
+
+        // Init previous quest id.
+        $prev_quest_id = "FIRST_RUN";
+
+        foreach ($cleanup_jobs as $row) {
+            // Set current quest id.
+            $current_quest_id = ($row['quest_id'] == 0) ? $row['cleaned'] : $row['quest_id'];
+
+            // Write to log.
+            cleanup_log("Cleanup ID: " . $row['id']);
+            cleanup_log("Chat ID: " . $row['chat_id']);
+            cleanup_log("Message ID: " . $row['message_id']);
+            cleanup_log("Quest ID: " . $row['quest_id']);
+
+            // Make sure quest exists
+            $rs = my_query(
+                "
+                SELECT  id
+                FROM    quests
+                  WHERE id = {$current_quest_id}
+                ", true
+            );
+            $qq = $rs->fetch_row();
+
+            // No quest found - set cleanup to 0 and continue with next quest
+            if (empty($qq['0'])) {
+                cleanup_log('No quest found with ID: ' . $current_quest_id, '!');
+                cleanup_log('Updating cleanup information.');
+                my_query(
+                "
+                    UPDATE    cleanup_quests
+                    SET       chat_id = 0, 
+                              message_id = 0 
+                    WHERE   id = {$row['id']}
+                ", true
+                );
+
+                // Continue with next quest
+                continue;
+            }
+
+            // Get quest data only when quest_id changed compared to previous run
+            if ($prev_quest_id != $current_quest_id) {
+                // Get the quest date by id.
+                $rs = my_query(
+                    "
+                    SELECT  quest_date,
+                            DATE_FORMAT(CURDATE(), '%Y-%m-%d')   AS  today,
+                            UNIX_TIMESTAMP(quest_date)           AS  ts_questdate,
+                            UNIX_TIMESTAMP(DATE_FORMAT(CURDATE(), '%Y-%m-%d'))  AS  ts_today
+                    FROM    
+                      WHERE id = {$current_quest_id}
+                    ", true
+                );
+
+                // Fetch quest date.
+                $quest = $rs->fetch_assoc();
+
+                // Get quest date and todays date.
+                $questdate = $quest['quest_date'];
+                $today = $quest['today'];
+                $unix_questdate = $quest['ts_questdate'];
+                $unix_today = $quest['ts_today'];
+
+                // Write unix timestamps and dates to log.
+                cleanup_log('Unix timestamps:');
+                cleanup_log('Today: ' . $unix_today);
+                cleanup_log('Quest date: ' . $unix_questdate);
+                cleanup_log('Today: ' . $today);
+                cleanup_log('Quest date: '  . $questdate);
+            }
+
+            // Time for telegram cleanup?
+            if ($unix_today > $unix_questdate) {
+                // Delete quest telegram message if not already deleted
+                if ($telegram == 1 && $row['chat_id'] != 0 && $row['message_id'] != 0) {
+                    // Delete telegram message.
+                    cleanup_log('Deleting telegram message ' . $row['message_id'] . ' from chat ' . $row['chat_id'] . ' for quest ' . $row['quest_id']);
+                    delete_message($row['chat_id'], $row['message_id']);
+                    // Set database values of chat_id and message_id to 0 so we know telegram message was deleted already.
+                    cleanup_log('Updating telegram cleanup information.');
+                    my_query(
+                    "
+                        UPDATE    cleanup_quest
+                        SET       chat_id = 0, 
+                                  message_id = 0 
+                        WHERE   id = {$row['id']}
+                    ", true
+                    );
+                } else {
+                    if ($telegram == 1) {
+                        cleanup_log('Telegram message is already deleted!');
+                    } else {
+                        cleanup_log('Telegram cleanup was not triggered! Skipping...');
+                    }
+                }
+            } else {
+                cleanup_log('Skipping cleanup of telegram for this quest! Cleanup time has not yet come...');
+            }
+
+            // Time for database cleanup?
+            if ($unix_today > $unix_questdate) {
+                // Delete quest from quests table.
+                // Make sure to delete only once - quest may be in multiple channels/supergroups, but only 1 time in database
+                if (($database == 1) && $row['quest_id'] != 0 && ($prev_quest_id != $current_quest_id)) {
+                    // Delete quest from quest table.
+                    cleanup_log('Deleting quest ' . $current_quest_id);
+                    my_query(
+                    "
+                        DELETE FROM    quests
+                        WHERE   id = {$row['id']}
+                    ", true
+                    );
+
+                    // Set database value of quest_id to 0 so we know info was deleted already
+                    // Use quest_id in where clause since the same quest_id can in cleanup more than once
+                    cleanup_log('Updating database cleanup information.');
+                    my_query(
+                    "
+                        UPDATE    cleanup_quests
+                        SET       quest_id = 0, 
+                                  cleaned = {$row['quest_id']}
+                        WHERE   quest_id = {$row['quest_id']}
+                    ", true
+                    );
+                } else {
+                    if ($database == 1) {
+                        cleanup_log('Quest is already deleted!');
+                    } else {
+                        cleanup_log('Quest cleanup was not triggered! Skipping...');
+                    }
+                }
+
+                // Delete quest from cleanup table once every value is set to 0 and cleaned got updated from 0 to the quest_id
+                // In addition trigger deletion only when previous and current quest_id are different to avoid unnecessary sql queries
+                if ($row['quest_id'] == 0 && $row['chat_id'] == 0 && $row['message_id'] == 0 && $row['cleaned'] != 0 && ($prev_quest_id != $current_quest_id)) {
+                    // Get all cleanup jobs which will be deleted now.
+                    cleanup_log('Removing cleanup info from database:');
+                    $rs_cl = my_query(
+                    "
+                        SELECT *
+                        FROM    cleanup_quests
+                        WHERE   cleaned = {$row['cleaned']}
+                    ", true
+                    );
+
+                    // Log each cleanup ID which will be deleted.
+                    while($rs_cleanups = $rs_cl->fetch_assoc()) {
+                        cleanup_log('Cleanup ID: ' . $rs_cleanups['id'] . ', Former Quest ID: ' . $rs_cleanups['cleaned']);
+                    }
+
+                    // Finally delete from cleanup table.
+                    my_query(
+                    "
+                        DELETE FROM    cleanup_quests
+                        WHERE   cleaned = {$row['cleaned']}
+                    ", true
+                    );
+                } else {
+                    if ($prev_quest_id != $current_quest_id) {
+                        cleanup_log('Time for complete removal of quest from database has not yet come.');
+                    } else {
+                        cleanup_log('Complete removal of quest from database was already done!');
+                    }
+                }
+            } else {
+                cleanup_log('Skipping cleanup of database for this quest! Cleanup time has not yet come...');
+            }
+
+            // Store current quest id as previous id for next loop
+            $prev_quest_id = $current_quest_id;
+        }
+
+    // Write to log.
+    cleanup_log('Finished with cleanup process!');
+}
+
+/**
  * Insert raid cleanup info to database.
  * @param $chat_id
  * @param $message_id
@@ -2116,7 +2361,7 @@ function insert_raid_cleanup($chat_id, $message_id, $raid_id)
  */
 function run_raids_cleanup ($telegram = 2, $database = 2) {
     // Check configuration, cleanup of telegram needs to happen before database cleanup!
-    if (CLEANUP_TIME_TG > CLEANUP_TIME_DB) {
+    if (CLEANUP_RAID_TIME_TG > CLEANUP_RAID_TIME_DB) {
 	cleanup_log('Configuration issue! Cleanup time for telegram messages needs to be lower or equal to database cleanup time!');
 	cleanup_log('Stopping cleanup process now!');
 	exit;
@@ -2130,11 +2375,11 @@ function run_raids_cleanup ($telegram = 2, $database = 2) {
 
     // Get cleanup values from config per default.
     if ($telegram == 2) {
-	$telegram = (CLEANUP_TELEGRAM == true) ? 1 : 0;
+	$telegram = (CLEANUP_RAID_TELEGRAM == true) ? 1 : 0;
     }
 
     if ($database == 2) {
-	$database = (CLEANUP_DATABASE == true) ? 1 : 0;
+	$database = (CLEANUP_RAID_DATABASE == true) ? 1 : 0;
     }
 
     // Start cleanup when at least one parameter is set to trigger cleanup
@@ -2247,8 +2492,8 @@ function run_raids_cleanup ($telegram = 2, $database = 2) {
 	        $end = $raid['ts_end'];
 	        $tz = $raid['timezone'];
     	        $now = $raid['ts_now'];
-	        $cleanup_time_tg = 60*CLEANUP_TIME_TG;
-	        $cleanup_time_db = 60*CLEANUP_TIME_DB;
+	        $cleanup_time_tg = 60*CLEANUP_RAID_TIME_TG;
+	        $cleanup_time_db = 60*CLEANUP_RAID_TIME_DB;
 
 		// Write times to log.
 		cleanup_log("Current time: " . unix2tz($now,$tz,"Y-m-d H:i:s"));

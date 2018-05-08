@@ -20,7 +20,7 @@ $rs = my_query(
         ON         quests.quest_id = questlist.id
         LEFT JOIN  rewardlist
         ON         quests.reward_id = rewardlist.id
-        WHERE      quest_date = CURDATE()
+        WHERE      quest_date = DATE_FORMAT(CURDATE(), '%Y-%m-%d')
         ORDER BY   pokestops.pokestop_name
         "
     );
