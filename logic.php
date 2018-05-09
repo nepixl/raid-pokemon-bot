@@ -473,19 +473,27 @@ function get_active_raids($tz)
 /**
  * Get local name of pokemon.
  * @param $pokedex_id
+ * @param $override_language
+ * @param $type: raid|quest
  * @return string
  */
-function get_local_pokemon_name($pokedex_id)
+function get_local_pokemon_name($pokedex_id, $override_language = false, $type = '')
 {
+    // Get translation type
+    if($override_language == true && $type != '' && ($type == 'raid' || $type == 'quest')) {
+        $getTypeTranslation = 'get' . ucfirst($type) . 'Translation';
+    } else {
+        $getTypeTranslation = 'getTranslation';
+    }
     // Init pokemon name and define fake pokedex ids used for raid eggs
     $pokemon_name = '';
     $eggs = $GLOBALS['eggs'];
 
     // Get eggs from normal translation.
     if(in_array($pokedex_id, $eggs)) {
-        $pokemon_name = getTranslation('egg_' . substr($pokedex_id, -1));
+        $pokemon_name = $getTypeTranslation('egg_' . substr($pokedex_id, -1));
     } else { 
-        $pokemon_name = getTranslation('pokemon_id_' . $pokedex_id);
+        $pokemon_name = $getTypeTranslation('pokemon_id_' . $pokedex_id);
     }
 
     // Fallback: Get original pokemon name from database
@@ -551,9 +559,10 @@ function get_quest($quest_id)
  * @param $add_creator bool
  * @param $add_timestamp bool
  * @param $compact_format bool
+ * @param $override_language bool
  * @return array
  */
-function get_formatted_quest($quest, $add_creator = false, $add_timestamp = false, $compact_format = false)
+function get_formatted_quest($quest, $add_creator = false, $add_timestamp = false, $compact_format = false, $override_language = false)
 {
     /** Example:
      * Pokestop: Reward-Stop Number 1
@@ -562,8 +571,15 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
      * Reward: 1 Pokemon (Magikarp or Onix)
     */
 
+    // Get translation type
+    if($override_language == true) {
+        $getTypeTranslation = 'getQuestTranslation';
+    } else {
+        $getTypeTranslation = 'getTranslation';
+    }
+
     // Pokestop name and address.
-    $pokestop_name = SP . '<b>' . (!empty($quest['pokestop_name']) ? ($quest['pokestop_name']) : (getTranslation('unnamed_pokestop'))) . '</b>' . CR;
+    $pokestop_name = SP . '<b>' . (!empty($quest['pokestop_name']) ? ($quest['pokestop_name']) : ($getTypeTranslation('unnamed_pokestop'))) . '</b>' . CR;
 
     // Add google maps link.
     if (!empty($quest['address'])) {
@@ -573,13 +589,13 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
     }
 
     // Quest action: Singular or plural?
-    $quest_action = explode(":", getTranslation('quest_action_' . $quest['quest_action']));
+    $quest_action = explode(":", $getTypeTranslation('quest_action_' . $quest['quest_action']));
     $quest_action_singular = $quest_action[0];
     $quest_action_plural = $quest_action[1];
     $qty_action = $quest['quest_quantity'] . SP . (($quest['quest_quantity'] > 1) ? ($quest_action_plural) : ($quest_action_singular));
 
     // Reward type: Singular or plural?
-    $reward_type = explode(":", getTranslation('reward_type_' . $quest['reward_type']));
+    $reward_type = explode(":", $getTypeTranslation('reward_type_' . $quest['reward_type']));
     $reward_type_singular = $reward_type[0];
     $reward_type_plural = $reward_type[1];
     $qty_reward = $quest['reward_quantity'] . SP . (($quest['reward_quantity'] > 1) ? ($reward_type_plural) : ($reward_type_singular));
@@ -591,7 +607,7 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
         $quest_pokemons = explode(',', $quest['pokedex_ids']);
         // Get local pokemon name
         foreach($quest_pokemons as $pokedex_id) {
-            $msg_poke .= get_local_pokemon_name($pokedex_id);
+            $msg_poke .= ($override_language == true) ? (get_local_pokemon_name($pokedex_id, true, 'quest')) : (get_local_pokemon_name($pokedex_id));
             $msg_poke .= ' / ';
         }
         // Trim last slash
@@ -602,20 +618,20 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
     // Build quest message
     $msg = '';
     if($compact_format == false) {
-        $msg .= getTranslation('pokestop') . ':' . $pokestop_name . $pokestop_address . CR;
-        $msg .= getTranslation('quest') . ': <b>' . getTranslation('quest_type_' . $quest['quest_type']) . SP . $qty_action . '</b>' . CR;
-        $msg .= getTranslation('reward') . ': <b>' . $qty_reward . '</b>' . $msg_poke . CR;
+        $msg .= $getTypeTranslation('pokestop') . ':' . $pokestop_name . $pokestop_address . CR;
+        $msg .= $getTypeTranslation('quest') . ': <b>' . $getTypeTranslation('quest_type_' . $quest['quest_type']) . SP . $qty_action . '</b>' . CR;
+        $msg .= $getTypeTranslation('reward') . ': <b>' . $qty_reward . '</b>' . $msg_poke . CR;
     } else {
-        $msg .= getTranslation('quest_type_' . $quest['quest_type']) . SP . $qty_action . ' — ' . $qty_reward . $msg_poke;
+        $msg .= $getTypeTranslation('quest_type_' . $quest['quest_type']) . SP . $qty_action . ' — ' . $qty_reward . $msg_poke;
     }
 
     // Display creator.
-    $msg .= ($quest['user_id'] && $add_creator == true) ? (CR . getTranslation('created_by') . ': <a href="tg://user?id=' . $quest['user_id'] . '">' . htmlspecialchars($quest['name']) . '</a>') : '';
+    $msg .= ($quest['user_id'] && $add_creator == true) ? (CR . $getTypeTranslation('created_by') . ': <a href="tg://user?id=' . $quest['user_id'] . '">' . htmlspecialchars($quest['name']) . '</a>') : '';
 
     // Add update time and quest id to message.
     if($add_timestamp == true) {
         $quest_date = explode(' ', $quest['quest_date']);
-        $msg .= CR . '<i>' . getTranslation('updated') . ': ' . $quest_date[0] . '</i>';
+        $msg .= CR . '<i>' . $getTypeTranslation('updated') . ': ' . $quest_date[0] . '</i>';
         $msg .= '  Q-ID = ' . $quest['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
     }
 
@@ -860,9 +876,10 @@ function get_pokemon_cp($pokedex_id)
 /**
  * Get formatted pokemon cp values.
  * @param $pokedex_id
+ * @param $override_language
  * @return string
  */
-function get_formatted_pokemon_cp($pokedex_id)
+function get_formatted_pokemon_cp($pokedex_id, $override_language = false)
 {
     // Get gyms from database
     $rs = my_query(
@@ -887,7 +904,8 @@ function get_formatted_pokemon_cp($pokedex_id)
     }
 
     // Combine CP and weather boosted CP
-    $cp = (!empty($cp20)) ? (getTranslation('pokedex_cp') . ' <b>' . $cp20 . '</b>') : '';
+    $text = ($override_language == true) ? (getRaidTranslation('pokedex_cp')) : (getTranslation('pokedex_cp'));
+    $cp = (!empty($cp20)) ? ($text . ' <b>' . $cp20 . '</b>') : '';
     $cp .= (!empty($cp25)) ? (' (' . $cp25 . ')') : '';
 
     return $cp;
@@ -2642,7 +2660,7 @@ function keys_vote($raid)
     $keys = [
         [
             [
-                'text'          => getTranslation('alone'),
+                'text'          => getRaidTranslation('alone'),
                 'callback_data' => $raid['id'] . ':vote_extra:0'
             ],
             [
@@ -2679,7 +2697,7 @@ function keys_vote($raid)
         $keys = [
             [
                 [
-                    'text'          => getTranslation('raid_done'),
+                    'text'          => getRaidTranslation('raid_done'),
                     'callback_data' => $raid['id'] . ':vote_refresh:0'
                 ]
             ]
@@ -2694,7 +2712,7 @@ function keys_vote($raid)
         if(RAID_ANYTIME == true)
         {
             $keys_time[] = array(
-                'text'          => getTranslation('anytime'),
+                'text'          => getRaidTranslation('anytime'),
                 'callback_data' => $raid['id'] . ':vote_time:0'
             );
         }
@@ -2815,7 +2833,7 @@ function keys_vote($raid)
             if($count >= 2) {
                 // Add button if raid boss does not matter
                 $keys_poke[] = array(
-                    'text'          => getTranslation('any_pokemon'),
+                    'text'          => getRaidTranslation('any_pokemon'),
                     'callback_data' => $raid['id'] . ':vote_pokemon:0'
                 );
 
@@ -2834,16 +2852,16 @@ function keys_vote($raid)
             $text_cancel = TEAM_CANCEL;
         // Icon + text.
         } else if(RAID_VOTE_ICONS == true && RAID_VOTE_TEXT == true) {
-            $text_here = EMOJI_HERE . getTranslation('here');
-            $text_late = EMOJI_LATE . getTranslation('late');
-            $text_done = TEAM_DONE . getTranslation('done');
-            $text_cancel = TEAM_CANCEL . getTranslation('cancellation');
+            $text_here = EMOJI_HERE . getRaidTranslation('here');
+            $text_late = EMOJI_LATE . getRaidTranslation('late');
+            $text_done = TEAM_DONE . getRaidTranslation('done');
+            $text_cancel = TEAM_CANCEL . getRaidTranslation('cancellation');
         // Text.
         } else {
-            $text_here = getTranslation('here');
-            $text_late = getTranslation('late');
-            $text_done = getTranslation('done');
-            $text_cancel = getTranslation('cancellation');
+            $text_here = getRaidTranslation('here');
+            $text_late = getRaidTranslation('late');
+            $text_done = getRaidTranslation('done');
+            $text_cancel = getRaidTranslation('cancellation');
         }
         
         // Add status keys.
@@ -3505,7 +3523,7 @@ function show_raid_poll($raid)
     if ($raid['gym_name'] || $raid['gym_team']) {
         // Add gym name to message.
         if ($raid['gym_name']) {
-            $msg .= getTranslation('gym') . ': <b>' . $raid['gym_name'] . '</b>';
+            $msg .= getRaidTranslation('gym') . ': <b>' . $raid['gym_name'] . '</b>';
         }
 
         // Add team to message.
@@ -3524,7 +3542,7 @@ function show_raid_poll($raid)
     }
 
     // Display raid boss name.
-    $msg .= getTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($raid['pokemon']) . '</b>';
+    $msg .= getRaidTranslation('raid_boss') . ': <b>' . get_local_pokemon_name($raid['pokemon'], true, 'raid') . '</b>';
 
     // Display raid boss weather.
     $pokemon_weather = get_pokemon_weather($raid['pokemon']);
@@ -3532,16 +3550,16 @@ function show_raid_poll($raid)
     $msg .= CR;
 
     // Display raid boss CP values.
-    $pokemon_cp = get_formatted_pokemon_cp($raid['pokemon']);
+    $pokemon_cp = get_formatted_pokemon_cp($raid['pokemon'], true);
     $msg .= (!empty($pokemon_cp)) ? ($pokemon_cp . CR) : ''; 
 
     // Display time left.
     $time_left = floor($raid['t_left'] / 60);
     if ( strpos(str_pad($time_left % 60, 2, '0', STR_PAD_LEFT) , '-' ) !== false ) {
-        $tl_msg = '<b>' . getTranslation('raid_done') . '</b>' . CR;
+        $tl_msg = '<b>' . getRaidTranslation('raid_done') . '</b>' . CR;
     } else {
 	// Replace $time_left with $tl_msg too
-        $tl_msg = ' — <b>' . getTranslation('still') . ' ' . floor($time_left / 60) . ':' . str_pad($time_left % 60, 2, '0', STR_PAD_LEFT) . 'h</b>' . CR;
+        $tl_msg = ' — <b>' . getRaidTranslation('still') . ' ' . floor($time_left / 60) . ':' . str_pad($time_left % 60, 2, '0', STR_PAD_LEFT) . 'h</b>' . CR;
     }
 
     // Raid has not started yet - adjust time left message
@@ -3556,8 +3574,8 @@ function show_raid_poll($raid)
 	$day_start = date('j', $raid['ts_start']);
 	$month_start = date('m', $raid['ts_start']);
 	$year_start = date('Y', $raid['ts_start']);
-        $raid_day = getTranslation('weekday_' . $weekday_start);
-        $raid_month = getTranslation('month_' . $month_start);
+        $raid_day = getRaidTranslation('weekday_' . $weekday_start);
+        $raid_month = getRaidTranslation('month_' . $month_start);
 
         // Days until the raid starts
         $date_now = new DateTime(date('Y-m-d', $raid['ts_now']));
@@ -3567,17 +3585,17 @@ function show_raid_poll($raid)
         // Is the raid in the same week?
         if($week_now == $week_start && $date_now == $date_raid) {
             // Output: Raid egg opens up 17:00
-            $msg .= '<b>' . getTranslation('raid_egg_opens') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
+            $msg .= '<b>' . getRaidTranslation('raid_egg_opens') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
         } else {
             if($days_to_raid > 7) {
                 // Output: Raid egg opens on Friday, 13 April (2018)
-                $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day . ', ' . $day_start . ' ' . $raid_month . (($year_start > $year_now) ? $year_start : '');
+                $msg .= '<b>' . getRaidTranslation('raid_egg_opens_day') . ' ' .  $raid_day . ', ' . $day_start . ' ' . $raid_month . (($year_start > $year_now) ? $year_start : '');
             } else {
                 // Output: Raid egg opens on Friday
-                $msg .= '<b>' . getTranslation('raid_egg_opens_day') . ' ' .  $raid_day;
+                $msg .= '<b>' . getRaidTranslation('raid_egg_opens_day') . ' ' .  $raid_day;
             }
             // Adds 'at 17:00' to the output.
-            $msg .= ' ' . getTranslation('raid_egg_opens_at') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
+            $msg .= ' ' . getRaidTranslation('raid_egg_opens_at') . ' ' . unix2tz($raid['ts_start'], $raid['timezone']) . '</b>' . CR;
         }
 
     // Raid has started and active or already ended
@@ -3589,7 +3607,7 @@ function show_raid_poll($raid)
 
         // Add time left message.
         } else {
-            $msg .= getTranslation('raid_until') . ' ' . unix2tz($raid['ts_end'], $raid['timezone']);
+            $msg .= getRaidTranslation('raid_until') . ' ' . unix2tz($raid['ts_end'], $raid['timezone']);
 	    $msg .= $tl_msg;
         }
     }
@@ -3597,7 +3615,7 @@ function show_raid_poll($raid)
     // Add Ex-Raid Message if Pokemon is in Ex-Raid-List.
     $raid_level = get_raid_level($raid['pokemon']);
     if($raid_level == 'X') {
-        $msg .= CR . EMOJI_WARN . ' <b>' . getTranslation('exraid_pass') . '</b> ' . EMOJI_WARN . CR;
+        $msg .= CR . EMOJI_WARN . ' <b>' . getRaidTranslation('exraid_pass') . '</b> ' . EMOJI_WARN . CR;
     }
 
     // Get counts and sums for the raid
@@ -3718,15 +3736,15 @@ function show_raid_poll($raid)
 
             // Add hint for late attendances.
             if(RAID_LATE_MSG && $previous_att_time == 'FIRST_RUN' && $cnt_latewait > 0) {
-                $late_wait_msg = str_replace('RAID_LATE_TIME', RAID_LATE_TIME, getTranslation('late_participants_wait'));
-                $msg .= CR . EMOJI_LATE . '<i>' . getTranslation('late_participants') . ' ' . $late_wait_msg . '</i>' . CR;
+                $late_wait_msg = str_replace('RAID_LATE_TIME', RAID_LATE_TIME, getRaidTranslation('late_participants_wait'));
+                $msg .= CR . EMOJI_LATE . '<i>' . getRaidTranslation('late_participants') . ' ' . $late_wait_msg . '</i>' . CR;
             }
 
             // Add section/header for time
             if($previous_att_time != $current_att_time) {
                 // Add to message.
                 $count_att_time_extrapeople = $cnt[$current_att_time]['extra_mystic'] + $cnt[$current_att_time]['extra_valor'] + $cnt[$current_att_time]['extra_instinct'];
-                $msg .= CR . '<b>' . (($current_att_time == 0) ? (getTranslation('anytime')) : (unix2tz($current_att_time, $raid['timezone']))) . '</b>' . ' [' . ($cnt[$current_att_time]['count'] + $count_att_time_extrapeople) . ']';
+                $msg .= CR . '<b>' . (($current_att_time == 0) ? (getRaidTranslation('anytime')) : (unix2tz($current_att_time, $raid['timezone']))) . '</b>' . ' [' . ($cnt[$current_att_time]['count'] + $count_att_time_extrapeople) . ']';
 
                 // Add attendance counts by team.
                 if ($cnt[$current_att_time]['count'] > 0) {
@@ -3757,7 +3775,7 @@ function show_raid_poll($raid)
                 // Show attendances when multiple pokemon are selected, unless all attending users voted for the raid boss + any pokemon
                 if($count_all != ($count_any_pokemon + $count_raid_pokemon)) {
                     // Add pokemon name.
-                    $msg .= ($current_pokemon == 0) ? ('<b>' . getTranslation('any_pokemon') . '</b>') : ('<b>' . get_local_pokemon_name($current_pokemon) . '</b>');
+                    $msg .= ($current_pokemon == 0) ? ('<b>' . getRaidTranslation('any_pokemon') . '</b>') : ('<b>' . get_local_pokemon_name($current_pokemon, true, 'raid') . '</b>');
 
                     // Attendance counts by team.
                     $current_att_time_poke = $cnt_pokemon[$current_att_time . '_' . $current_pokemon];
@@ -3867,13 +3885,13 @@ function show_raid_poll($raid)
         while ($row = $rs_att->fetch_assoc()) {
             // Add section/header for canceled
             if($row['cancel'] == 1 && $cancel_done == 'CANCEL') {
-                $msg .= CR . TEAM_CANCEL . ' <b>' . getTranslation('cancel') . ': </b>' . '[' . $cnt_cancel_done['count_cancel'] . ']' . CR;
+                $msg .= CR . TEAM_CANCEL . ' <b>' . getRaidTranslation('cancel') . ': </b>' . '[' . $cnt_cancel_done['count_cancel'] . ']' . CR;
                 $cancel_done = 'DONE';
             }
 
             // Add section/header for canceled
             if($row['raid_done'] == 1 && $cancel_done == 'CANCEL' || $row['raid_done'] == 1 && $cancel_done == 'DONE') {
-                $msg .= CR . TEAM_DONE . ' <b>' . getTranslation('finished') . ': </b>' . '[' . $cnt_cancel_done['count_done'] . ']' . CR;
+                $msg .= CR . TEAM_DONE . ' <b>' . getRaidTranslation('finished') . ': </b>' . '[' . $cnt_cancel_done['count_done'] . ']' . CR;
                 $cancel_done = 'END';
             }
 
@@ -3881,8 +3899,8 @@ function show_raid_poll($raid)
             $msg .= ($row['team'] === NULL) ? ('└ ' . $GLOBALS['teams']['unknown'] . ' ') : ('└ ' . $GLOBALS['teams'][$row['team']] . ' ');
             $msg .= ($row['level'] == 0) ? ('<b>00</b> ') : (($row['level'] < 10) ? ('<b>0' . $row['level'] . '</b> ') : ('<b>' . $row['level'] . '</b> '));
             $msg .= '<a href="tg://user?id=' . $row['user_id'] . '">' . htmlspecialchars($row['name']) . '</a> ';
-            $msg .= ($row['cancel'] == 1) ? ('[' . (($row['ts_att'] == 0) ? (getTranslation('anytime')) : (unix2tz($row['ts_att'], $raid['timezone']))) . '] ') : '';
-            $msg .= ($row['raid_done'] == 1) ? ('[' . (($row['ts_att'] == 0) ? (getTranslation('anytime')) : (unix2tz($row['ts_att'], $raid['timezone']))) . '] ') : '';
+            $msg .= ($row['cancel'] == 1) ? ('[' . (($row['ts_att'] == 0) ? (getRaidTranslation('anytime')) : (unix2tz($row['ts_att'], $raid['timezone']))) . '] ') : '';
+            $msg .= ($row['raid_done'] == 1) ? ('[' . (($row['ts_att'] == 0) ? (getRaidTranslation('anytime')) : (unix2tz($row['ts_att'], $raid['timezone']))) . '] ') : '';
             $msg .= ($row['extra_mystic']) ? ('+' . $row['extra_mystic'] . TEAM_B . ' ') : '';
             $msg .= ($row['extra_valor']) ? ('+' . $row['extra_valor'] . TEAM_R . ' ') : '';
             $msg .= ($row['extra_instinct']) ? ('+' . $row['extra_instinct'] . TEAM_Y . ' ') : '';
@@ -3892,14 +3910,14 @@ function show_raid_poll($raid)
 
     // Add no attendance found message.
     if ($cnt_all + $cnt_cancel_done['count_cancel'] + $cnt_cancel_done['count_done'] == 0) {
-        $msg .= CR . getTranslation('no_participants_yet') . CR;
+        $msg .= CR . getRaidTranslation('no_participants_yet') . CR;
     }
 
     // Display creator.
-    $msg .= ($raid['user_id'] && $raid['name']) ? (CR . getTranslation('created_by') . ': <a href="tg://user?id=' . $raid['user_id'] . '">' . htmlspecialchars($raid['name']) . '</a>') : '';
+    $msg .= ($raid['user_id'] && $raid['name']) ? (CR . getRaidTranslation('created_by') . ': <a href="tg://user?id=' . $raid['user_id'] . '">' . htmlspecialchars($raid['name']) . '</a>') : '';
 
     // Add update time and raid id to message.
-    $msg .= CR . '<i>' . getTranslation('updated') . ': ' . unix2tz(time(), $raid['timezone'], 'H:i:s') . '</i>';
+    $msg .= CR . '<i>' . getRaidTranslation('updated') . ': ' . unix2tz(time(), $raid['timezone'], 'H:i:s') . '</i>';
     $msg .= '  R-ID = ' . $raid['id']; // DO NOT REMOVE! --> NEEDED FOR CLEANUP PREPARATION!
 
     // Return the message.
@@ -4019,45 +4037,85 @@ function show_raid_poll_small($raid)
  */
 function raid_list($update)
 {
-    // Init empty rows array.
+    // Init empty rows array and query type.
     $rows = array();
 
     // Inline list polls.
     if ($update['inline_query']['query']) {
 
+        // Raid / Quest id.
         $iqq = intval($update['inline_query']['query']);
 
-        // By ID.
+        // Raid by ID.
         $request = my_query(
             "
-            SELECT    *,
-			          UNIX_TIMESTAMP(end_time)                        AS ts_end,
-			          UNIX_TIMESTAMP(start_time)                      AS ts_start,
-			          UNIX_TIMESTAMP(NOW())                           AS ts_now,
-			          UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
+            SELECT            *,
+                              id AS iqq_raid_id,
+			      UNIX_TIMESTAMP(end_time)                        AS ts_end,
+			      UNIX_TIMESTAMP(start_time)                      AS ts_start,
+			      UNIX_TIMESTAMP(NOW())                           AS ts_now,
+			      UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
 		    FROM      raids
 		      WHERE   id = {$iqq}
+                      AND     end_time>NOW()
             "
         );
 
+        while ($answer = $request->fetch_assoc()) {
+            $rows[] = $answer;
+        }
+
+        // No raid found - try quest via ID.
+        if(!$rows) {
+            // Quest by ID.
+            $request = my_query(
+                "
+                SELECT  *,
+                        id AS iqq_quest_id
+                        FROM      quests
+                          WHERE   id = {$iqq}
+                          AND     quest_date = CURDATE()
+                "
+            );
+
+            while ($answer = $request->fetch_assoc()) {
+                $rows[] = $answer;
+            }
+        }
     } else {
-        // By user.
+        // Get raid data by user.
         $request = my_query(
             "
-            SELECT      *,
-			            UNIX_TIMESTAMP(end_time)                        AS ts_end,
-			            UNIX_TIMESTAMP(start_time)                      AS ts_start,
-			            UNIX_TIMESTAMP(NOW())                           AS ts_now,
-			            UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
+            SELECT              *,
+                                raids.id AS iqq_raid_id,
+			        UNIX_TIMESTAMP(end_time)                        AS ts_end,
+			        UNIX_TIMESTAMP(start_time)                      AS ts_start,
+			        UNIX_TIMESTAMP(NOW())                           AS ts_now,
+			        UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
 		    FROM        raids
 		      WHERE     user_id = {$update['inline_query']['from']['id']}
-		      ORDER BY  id DESC LIMIT 3
+		      ORDER BY  id DESC LIMIT 2
             "
         );
-    }
 
-    while ($answer = $request->fetch_assoc()) {
-        $rows[] = $answer;
+        while ($answer_raids = $request->fetch_assoc()) {
+            $rows[] = $answer_raids;
+        }
+
+        // Get quest data by user.
+        $request = my_query(
+            "
+            SELECT              *,
+                                quests.id AS iqq_quest_id
+                    FROM        quests
+                      WHERE     user_id = {$update['inline_query']['from']['id']}
+                      ORDER BY  id DESC LIMIT 2
+            "
+        );
+
+        while ($answer_quests = $request->fetch_assoc()) {
+            $rows[] = $answer_quests;
+        }
     }
 
     debug_log($rows);

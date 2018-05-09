@@ -40,7 +40,7 @@ $content = file_get_contents('php://input');
 // Decode the json string.
 $update = json_decode($content, true);
 
-// Get language from user.
+// Get language from user - otherwise use language from config.
 if (LANGUAGE == '') {
     // Message or callback?
     $language_code = (isset($update['message']['from']['language_code'])) ? ($update['message']['from']['language_code']) : ($update['callback_query']['from']['language_code']);
@@ -48,6 +48,9 @@ if (LANGUAGE == '') {
     // Get and define userlanguage.
     $userlanguage = get_user_language($language_code);
     define('USERLANGUAGE', $userlanguage);
+} else {
+    // Set user language to language from config.
+    define('USERLANGUAGE', LANGUAGE);
 }
 
 // Update var is false.

@@ -19,13 +19,13 @@ $chat = $data['arg'];
 $quest = get_quest($id);
 
 // Get text and keys.
-$text = get_formatted_quest($quest, true, true, false);
+$text = get_formatted_quest($quest, true, true, false, true);
 $keys = [];
 
 // Send location.
 if (QUEST_LOCATION == true) {
     // Send location.
-    $msg_header = get_formatted_quest($quest, false, false, true);
+    $msg_header = get_formatted_quest($quest, false, false, true, true);
     $msg_text = !empty($quest['address']) ? $quest['address'] . ', Q-ID = ' . $quest['id'] : $quest['pokestop_name'] . ', ' . $quest['id']; // DO NOT REMOVE " Q-ID = " --> NEEDED FOR CLEANUP PREPARATION!
     $loc = send_venue($chat, $quest['lat'], $quest['lon'], $msg_header, $msg_text);
 

@@ -53,6 +53,8 @@ define('CLEANUP_RAID_TIME_DB',		'10080'); // minutes after RAID ended
 define('CLEANUP_QUEST_TELEGRAM',	true);
 define('CLEANUP_QUEST_DATABASE',	true);
 
-define('LANGUAGE',		'EN'); // language for the text EN, DE, NL or PT-BR. Leave blank to use users language.
+define('LANGUAGE',		''); // Language for the communication with the bot. Can be EN, DE, NL or PT-BR. Leave blank to use users language.
+define('RAID_POLL_LANGUAGE',	'EN'); // Language for the raid polls. Can be EN, DE, NL or PT-BR.
+define('QUEST_LANGUAGE',	'EN'); // Language for the quests. Can be EN, DE, NL or PT-BR.
 
 define('PIN_MESSAGE',		''); //Add text under the pinned message.

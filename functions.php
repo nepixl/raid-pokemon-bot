@@ -222,11 +222,38 @@ function answerInlineQuery($query_id, $contents)
 
     // For each content.
     foreach ($contents as $key => $row) {
-        // Get raid poll.
-        $text = show_raid_poll($row);
+        // Raid
+        if(isset($row['iqq_raid_id'])) {
+            // Get raid poll.
+            $text = show_raid_poll($row);
 
-        // Get inline keyboard.
-        $inline_keyboard = keys_vote($row);
+            // Get inline keyboard.
+            $inline_keyboard = keys_vote($row);
+
+            // Set the title.
+            $title = get_local_pokemon_name($row['pokemon']) . ' ' . getTranslation('from') . ' ' . unix2tz($row['ts_start'], $row['timezone'])  . ' ' . getTranslation('to') . ' ' . unix2tz($row['ts_end'], $row['timezone']);
+
+            // Set the description.
+            $desc = strval($row['gym_name']);
+
+        // Quest
+        } else if(isset($row['iqq_quest_id'])) {
+            // Get the quest.
+            $quest = get_quest($row['iqq_quest_id']);
+
+            // Set the text.
+            $text = get_formatted_quest($quest, true, true, false, true);
+
+            // Set the title.
+            $title = $quest['pokestop_name'];
+
+            // Set the inline keyboard.
+            $inline_keyboard = [];
+
+            // Set the description.
+            $desc = get_formatted_quest($quest, false, false, true, false);
+        }
+
 
         // Create input message content array.
         $input_message_content = [
@@ -239,8 +266,8 @@ function answerInlineQuery($query_id, $contents)
         $results[] = [
             'type'                  => 'article',
             'id'                    => $query_id . $key,
-            'title'                 => get_local_pokemon_name($row['pokemon']) . ' ' . getTranslation('from') . ' ' . unix2tz($row['ts_start'], $row['timezone'])  . ' ' . getTranslation('to') . ' ' . unix2tz($row['ts_end'], $row['timezone']),
-            'description'           => strval($row['gym_name']),
+            'title'                 => $title,
+            'description'           => $desc,
             'input_message_content' => $input_message_content,
             'reply_markup'          => [
                 'inline_keyboard' => $inline_keyboard
@@ -629,19 +656,47 @@ function curl_json_request($json)
 }
 
 /**
- * Gets a table translation out of the json file.
+ * Call the translation function with override parameters for raid polls.
  * @param $text
  * @return translation
  */
-function getTranslation($text)
+function getRaidTranslation($text)
+{
+    $translation = getTranslation($text, true, RAID_POLL_LANGUAGE);
+
+    return $translation;
+}
+
+/**
+ * Call the translation function with override parameters for quests.
+ * @param $text
+ * @return translation
+ */
+function getQuestTranslation($text)
+{
+    $translation = getTranslation($text, true, QUEST_LANGUAGE);
+
+    return $translation;
+}
+
+/**
+ * Gets a table translation out of the json file.
+ * @param $text
+ * @param $override
+ * @param $override_language
+ * @return translation
+ */
+function getTranslation($text, $override = false, $override_language = USERLANGUAGE)
 {
     debug_log($text,'T:');
     $translation = '';
 
-    // User language?
-    $language = LANGUAGE;
-    if ($language == '') {
-        $language = USERLANGUAGE;
+    // Set language
+    $language = USERLANGUAGE;
+
+    // Override language?
+    if($override == true && $override_language != '') {
+        $language = $override_language;
     }
 
     // Pokemon name?
