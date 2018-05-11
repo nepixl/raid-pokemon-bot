@@ -119,6 +119,12 @@
                 "EN": "Select reward:",
                 "PT-BR": "TRANSLATE"
         },
+        "create_raid_or_quest" : {
+                "NL": "TRANSLATE",
+                "DE": "Raid oder Forschung anlegen:",
+                "EN": "Create raid or quest:",
+                "PT-BR": "TRANSLATE"
+        },
 	"Xstars" : {
 		"NL": "Ex-Raid",
 		"DE": "Ex-Raid",

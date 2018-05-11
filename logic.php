@@ -583,9 +583,14 @@ function get_formatted_quest($quest, $add_creator = false, $add_timestamp = fals
     // Pokestop name and address.
     $pokestop_name = SP . '<b>' . (!empty($quest['pokestop_name']) ? ($quest['pokestop_name']) : ($getTypeTranslation('unnamed_pokestop'))) . '</b>' . CR;
 
+    // Get pokestop info.
+    $stop = get_pokestop($quest['pokestop_id']);
+
     // Add google maps link.
-    if (!empty($quest['address'])) {
+    if(!empty($quest['address'])) {
         $pokestop_address = '<a href="https://maps.google.com/?daddr=' . $quest['lat'] . ',' . $quest['lon'] . '">' . $quest['address'] . '</a>';
+    } else if(!empty($stop['address'])) {
+        $pokestop_address = '<a href="https://maps.google.com/?daddr=' . $stop['lat'] . ',' . $stop['lon'] . '">' . $stop['address'] . '</a>';
     } else {
         $pokestop_address = '<a href="http://maps.google.com/maps?q=' . $quest['lat'] . ',' . $quest['lon'] . '">http://maps.google.com/maps?q=' . $quest['lat'] . ',' . $quest['lon'] . '</a>';
     }
@@ -739,6 +744,8 @@ function delete_quest($quest_id)
  */
 function get_pokestop($pokestop_id)
 {
+    global $db;
+
     // Pokestop from database
     if($pokestop_id != 0) {
         // Get pokestop from database
@@ -751,6 +758,35 @@ function get_pokestop($pokestop_id)
             );
 
         $stop = $rs->fetch_assoc();
+
+    // Get address and update address string.
+    if(!empty(GOOGLE_API_KEY)){
+        // Get address.
+        $lat = $stop['lat'];
+        $lon = $stop['lon'];
+        $addr = get_address($lat, $lon);
+
+        // Get full address - Street #, ZIP District
+        $address = "";
+        $address .= (!empty($addr['street']) ? $addr['street'] : "");
+        $address .= (!empty($addr['street_number']) ? " " . $addr['street_number'] : "");
+        $address .= (!empty($addr) ? ", " : "");
+        $address .= (!empty($addr['postal_code']) ? $addr['postal_code'] . " " : "");
+        $address .= (!empty($addr['district']) ? $addr['district'] : "");
+
+        // Update pokestop address.
+        $rs = my_query(
+            "
+            UPDATE        pokestops
+            SET           address = '{$db->real_escape_string($address)}'
+               WHERE      id = '{$pokestop_id}'
+            "
+        );
+
+       // Set pokestop address.
+       $stop['address'] = $address;
+    }
+
     // Unnamend pokestop
     } else {
         $stop = 0;
@@ -805,6 +841,64 @@ function get_pokestop_list_keys($searchterm)
         // Return false.
         $keys = false;
     }
+
+    return $keys;
+}
+
+/**
+ * Get pokestops within radius around lat/lon.
+ * @param $lat
+ * @param $lon
+ * @param $radius
+ * @return array
+ */
+function get_pokestops_in_radius_keys($lat, $lon, $radius)
+{
+    $radius = $radius / 1000;
+    // Get all pokestop within the radius
+    $rs = my_query(
+            " SELECT    id, pokestop_name,
+                        (
+                            6371 *
+                            acos(
+                                cos(radians({$lat})) *
+                                cos(radians(lat)) *
+                                cos(
+                                    radians(lon) - radians({$lon})
+                                ) +
+                                sin(radians({$lat})) *
+                                sin(radians(lat))
+                            )
+                        ) AS distance
+              FROM      pokestops
+              HAVING    distance < {$radius}
+              ORDER BY  distance
+              LIMIT     10
+            "
+        );
+
+    // Init empty keys array.
+    $keys = array();
+
+    // Add key for each found pokestop
+    while ($stops = $rs->fetch_assoc()) {
+        // Pokestop name.
+        $pokestop_name = (!empty($stops['pokestop_name']) ? ($stops['pokestop_name']) : (getTranslation('unnamed_pokestop')));
+
+        // Add keys.
+        $keys[] = array(
+            'text'          => $pokestop_name,
+            'callback_data' => $stops['id'] . ':quest_create:0'
+        );
+    }
+
+    // Add unknown pokestop.
+    //$unknown_keys = array();
+    //$unknown_keys[] = universal_inner_key($keys, '0', 'quest_create', $lat . ',' . $lon, getTranslation('unnamed_pokestop'));
+
+    // Inline keys.
+    $keys = inline_key_array($keys, 1);
+    //$keys[] = $unknown_keys;
 
     return $keys;
 }
@@ -2101,7 +2195,6 @@ function run_quests_cleanup ($telegram = 2, $database = 2) {
                   LIMIT 0, 250     
                 ", true
             );
-        }
         // Query for database cleanup without telegram cleanup
         } else if ($telegram == 0 && $database == 1) {
             // Get cleanup info.
@@ -2185,7 +2278,7 @@ function run_quests_cleanup ($telegram = 2, $database = 2) {
                             CURDATE()                   AS  today,
                             UNIX_TIMESTAMP(quest_date)  AS  ts_questdate,
                             UNIX_TIMESTAMP(CURDATE())   AS  ts_today
-                    FROM    
+                    FROM    quests
                       WHERE id = {$current_quest_id}
                     ", true
                 );
@@ -2218,7 +2311,7 @@ function run_quests_cleanup ($telegram = 2, $database = 2) {
                     cleanup_log('Updating telegram cleanup information.');
                     my_query(
                     "
-                        UPDATE    cleanup_quest
+                        UPDATE    cleanup_quests
                         SET       chat_id = 0, 
                                   message_id = 0 
                         WHERE   id = {$row['id']}
@@ -2308,8 +2401,9 @@ function run_quests_cleanup ($telegram = 2, $database = 2) {
             $prev_quest_id = $current_quest_id;
         }
 
-    // Write to log.
-    cleanup_log('Finished with cleanup process!');
+        // Write to log.
+        cleanup_log('Finished with cleanup process!');
+    }
 }
 
 /**
@@ -2640,8 +2734,8 @@ function run_raids_cleanup ($telegram = 2, $database = 2) {
             $prev_raid_id = $current_raid_id;
         }
 
-    // Write to log.
-    cleanup_log('Finished with cleanup process!');
+        // Write to log.
+        cleanup_log('Finished with cleanup process!');
     }
 }
 

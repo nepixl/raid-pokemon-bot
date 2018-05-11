@@ -173,8 +173,19 @@ if (isset($update['callback_query'])) {
 } else if (isset($update['message']['location'])) {
     // Check access to the bot
     bot_access_check($update);
+
+    // Ask what to create.
+    if(RAID_VIA_LOCATION == true && QUEST_VIA_LOCATION == true) {
+        include_once(ROOT_PATH . '/modules/geo_create.php');
+
     // Create raid and exit.
-    include_once(ROOT_PATH . '/modules/raid_create.php');
+    } else if(RAID_VIA_LOCATION == true && QUEST_VIA_LOCATION == false) {
+        include_once(ROOT_PATH . '/modules/raid_create.php');
+
+    // Create quest and exit.
+    } else if(RAID_VIA_LOCATION == false && QUEST_VIA_LOCATION == true) {
+        include_once(ROOT_PATH . '/modules/quest_geo.php');
+    }
     exit();
 
 // Cleanup collection from channel/supergroup messages.
