@@ -437,6 +437,8 @@ function get_raid($raid_id)
     // Get the row.
     $raid = $rs->fetch_assoc();
 
+    debug_log($raid);
+
     return $raid;
 }
 
@@ -4049,15 +4051,18 @@ function raid_list($update)
         // Raid by ID.
         $request = my_query(
             "
-            SELECT            *,
-                              id AS iqq_raid_id,
-			      UNIX_TIMESTAMP(end_time)                        AS ts_end,
-			      UNIX_TIMESTAMP(start_time)                      AS ts_start,
-			      UNIX_TIMESTAMP(NOW())                           AS ts_now,
-			      UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
-		    FROM      raids
-		      WHERE   id = {$iqq}
-                      AND     end_time>NOW()
+            SELECT              raids.*,
+                                raids.id AS iqq_raid_id,
+			        UNIX_TIMESTAMP(end_time)                        AS ts_end,
+			        UNIX_TIMESTAMP(start_time)                      AS ts_start,
+			        UNIX_TIMESTAMP(NOW())                           AS ts_now,
+			        UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left,
+                                users.name
+		    FROM        raids
+                    LEFT JOIN   users
+                    ON          raids.user_id = users.user_id
+		      WHERE     raids.id = {$iqq}
+                      AND       end_time>NOW()
             "
         );
 
@@ -4086,15 +4091,18 @@ function raid_list($update)
         // Get raid data by user.
         $request = my_query(
             "
-            SELECT              *,
+            SELECT              raids.*,
                                 raids.id AS iqq_raid_id,
 			        UNIX_TIMESTAMP(end_time)                        AS ts_end,
 			        UNIX_TIMESTAMP(start_time)                      AS ts_start,
 			        UNIX_TIMESTAMP(NOW())                           AS ts_now,
-			        UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left
+			        UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(NOW())  AS t_left,
+                                users.name
 		    FROM        raids
-		      WHERE     user_id = {$update['inline_query']['from']['id']}
-		      ORDER BY  id DESC LIMIT 2
+                    LEFT JOIN   users
+                    ON          raids.user_id = users.user_id
+		      WHERE     raids.user_id = {$update['inline_query']['from']['id']}
+		      ORDER BY  iqq_raid_id DESC LIMIT 2
             "
         );
 

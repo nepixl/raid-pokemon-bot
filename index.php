@@ -43,7 +43,13 @@ $update = json_decode($content, true);
 // Get language from user - otherwise use language from config.
 if (LANGUAGE == '') {
     // Message or callback?
-    $language_code = (isset($update['message']['from']['language_code'])) ? ($update['message']['from']['language_code']) : ($update['callback_query']['from']['language_code']);
+    if(isset($update['message']['from']['language_code'])) {
+        $language_code = $update['message']['from']['language_code'];
+    } else if(isset($update['callback_query']['from']['language_code'])) {
+        $language_code = $update['callback_query']['from']['language_code'];
+    } else {
+        $language_code = LANGUAGE;
+    }
 
     // Get and define userlanguage.
     $userlanguage = get_user_language($language_code);
@@ -185,11 +191,19 @@ if (isset($update['callback_query'])) {
         $chat_id = $update['channel_post']['chat']['id'];
         $message_id = $update['channel_post']['message_id'];
 
+        // Get ID type (raid or quest) to get ID afterwards.
+        $id_pos = strrpos($update['channel_post']['text'], '-ID = ');
+        $id_type = ($id_pos === false) ? ('0') : (substr($update['channel_post']['text'], ($id_pos - 1), 1));
+
 	// Get raid_id from text.
-        $raid_id = substr(strrchr($update['channel_post']['text'], "R-ID = "), 7);
+        if($id_type == 'R') {
+            $raid_id = substr(strrchr($update['channel_post']['text'], 'R-ID = '), 7);
+        }
 
         // Get quest_id from text.
-        $quest_id = substr(strrchr($update['channel_post']['text'], "Q-ID = "), 7);
+        if($id_type == 'Q') {
+            $quest_id = substr(strrchr($update['channel_post']['text'], 'Q-ID = '), 7);
+        }
 
     // Supergroup
     } else if ($update['message']['chat']['type'] == "supergroup") {
@@ -197,11 +211,19 @@ if (isset($update['callback_query'])) {
         $chat_id = $update['message']['chat']['id'];
         $message_id = $update['message']['message_id'];
 
-	// Get raid_id from text.
-        $raid_id = substr(strrchr($update['message']['text'], "R-ID = "), 7);
+        // Get ID type (raid or quest) to get ID afterwards.
+        $id_pos = strrpos($update['message']['text'], '-ID = ');
+        $id_type = ($id_pos === false) ? ('0') : (substr($update['message']['text'], ($id_pos - 1), 1));
 
-	// Get quest_id from text.
-        $quest_id = substr(strrchr($update['message']['text'], "Q-ID = "), 7);
+        // Get raid_id from text.
+        if($id_type == 'R') {
+            $raid_id = substr(strrchr($update['message']['text'], 'R-ID = '), 7);
+        }
+
+        // Get quest_id from text.
+        if($id_type == 'Q') {
+            $quest_id = substr(strrchr($update['message']['text'], 'Q-ID = '), 7);
+        }
     }
 
     // Write cleanup info to database.
