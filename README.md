@@ -398,6 +398,10 @@ The bot will set the name of gym to your input.
 
 Example input: `/gym Siegessäule`
 
+### Map:
+
+If you like to use the map, you need to put in an mapbox token in map/index.php. The sprite's are on copyright, that's why they are not in the icons map. Get sprite's and call them: "id_1.png" where 1 is the pokedex number.
+
 # Debugging
 
 Check your bot logfile and other related log files, e.g. apache/httpd log, php log, and so on.
