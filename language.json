@@ -120,10 +120,16 @@
                 "PT-BR": "TRANSLATE"
         },
         "create_raid_or_quest" : {
-                "NL": "TRANSLATE",
+                "NL": "Wat wil je aanmaken:",
                 "DE": "Raid oder Forschung anlegen:",
                 "EN": "Create raid or quest:",
                 "PT-BR": "TRANSLATE"
+        },
+        "raid" : {
+                "NL": "Raid",
+                "DE": "Raid",
+                "EN": "Raid",
+                "PT-BR": "Raid"
         },
 	"Xstars" : {
 		"NL": "Ex-Raid",

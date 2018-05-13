@@ -14,6 +14,7 @@ $lon = '';
 if (isset($update['message']['location'])) {
     $lat = $update['message']['location']['latitude'];
     $lon = $update['message']['location']['longitude'];
+    $coords = $lat . ',' . $lon;
 }
 
 // Set the message.
@@ -23,12 +24,12 @@ $msg = getTranslation('create_raid_or_quest');
 $keys = [
     [
         [
-            'text'          => getTranslation('create_a_raid'),
-            'callback_data' => '0:raid_create:' . $lat . ',' . $lon,
+            'text'          => getTranslation('raid'),
+            'callback_data' => '0:raid_create:' . $coords,
         ],
         [
             'text'          => getTranslation('quest'),
-            'callback_data' => '0:raid_create:' . $coords,
+            'callback_data' => '0:quest_geo:' . $coords,
         ]
     ]
 ];
