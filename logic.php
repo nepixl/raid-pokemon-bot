@@ -1683,6 +1683,7 @@ function reward_qty_type_keys($pokestop_id, $quest_id, $quest_type, $reward_type
             SELECT    *
             FROM      rewardlist
             WHERE     reward_type = '$reward_type'
+            ORDER BY  reward_quantity
             "
         );
 
