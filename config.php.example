@@ -30,7 +30,7 @@ define('SHARE_QUEST_CHATS',	'');
 
 define('QUEST_VIA_LOCATION',	true); // Allow to create quests from location shared with the bot
 define('QUEST_LOCATION',	false); // send location as message in addition to quest message
-define('QUEST_STOPS_RADIUS',	'30'); // radius in meters around location to search for pokestops
+define('QUEST_STOPS_RADIUS',	'50'); // radius in meters around location to search for pokestops
 
 define('RAID_VIA_LOCATION',	true); // Allow to create raids from location shared with the bot
 define('RAID_LOCATION',		false); // send location as message in addition to raid poll message
