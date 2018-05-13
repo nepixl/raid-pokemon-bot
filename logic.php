@@ -498,8 +498,12 @@ function get_local_pokemon_name($pokedex_id, $override_language = false, $type =
         $pokemon_name = $getTypeTranslation('pokemon_id_' . $pokedex_id);
     }
 
-    // Fallback: Get original pokemon name from database
-    if(empty($pokemon_name)) {
+    // Fallback 1: Valid pokedex id or just a raid egg?
+    if($pokedex_id === "NULL" || $pokedex_id == 0) {
+        $pokemon_name = $getTypeTranslation('egg_0');
+
+    // Fallback 2: Get original pokemon name from database
+    } else if(empty($pokemon_name)) {
         $rs = my_query(
                 "
                 SELECT    pokemon_name
@@ -977,26 +981,30 @@ function get_pokemon_cp($pokedex_id)
  */
 function get_formatted_pokemon_cp($pokedex_id, $override_language = false)
 {
-    // Get gyms from database
-    $rs = my_query(
-            "
-            SELECT    min_cp, max_cp, min_weather_cp, max_weather_cp
-            FROM      pokemon
-            WHERE     pokedex_id = {$pokedex_id}
-            "
-        );
-
+    // Init cp text.
     $cp20 = '';
     $cp25 = '';
 
-    while($row = $rs->fetch_assoc()) {
-        // CP
-        $cp20 .= ($row['min_cp'] > 0) ? $row['min_cp'] : '';
-        $cp20 .= (!empty($cp20) && $cp20 > 0) ? ('/' . $row['max_cp']) : ($row['max_cp']);
+    // Valid pokedex id?
+    if($pokedex_id !== "NULL" && $pokedex_id != 0) {
+        // Get gyms from database
+        $rs = my_query(
+                "
+                SELECT    min_cp, max_cp, min_weather_cp, max_weather_cp
+                FROM      pokemon
+                WHERE     pokedex_id = {$pokedex_id}
+                "
+            );
 
-        // Weather boosted CP
-        $cp25 .= ($row['min_weather_cp'] > 0) ? $row['min_weather_cp'] : '';
-        $cp25 .= (!empty($cp25) && $cp25 > 0) ? ('/' . $row['max_weather_cp']) : ($row['max_weather_cp']);
+        while($row = $rs->fetch_assoc()) {
+            // CP
+            $cp20 .= ($row['min_cp'] > 0) ? $row['min_cp'] : '';
+            $cp20 .= (!empty($cp20) && $cp20 > 0) ? ('/' . $row['max_cp']) : ($row['max_cp']);
+
+            // Weather boosted CP
+            $cp25 .= ($row['min_weather_cp'] > 0) ? $row['min_weather_cp'] : '';
+            $cp25 .= (!empty($cp25) && $cp25 > 0) ? ('/' . $row['max_weather_cp']) : ($row['max_weather_cp']);
+        }
     }
 
     // Combine CP and weather boosted CP
@@ -1014,19 +1022,23 @@ function get_formatted_pokemon_cp($pokedex_id, $override_language = false)
  */
 function get_pokemon_weather($pokedex_id)
 {
-    // Get pokemon weather from database
-    $rs = my_query(
-            "
-            SELECT    weather
-            FROM      pokemon
-            WHERE     pokedex_id = {$pokedex_id}
-            "
-        );
+    if($pokedex_id !== "NULL" && $pokedex_id != 0) {
+        // Get pokemon weather from database
+        $rs = my_query(
+                "
+                SELECT    weather
+                FROM      pokemon
+                WHERE     pokedex_id = {$pokedex_id}
+                "
+            );
 
-    // Fetch the row.
-    $ww = $rs->fetch_assoc();
+        // Fetch the row.
+        $ww = $rs->fetch_assoc();
 
-    return $ww['weather'];
+        return $ww['weather'];
+    } else {
+        return 0;
+   }
 }
 
 /**

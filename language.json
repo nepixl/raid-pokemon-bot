@@ -479,6 +479,12 @@
 		"EN": "Level 1 Egg",
 		"PT-BR": "Ovo de Nível 1"
 	},
+	"egg_0" : {
+		"NL": "Raid Ei",
+		"DE": "Raid Ei",
+		"EN": "Raid Egg",
+		"PT-BR": "Raid Ovo"
+	},
 	"forest" : {
 		"NL": "Ergens in het bos",
 		"DE": "Irgendwo im Wald",

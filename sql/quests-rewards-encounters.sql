@@ -166,7 +166,7 @@ INSERT INTO `encounterlist` VALUES (26,26,'309');
 INSERT INTO `encounterlist` VALUES (27,27,'322');
 INSERT INTO `encounterlist` VALUES (28,28,'136');
 INSERT INTO `encounterlist` VALUES (29,29,'207');
-INSERT INTO `encounterlist` VALUES (30,30,'37,61');
+INSERT INTO `encounterlist` VALUES (30,30,'37,60');
 INSERT INTO `encounterlist` VALUES (31,31,'4');
 INSERT INTO `encounterlist` VALUES (32,32,'38');
 INSERT INTO `encounterlist` VALUES (33,33,'129');
