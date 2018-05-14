@@ -16,9 +16,9 @@ CREATE TABLE `attendance` (
   `user_id` bigint(20) DEFAULT NULL,
   `raid_id` int(10) unsigned DEFAULT NULL,
   `attend_time` datetime DEFAULT NULL,
-  `extra_mystic` int(10) unsigned DEFAULT '0',
-  `extra_valor` int(10) unsigned DEFAULT '0',
-  `extra_instinct` int(10) unsigned DEFAULT '0',
+  `extra_mystic` tinyint(1) unsigned DEFAULT '0',
+  `extra_valor` tinyint(1) unsigned DEFAULT '0',
+  `extra_instinct` tinyint(1) unsigned DEFAULT '0',
   `arrived` tinyint(1) unsigned DEFAULT '0',
   `raid_done` tinyint(1) unsigned DEFAULT '0',
   `cancel` tinyint(1) unsigned DEFAULT '0',
@@ -63,8 +63,8 @@ CREATE TABLE `encounterlist` (
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gyms` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `lat` varchar(11) DEFAULT NULL,
-  `lon` varchar(11) DEFAULT NULL,
+  `lat` decimal(10,8) DEFAULT NULL,
+  `lon` decimal(11,8) DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
   `gym_name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -99,8 +99,8 @@ CREATE TABLE `pokemon` (
 CREATE TABLE `pokestops` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `pokestop_name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
-  `lat` varchar(11) DEFAULT NULL,
-  `lon` varchar(11) DEFAULT NULL,
+  `lat` decimal(10,8) DEFAULT NULL,
+  `lon` decimal(11,8) DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -133,8 +133,8 @@ CREATE TABLE `raids` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint(20) DEFAULT NULL,
   `pokemon` varchar(12) DEFAULT NULL,
-  `lat` varchar(11) DEFAULT NULL,
-  `lon` varchar(11) DEFAULT NULL,
+  `lat` decimal(10,8) DEFAULT NULL,
+  `lon` decimal(11,8) DEFAULT NULL,
   `first_seen` datetime DEFAULT NULL,
   `start_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
@@ -166,9 +166,6 @@ CREATE TABLE `users` (
   `team` enum('mystic','valor','instinct') DEFAULT NULL,
   `moderator` tinyint(1) unsigned DEFAULT NULL,
   `timezone` int(10) DEFAULT NULL,
-  `lang` varchar(5) DEFAULT NULL,
-  `alert_lat` varchar(12) DEFAULT NULL,
-  `alert_lon` varchar(12) DEFAULT NULL,
   `level` int(10) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `i_userid` (`user_id`)

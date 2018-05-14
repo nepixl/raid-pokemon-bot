@@ -483,7 +483,6 @@ The bot will set the name of gym to your input.
 
 Example input: `/gym Siegessäule`
 
-
 ### Command: /quest
 
 Create a quest by searching for the Pokestop name in the database. The bot will answer with all pokestops matching the name, e.g. "PokeCity Stop".
@@ -507,6 +506,9 @@ Based on your access to the bot, you may can only delete quests you created your
 
 Get a list of all available quests and their ID from the database.
 
+## Map:
+
+If you like to use the map, you need to put in an mapbox token in map/index.php. The sprite's are on copyright, that's why they are not in the icons map. Get sprite's and call them: "id_1.png" where 1 is the pokedex number.
 
 # Debugging
 
