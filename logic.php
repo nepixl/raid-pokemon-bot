@@ -840,7 +840,7 @@ function get_pokestop_list_keys($searchterm)
                 SELECT    id, pokestop_name
                 FROM      pokestops
                 WHERE     pokestop_name LIKE '%$searchterm%'
-                LIMIT     20
+                LIMIT     10
                 "
             );
 
@@ -861,7 +861,7 @@ function get_pokestop_list_keys($searchterm)
         
         if($keys) {
             // Get the inline key array.
-            $keys = inline_key_array($keys, 2);
+            $keys = inline_key_array($keys, 1);
         } else {
             $keys = true;
         }
