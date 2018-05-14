@@ -6,6 +6,9 @@ debug_log('WILLOW()');
 //debug_log($update);
 //debug_log($data);
 
+// Check access - user must be admin!
+bot_access_check($update, BOT_ADMINS);
+
 // Get all available quests from database.
 $rs = my_query(
         "

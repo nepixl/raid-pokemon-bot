@@ -3280,8 +3280,8 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
             $msg .= getTranslation('no_active_raids');
 
             //Add custom message from the config.   
-            if (PIN_MESSAGE != '') {
-                $msg .= PIN_MESSAGE . CR;
+            if (RAID_PIN_MESSAGE != '') {
+                $msg .= RAID_PIN_MESSAGE . CR;
             }
 
             // Edit the message, but disable the web preview!
@@ -3327,8 +3327,8 @@ function get_overview($update, $chats_active, $raids_active, $action = 'refresh'
 	    $keys = array();
         
             //Add custom message from the config.	
-            if (PIN_MESSAGE != '') {
-                $msg .= PIN_MESSAGE . CR;
+            if (RAID_PIN_MESSAGE != '') {
+                $msg .= RAID_PIN_MESSAGE . CR;
             }
 
             // Share or refresh?

@@ -1,6 +1,6 @@
 # About
 
-Telegram bot for organizing raids in Pokemon Go. Developers are welcome to join https://t.me/RaidBotSupport
+Telegram bot for organizing raids and sharing quests in Pokemon Go. Developers are welcome to join https://t.me/RaidBotSupport
 
 # Screenshots
 
@@ -12,21 +12,17 @@ Telegram bot for organizing raids in Pokemon Go. Developers are welcome to join 
 ![Example raid poll](/screenshots/raid-poll-example-with-cancel.png?raw=true "Example raid poll")
 ![Example raid poll](/screenshots/raid-poll-example-with-done.png?raw=true "Example raid poll")
 
+#### Example quest with reward:
+![Example quest](/screenshots/quest-example.png?raw=true "Example quest")
+
+#### Example quest with pokemon encounter:
+![Example quest](/screenshots/quest-example-with-pokemon-encounter.png?raw=true "Example quest")
+
 # Installation and configuration
 
 ## Webserver
 
 Preferrably apache2 with php7 and https certificate ( https://www.letsencrypt.org )
-
-## Config
-
-Copy config.php.example to config.php and edit (values explained further)
-
-## Log files
-
-Create log dir, e.g. /var/log/tg-bots/ and set it writeable by webserver
-
-Edit config.php and set `CONFIG_LOGFILE`
 
 ## Bot token
 
@@ -37,9 +33,131 @@ Bot Settings:
  - Allow Groups
    - Group Privacy off
 
-Use https://www.miniwebtool.com/sha512-hash-generator/ and set `CONFIG_HASH` to hashed value of your token (make sure it is lowecase)
+## Database
 
-## Sharing raids
+Create database named for your bot ID (first part of your Telegram bot token).
+
+Set database password to second part of your Telegram bot token.
+
+Only allow localhost access.
+
+Import `raid-pokemon-bot.sql` as default DB structure and `raid-boss-pokedex.sql` for the raid bosses. You can find these files in the sql folder.
+
+Command DB structure: `mysql -u USERNAME -p DATABASENAME < raid-pokemon-bot.sql`
+
+Command raid bosses: `mysql -u USERNAME -p DATABASENAME < raid-boss-pokedex.sql`
+
+## Config
+
+Copy config.php.example to config.php and edit (values explained further).
+
+Enter the details for the database connection to the config.php file.
+
+## Log files
+
+Create log dir, e.g. /var/log/tg-bots/ and set it writeable by webserver.
+
+Edit config.php and set `CONFIG_LOGFILE`.
+
+Use https://www.miniwebtool.com/sha512-hash-generator/ and set `CONFIG_HASH` to hashed value of your bot token (preferably lowercase).
+
+## Proxy
+
+In case you are running the bot behind a proxy server, set `CURL_USEPROXY` to `true`.
+
+Add the proxy server address and port at `CURL_PROXYSERVER`.
+
+Authentication against the proxy server by username and password is currently not supported.
+
+## Webhooks
+
+Set Telegram webhook via webhook.html, e.g. https://your-hostname/bot-dir/webhook.html
+
+## Languages
+
+You can set several languages for the bot. Available languages are (A-Z):
+ - DE (German)
+ - EN (English)
+ - NL (Dutch)
+ - PT-BR (Brazilian Portugese)
+
+Set `LANGUAGE` for the prefered language the bot will answer users when they chat with them. Leave blank that the bot will answer in the users language. If the users language is not supported, e.g. ZH-CN (Chinese), the bot will always use EN (English) as fallback language.
+
+Set `RAID_POLL_LANGUAGE` to the prefered language for raid polls.
+
+Set `QUEST_LANGUAGE` to the prefered language for quests.
+
+So if you want to have the bot communication based on the users language, the raid polls in German and the quests in Dutch for example:
+
+`define('LANGUAGE', '');`
+
+`define('RAID_POLL_LANGUAGE', 'DE');`
+
+`define('QUEST_LANGUAGE', 'NL');`
+
+## Timezone and Google maps API
+
+Set `TIMEZONE` to the timezone you wish to use for the bot. Predefined value from the example config is "Europe/Berlin".
+
+Optionally you can you use Google maps API to lookup addresses of gyms based on latitude and longitude
+
+Therefore get a Google maps API key and set it as `GOOGLE_API_KEY` in your config.
+
+To get a new API key, navigate to https://console.developers.google.com/apis/credentials and create a new API project, e.g. raid-telegram-bot
+
+Once the project is created select "API key" from the "Create credentials" dropdown menu - a new API key is created.
+
+After the key is created, you need to activate it for both: Geocoding and Timezone API
+
+Therefore go to "Dashboard" on the left navigation pane and afterwards hit "Enable APIs and services" on top of the page.
+
+Search for Geocoding and Timezone API and enable them. Alternatively use these links to get to Geocoding and Timezone API services:
+
+https://console.developers.google.com/apis/library/timezone-backend.googleapis.com
+
+https://console.developers.google.com/apis/library/geocoding-backend.googleapis.com
+
+Finally check the dashboard again and make sure Google Maps Geocoding API and Google Maps Time Zone API are listed as enabled services.
+
+## Raid creation
+
+There are several options to customize the creation of raid polls:
+
+Set `RAID_VIA_LOCATION` to true to allow raid creation from a location shared with the bot.
+
+Set `RAID_EGG_DURATION` to the maximum amount of minutes a user can select for the egg hatching phase.
+
+Set `RAID_POKEMON_DURATION_SHORT` to the maximum amount of minutes a user can select as raid duration for already running/active raids.
+
+Set `RAID_POKEMON_DURATION_LONG` to the maximum amount of minutes a user can select as raid duration for not yet hatched raid eggs.
+
+Set `RAID_DURATION_CLOCK_STYLE` to customize the default style for the raid start time selection. Set to true, the bot will show the time in clocktime style, e.g. "18:34" as selection when the raid will start. Set to false the bot will show the time until the raid starts in minutes, e.g. "0:16" (similar to the countdown in the gyms). Users can switch between both style in the raid creation process.
+
+## Raid times
+
+There are several options to configure the times related to the raid polls:
+
+Set `RAID_LOCATION` to true to send back the location as message in addition to the raid poll.
+
+Set `RAID_SLOTS` to the amount of minutes which shall be between the voting slots.
+
+Set `RAID_LAST_START` to the minutes for the last start option before the a raid ends.
+
+Set `RAID_ANYTIME` to true to allow attendance of the raid at any time. If set to false, users have to pick a specific time.
+
+## Raid poll design and layout
+
+There are several options to configure the design and layout of the raid polls:
+
+Set `RAID_VOTE_ICONS` to true to show the icons for the status vote buttons.
+
+Set `RAID_VOTE_TEXT` to true to show the text for the status vote buttons.
+
+Set `RAID_LATE_MSG` to true to enable the message hinting that some participants are late.
+
+Set `RAID_LATE_TIME` to the amount of minutes the local community will may be wait for the late participants.
+
+## Raid sharing
 
 You can share raid polls with any chat in Telegram via a share button.
 
@@ -67,78 +185,6 @@ A few examples:
 
 `define('SHARE_RAID_CHATS', '-100111222333');`
 
-## Raid times
-
-There are several options to configure the times related to the raid polls:
-
-Set `RAID_LOCATION` to true to send back the location as message in addition to the raid poll.
-
-Set `RAID_SLOTS` to the amount of minutes which shall be between the voting slots.
-
-Set `RAID_LAST_START` to the minutes for the last start option before the a raid ends.
-
-Set `RAID_ANYTIME` to true to allow attendance of the raid at any time. If set to false, users have to pick a specific time.
-
-## Raid poll design and layout
-
-There are several options to configure the design and layout of the raid polls:
-
-Set `RAID_VOTE_ICONS` to true to show the icons for the status vote buttons.
-
-Set `RAID_VOTE_TEXT` to true to show the text for the status vote buttons.
-
-Set `RAID_LATE_MSG` to true to enable the message hinting that some participants are late.
-
-Set `RAID_LATE_TIME` to the amount of minutes the local community will may be wait for the late participants.
-
-## Proxy
-
-In case you are running the bot behind a proxy server, set `CURL_USEPROXY` to `true`.
-
-Add the proxy server address and port at `CURL_PROXYSERVER`.
-
-Authentication against the proxy server by username and password is currently not supported.
-
-## Database
-
-Create database named for your bot ID (first part of your Telegram bot token)
-
-Set database password to second part of your Telegram bot token
-
-Only allow localhost access
-
-Import `raid-pokemon-bot.sql` as default DB structure and `raid-boss-pokedex.sql` for the raid bosses. You can find these files in the sql folder.
-
-Command DB structure: `mysql -u USERNAME -p DATABASENAME < raid-pokemon-bot.sql`
-
-Command raid bosses: `mysql -u USERNAME -p DATABASENAME < raid-boss-pokedex.sql`
-
-## Webhooks
-
-Set Telegram webhook via https://your-hostname/bot-dir/webhook.html
-
-## Google maps API
-
-Optionally you can you use Google maps API to lookup addresses of gyms based on latitude and longitude
-
-Therefore get a Google maps API key and set it as `GOOGLE_API_KEY` in your config.
-
-To get a new API key, navigate to https://console.developers.google.com/apis/credentials and create a new API project, e.g. raid-telegram-bot
-
-Once the project is created select "API key" from the "Create credentials" dropdown menu - a new API key is created.
-
-After the key is created, you need to activate it for both: Geocoding and Timezone API
-
-Therefore go to "Dashboard" on the left navigation pane and afterwards hit "Enable APIs and services" on top of the page.
-
-Search for Geocoding and Timezone API and enable them. Alternatively use these links to get to Geocoding and Timezone API services:
-
-https://console.developers.google.com/apis/library/timezone-backend.googleapis.com
-
-https://console.developers.google.com/apis/library/geocoding-backend.googleapis.com
-
-Finally check the dashboard again and make sure Google Maps Geocoding API and Google Maps Time Zone API are listed as enabled services.
-
 ## Raid overview
 
 The bot allows you to list all raids which got shared with one or more chats as a single raid overview message to quickly get an overview of all raids which are currently running and got shared in each chat. You can view and share raid overviews via the /list command - but only if some raids are currently active and if these active raids got shared to any chats!
@@ -155,25 +201,37 @@ or just refresh the raid overview message you've shared with a specific chat (e.
 
 To delete a shared raid overview message you can use the /list command too.
 
+With the `RAID_PIN_MESSAGE` in config.php you can add a custom message inside the raid overview message which will be attached to the bottom of the raid overview message.
+
+## Quest creation
+
+There are several options to customize the creation of quests:
+
+Set `QUEST_VIA_LOCATION` to true to allow quest creation from a location shared with the bot.
+
+Set `QUEST_LOCATION` to true to send back the location as message in addition to the quest.
+
+Set `QUEST_STOPS_RADIUS` to the amount in meters the bot will search for pokestops around the location shared with the bot.
+
 ## Cleanup
 
-The bot features an automatic cleanup of telegram raid poll messages as well as cleanup of the database (attendance and raids tables).
+The bot features an automatic cleanup of telegram raid poll messages as well as cleanup of the database (attendance and raids tables). Also quests can be cleaned up from telegram and the database.
 
 To activate cleanup you need to change the config and create a cronjob to trigger the cleanup process as follows:
 
 Set the `CLEANUP` in the config to `true` and define a cleanup secret/passphrase under `CLEANUP_SECRET`.
 
-Activate the cleanup of telegram messages and/or the database by setting `CLEANUP_RAID_TELEGRAM` / `CLEANUP_RAID_DATABASE` to true.
+Activate the cleanup of telegram messages and/or the database for raids by setting `CLEANUP_RAID_TELEGRAM` / `CLEANUP_RAID_DATABASE` to true and for quests via `CLEANUP_QUEST_TELEGRAM` / `CLEANUP_QUEST_DATABASE`.
 
-Specify the amount of minutes which need to pass by after raid has ended before the bot executes the cleanup. Times are in minutes in `CLEANUP_RAID_TIME_TG` for telegram cleanup and `CLEANUP_RAID_TIME_DB` for database cleanup.
+For raids: Specify the amount of minutes which need to pass by after raid has ended before the bot executes the cleanup. Times are in minutes in `CLEANUP_RAID_TIME_TG` for telegram cleanup and `CLEANUP_RAID_TIME_DB` for database cleanup. The value for the minutes of the database cleanup `CLEANUP_RAID_TIME_DB` must be greater than then one for telegram cleanup `CLEANUP_RAID_TIME_TG`. Otherwise cleanup will do nothing and exit due to misconfiguration!
 
-The value for the minutes of the database cleanup `CLEANUP_RAID_TIME_DB` must be greater than then one for telegram cleanup `CLEANUP_RAID_TIME_TG`. Otherwise cleanup will do nothing and exit due to misconfiguration!
+For quests: The cleanup process will automatically detect old quests which are not from the present day.
 
-Finally set up a cronjob to trigger the cleanup. You can also trigger telegram / database cleanup per cronjob: For no cleanup use 0, for cleanup use 1 and to use your config file use 2 or leave "telegram" and "database" out of the request data array.
+Finally set up a cronjob to trigger the cleanup. You can also trigger telegram / database cleanup per cronjob: For no cleanup use 0, for cleanup use 1 and to use your config file use 2 or leave "telegram" and "database" out of the request data array. Please make sure to always specify the cleanup type which can be `raid` or `quest`.
 
-A few examples - make sure to replace the URL with yours:
+A few examples for raids - make sure to replace the URL with yours:
 
-#### Cronjob using cleanup values from config.php: Just the secret without telegram/database OR telegram = 2 and database = 2
+#### Cronjob using cleanup values from config.php for raid polls: Just the secret without telegram/database OR telegram = 2 and database = 2
 
 `curl -k -d '{"cleanup":{"type":"raid","secret":"your-cleanup-secret/passphrase"}}' https://localhost/index.php?apikey=111111111:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP123`
 
@@ -181,17 +239,35 @@ OR
 
 `curl -k -d '{"cleanup":{"type":"raid","secret":"your-cleanup-secret/passphrase","telegram":"2","database":"2"}}' https://localhost/index.php?apikey=111111111:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP123`
 
-#### Cronjob to clean up telegram messages only: telegram = 1 and database = 0 
+#### Cronjob to clean up telegram raid poll messages only: telegram = 1 and database = 0 
 
 `curl -k -d '{"cleanup":{"type":"raid","secret":"your-cleanup-secret/passphrase","telegram":"1","database":"0"}}' https://localhost/index.php?apikey=111111111:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP123`
 
-#### Cronjob to clean up telegram messages and database: telegram = 1 and database = 1
+#### Cronjob to clean up telegram raid poll messages and database: telegram = 1 and database = 1
 
 `curl -k -d '{"cleanup":{"type":"raid","secret":"your-cleanup-secret/passphrase","telegram":"1","database":"1"}}' https://localhost/index.php?apikey=111111111:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP123`
 
-#### Cronjob to clean up database and maybe telegram messages (when specified in config): telegram = 2 and database = 1
+#### Cronjob to clean up database and maybe telegram raid poll messages (when specified in config): telegram = 2 and database = 1
 
 `curl -k -d '{"cleanup":{"type":"raid","secret":"your-cleanup-secret/passphrase","telegram":"2","database":"1"}}' https://localhost/index.php?apikey=111111111:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP123`
+
+A few examples for quests - make sure to replace the URL with yours:
+
+#### Cronjob using cleanup values from config.php for quests: Just the secret without telegram/database OR telegram = 2 and database = 2
+
+`curl -k -d '{"cleanup":{"type":"quest","secret":"your-cleanup-secret/passphrase"}}' https://localhost/index.php?apikey=111111111:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP123`
+
+OR
+
+`curl -k -d '{"cleanup":{"type":"quest","secret":"your-cleanup-secret/passphrase","telegram":"2","database":"2"}}' https://localhost/index.php?apikey=111111111:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP123`
+
+#### Cronjob to clean up telegram quest messages only: telegram = 1 and database = 0 
+
+`curl -k -d '{"cleanup":{"type":"quest","secret":"your-cleanup-secret/passphrase","telegram":"1","database":"0"}}' https://localhost/index.php?apikey=111111111:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP123`
+
+#### Cronjob to clean up database and telegram quest messages: telegram = 1 and database = 1
+
+`curl -k -d '{"cleanup":{"type":"quest","secret":"your-cleanup-secret/passphrase","telegram":"1","database":"1"}}' https://localhost/index.php?apikey=111111111:AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPP123`
 
 # Access permissions
 
@@ -246,6 +322,12 @@ Telegram Users can only vote on raid polls, but have no access to other bot func
 |           |            |                                  |               |            |            |            |          |
 |           | Pokedex    | Manage raid pokemon `/pokedex`   | Yes           | Yes        |            |            |          |
 |           |            |                                  |               |            |            |            |          |
+|           | Quests     | Create `/quest`                  | Yes           | Yes        | Yes        | Yes        |          |
+|           |            | List `/listquest`                | Yes           | Yes        | Yes        | Yes        |          |
+|           |            | Delete ALL quests `/deletequest` | Yes           | Yes        | Yes        | Yes        |          |
+|           |            | Delete OWN quests `/deletequest` | Yes           | Yes        | Yes        | Yes        |          |
+|           |            | Quests in DB by ID `/willow`     | Yes           | Yes        |            |            |          |
+|           |            |                                  |               |            |            |            |          |
 |           | Help       | Show `/help`                     | Yes           | Yes        | Yes        | Yes        |          |
 
 
@@ -254,8 +336,11 @@ Telegram Users can only vote on raid polls, but have no access to other bot func
 ## Bot commands
 ### Command: No command - just send your location to the bot
 
-The bot will guide you through the creation of the raid poll by asking you for the raid level, the pokemon raid boss, the time until the raids starts and the time left for the raid. Afterwards you can set the gym name and gym team by using the /gym and /team commands.
+The bot will guide you through the creation of a raid poll or a quest based on the settings in the config file.
 
+In case of a raid poll the bot will ask you for the raid level, the pokemon raid boss, the time until the raids starts and the time left for the raid. Afterwards you can set the gym name and gym team by using the /gym and /team commands.
+
+In case of a quest the bot will ask you for the quest type and quest action to be done and the reward which will be given upon quest fulfillment.
 
 ### Command: /start
 
@@ -355,7 +440,7 @@ Example input: `/new 52.514545,13.350095`
 
 ### Command: /list 
 
-The bot will allow you to via a list of the last 20 active raids, share and delete all raids which got shared to channels as a raid overview.
+The bot will allow you to get a list of the last 20 active raids, share and delete all raids which got shared to channels as a raid overview.
 
 #### Screenshots
 #### List existing raid polls with the `/list` command:
@@ -398,6 +483,31 @@ The bot will set the name of gym to your input.
 
 Example input: `/gym Siegessäule`
 
+
+### Command: /quest
+
+Create a quest by searching for the Pokestop name in the database. The bot will answer with all pokestops matching the name, e.g. "PokeCity Stop".
+
+Example input: `/quest PokeCity Stop`
+
+
+### Command: /listquest
+
+The bot will allow you to get a list of the quests from today, share and delete all quests.
+
+
+### Command: /deletequest
+
+Delete an existing quest. With this command you can delete a quest from telegram and the database. Use with care!
+
+Based on your access to the bot, you may can only delete quests you created yourself and cannot delete quests from other bot users.
+
+
+### Command: /willow
+
+Get a list of all available quests and their ID from the database.
+
+
 # Debugging
 
 Check your bot logfile and other related log files, e.g. apache/httpd log, php log, and so on.
@@ -419,8 +529,12 @@ The following commands are used to create the raid-pokemon-bot.sql and raid-boss
 
 #### raid-pokemon-bot.sql
 
-Export command: `mysqldump -u USERNAME -p --no-data --skip-add-drop-table --skip-add-drop-database --skip-comments DATABASENAME | sed 's/ AUTO_INCREMENT=[0-9]*\b/ AUTO_INCREMENT=100/' > raid-pokemon-bot.sql`
+Export command: `mysqldump -u USERNAME -p --no-data --skip-add-drop-table --skip-add-drop-database --skip-comments DATABASENAME | sed 's/ AUTO_INCREMENT=[0-9]*\b/ AUTO_INCREMENT=100/' > sql/raid-pokemon-bot.sql`
 
-#### raid-boss-pokedex.sql
+#### pokedex-pokemon.sql
 
-Export command: `mysqldump -u USERNAME -p --skip-extended-insert --skip-comments DATABASENAME pokemon > raid-boss-pokedex.sql`
+Export command: `mysqldump -u USERNAME -p --skip-extended-insert --skip-comments DATABASENAME pokemon > sql/pokedex-pokemon.sql`
+
+#### quests-rewards-encounters.sql
+
+Export command: `mysqldump -u USERNAME -p --skip-extended-insert --skip-comments DATABASENAME questlist rewardlist encounterlist > sql/quest-rewards-encounters.sql`

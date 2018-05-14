@@ -1,64 +1,76 @@
 <?php
-define('GOOGLE_API_KEY',	''); // optional
-define('TIMEZONE',		'Europe/Berlin');
+define('DB_HOST',			'localhost');
+define('DB_NAME',			'your_database_name');
+define('DB_USER',			'your_database_user');
+define('DB_PASSWORD',			'your_database_password');
 
-define('CURL_USEPROXY',		false);
-define('CURL_PROXYSERVER',	'http://your.proxyserver.com:8080');
+define('DEBUG',				true);
+define('CONFIG_LOGFILE',		'/var/log/tg-bots/dev-raid-bot.log');
+define('CONFIG_HASH',			'aaaabbbbccccddddeeeeffff1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff1111222233334444555566667777888899990000');
 
-define('DEBUG',			true);
-define('CONFIG_LOGFILE',	'/var/log/tg-bots/dev-raid-bot.log');
-define('CONFIG_HASH',		'aaaabbbbccccddddeeeeffff1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff1111222233334444555566667777888899990000');
+define('CURL_USEPROXY',			false);
+define('CURL_PROXYSERVER',		'http://your.proxyserver.com:8080');
 
-define('DB_HOST',		'localhost');
-define('DB_NAME',		'your_database_name');
-define('DB_USER',		'your_database_user');
-define('DB_PASSWORD',		'your_database_password');
+define('MAINTAINER',			'@your_tg_username');
+define('MAINTAINER_ID',			'your_tg_integer');
+define('BOT_NAME',			'@RaidPokemonBot');
+define('BOT_ADMINS',			'');
+define('BOT_ACCESS',			'');
 
-define('MAINTAINER',		'@your_tg_username');
-define('MAINTAINER_ID',		'your_tg_integer');
-define('BOT_NAME',		'@RaidPokemonBot');
-define('BOT_ADMINS',		''); // optional
-define('BOT_ACCESS',		''); // optional
+// Languages
+define('LANGUAGE',             		'');
+define('RAID_POLL_LANGUAGE',   		'EN');
+define('QUEST_LANGUAGE',       		'EN');
 
-define('SHARE_RAID_MODERATORS',	true);
-define('SHARE_RAID_USERS',	true);
-define('SHARE_RAID_CHATS',	'');
+// Timezone and Google maps API 
+define('TIMEZONE',			'Europe/Berlin');
+define('GOOGLE_API_KEY',		''); 
 
-define('SHARE_QUEST_MODERATORS',true);
-define('SHARE_QUEST_USERS',	true);
-define('SHARE_QUEST_CHATS',	'');
+// Raid creation
+define('RAID_VIA_LOCATION',		true);
+define('RAID_EGG_DURATION',		'60');
+define('RAID_POKEMON_DURATION_SHORT',	'45');
+define('RAID_POKEMON_DURATION_LONG',	'90');
+define('RAID_DURATION_CLOCK_STYLE',	true);
 
-define('QUEST_VIA_LOCATION',	true); // Allow to create quests from location shared with the bot
-define('QUEST_LOCATION',	false); // send location as message in addition to quest message
-define('QUEST_STOPS_RADIUS',	'50'); // radius in meters around location to search for pokestops
+// Raid times
+define('RAID_LOCATION',			false);
+define('RAID_SLOTS',			'15');
+define('RAID_LAST_START',		'10');
+define('RAID_ANYTIME',			false); 
 
-define('RAID_VIA_LOCATION',	true); // Allow to create raids from location shared with the bot
-define('RAID_LOCATION',		false); // send location as message in addition to raid poll message
-define('RAID_SLOTS',		'15'); // minutes
-define('RAID_LAST_START',	'10'); // minutes before RAID ends
-define('RAID_ANYTIME',		false); 
-define('RAID_VOTE_ICONS',	true); // show icons for status vote buttons
-define('RAID_VOTE_TEXT',	false); // show text for status vote buttons
-define('RAID_LATE_MSG',		true); // show late hint message
-define('RAID_LATE_TIME',	'3'); // minutes which may be waited
+// Raid poll design and layout
+define('RAID_VOTE_ICONS',		true);
+define('RAID_VOTE_TEXT',		false);
+define('RAID_LATE_MSG',			true);
+define('RAID_LATE_TIME',		'3');
 
-define('RAID_EGG_DURATION',		'60'); //minutes till egg comes out
-define('RAID_POKEMON_DURATION_LONG',	'90'); //minutes till pokemon leave
-define('RAID_POKEMON_DURATION_SHORT',	'45'); //minutes till pokemon leave
-define('RAID_DURATION_CLOCK_STYLE',	true); // True: Clocktime style, e.g. "18:34" --- False: Minute style, e.g. "still 0:34"
+// Raid sharing
+define('SHARE_RAID_MODERATORS',		true);
+define('SHARE_RAID_USERS',		true);
+define('SHARE_RAID_CHATS',		'');
 
-define('CLEANUP',			false); // must be true for cleanup
+// Raid overview
+define('RAID_PIN_MESSAGE',		'');
+
+// Quest creation
+define('QUEST_VIA_LOCATION',		true);
+define('QUEST_LOCATION',		false);
+define('QUEST_STOPS_RADIUS',		'50');
+
+// Quest sharing
+define('SHARE_QUEST_MODERATORS',	true);
+define('SHARE_QUEST_USERS',		true);
+define('SHARE_QUEST_CHATS',		'');
+
+// Cleanup
+define('CLEANUP',			false);
 define('CLEANUP_LOGFILE',		'/var/log/tg-bots/dev-raid-bot-cleanup.log');
 define('CLEANUP_SECRET',		'your-cleanup-secret/passphrase');
 define('CLEANUP_RAID_TELEGRAM',		true);
-define('CLEANUP_RAID_TIME_TG',		'10'); // minutes after RAID ended
+define('CLEANUP_RAID_TIME_TG',		'10');
 define('CLEANUP_RAID_DATABASE',		true);
-define('CLEANUP_RAID_TIME_DB',		'10080'); // minutes after RAID ended
+define('CLEANUP_RAID_TIME_DB',		'10080');
 define('CLEANUP_QUEST_TELEGRAM',	true);
 define('CLEANUP_QUEST_DATABASE',	true);
 
-define('LANGUAGE',		''); // Language for the communication with the bot. Can be EN, DE, NL or PT-BR. Leave blank to use users language.
-define('RAID_POLL_LANGUAGE',	'EN'); // Language for the raid polls. Can be EN, DE, NL or PT-BR.
-define('QUEST_LANGUAGE',	'EN'); // Language for the quests. Can be EN, DE, NL or PT-BR.
-
-define('PIN_MESSAGE',		''); //Add text under the pinned message.
