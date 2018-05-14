@@ -16,7 +16,9 @@ $quest_in_db = quest_duplication_check($pokestop_id);
 if (!$quest_in_db) {
     // Build message string.
     $msg = '';
-    $msg .= getTranslation('quest_select_type') . CR;
+    $stop = get_pokestop($pokestop_id, false);
+    $msg .= getTranslation('pokestop') . ': <b>' . $stop['pokestop_name'] . '</b>' . (!empty($stop['address']) ? (CR . $stop['address']) : '');
+    $msg .= CR . CR . '<b>' . getTranslation('quest_select_type') . '</b>';
 
     // Create the keys.
     $keys = quest_type_keys($pokestop_id);
@@ -30,8 +32,8 @@ if (!$quest_in_db) {
     $keys = [];
 }
 
-// Edit message.
-edit_message($update, $msg, $keys, ['disable_web_page_preview' => 'true']);
+// Edit the message.
+edit_message($update, $msg, $keys);
 
 // Build callback message string.
 $callback_response = 'OK';

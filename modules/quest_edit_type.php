@@ -14,7 +14,10 @@ $quest_type = $data['arg'];
 
 // Build message string.
 $msg = '';
-$msg .= getTranslation('quest_select_qty_action') . CR;
+$stop = get_pokestop($pokestop_id, false);
+$msg .= getTranslation('pokestop') . ': <b>' . $stop['pokestop_name'] . '</b>' . (!empty($stop['address']) ? (CR . $stop['address']) : '');
+$msg .= CR . getTranslation('quest') . ': <b>' . getTranslation('quest_type_' . $quest_type) . '...</b>';
+$msg .= CR . CR . '<b>' . getTranslation('quest_select_qty_action') . '</b>';
 
 // Create the keys.
 $keys = quest_qty_action_keys($pokestop_id, $quest_type);

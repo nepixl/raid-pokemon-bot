@@ -521,6 +521,30 @@ function get_local_pokemon_name($pokedex_id, $override_language = false, $type =
 }
 
 /**
+ * Get questlist entry.
+ * @param $questlist_id
+ * @return array
+ */
+function get_questlist_entry($questlist_id)
+{
+    // Get the questlist entry by id.
+    $rs = my_query(
+        "
+        SELECT     *
+        FROM       questlist
+        WHERE      id = {$questlist_id}
+        "
+    );
+
+    // Get the row.
+    $ql_entry = $rs->fetch_assoc();
+
+    debug_log($ql_entry);
+
+    return $ql_entry;
+}
+
+/**
  * Get quest.
  * @param $quest_id
  * @return array
@@ -746,7 +770,7 @@ function delete_quest($quest_id)
  * @param $pokestop_id
  * @return array
  */
-function get_pokestop($pokestop_id)
+function get_pokestop($pokestop_id, $update_pokestop = true)
 {
     global $db;
 
@@ -764,7 +788,7 @@ function get_pokestop($pokestop_id)
         $stop = $rs->fetch_assoc();
 
     // Get address and update address string.
-    if(!empty(GOOGLE_API_KEY)){
+    if(!empty(GOOGLE_API_KEY) && $update_pokestop == true){
         // Get address.
         $lat = $stop['lat'];
         $lon = $stop['lon'];
