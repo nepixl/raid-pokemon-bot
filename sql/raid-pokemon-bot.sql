@@ -18,9 +18,9 @@ CREATE TABLE `attendance` (
   `attend_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
   `team` enum('mystic','valor','instinct') DEFAULT NULL,
-  `extra_mystic` int(10) unsigned DEFAULT '0',
-  `extra_valor` int(10) unsigned DEFAULT '0',
-  `extra_instinct` int(10) unsigned DEFAULT '0',
+  `extra_mystic` tinyint(1) unsigned DEFAULT '0',
+  `extra_valor` tinyint(1) unsigned DEFAULT '0',
+  `extra_instinct` tinyint(1) unsigned DEFAULT '0',
   `arrived` tinyint(1) unsigned DEFAULT '0',
   `raid_done` tinyint(1) unsigned DEFAULT '0',
   `cancel` tinyint(1) unsigned DEFAULT '0',
@@ -28,7 +28,7 @@ CREATE TABLE `attendance` (
   `pokemon` varchar(12) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `raid_id` (`raid_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -39,18 +39,18 @@ CREATE TABLE `cleanup` (
   `message_id` bigint(20) unsigned NOT NULL,
   `cleaned` int(10) unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gyms` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `lat` varchar(11) DEFAULT NULL,
-  `lon` varchar(11) DEFAULT NULL,
+  `lat` decimal(10,8) DEFAULT NULL,
+  `lon` decimal(11,8) DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
   `gym_name` varchar(255) CHARACTER SET utf8mb4 DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -59,7 +59,7 @@ CREATE TABLE `overview` (
   `chat_id` bigint(20) NOT NULL,
   `message_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -74,7 +74,7 @@ CREATE TABLE `pokemon` (
   `max_weather_cp` int(10) unsigned NOT NULL,
   `weather` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -82,8 +82,8 @@ CREATE TABLE `raids` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint(20) DEFAULT NULL,
   `pokemon` varchar(12) DEFAULT NULL,
-  `lat` varchar(11) DEFAULT NULL,
-  `lon` varchar(11) DEFAULT NULL,
+  `lat` decimal(10,8) DEFAULT NULL,
+  `lon` decimal(11,8) DEFAULT NULL,
   `first_seen` datetime DEFAULT NULL,
   `start_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
@@ -94,7 +94,7 @@ CREATE TABLE `raids` (
   PRIMARY KEY (`id`),
   KEY `end_time` (`end_time`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -106,13 +106,10 @@ CREATE TABLE `users` (
   `team` enum('mystic','valor','instinct') DEFAULT NULL,
   `moderator` tinyint(1) unsigned DEFAULT NULL,
   `timezone` int(10) DEFAULT NULL,
-  `lang` varchar(5) DEFAULT NULL,
-  `alert_lat` varchar(12) DEFAULT NULL,
-  `alert_lon` varchar(12) DEFAULT NULL,
   `level` int(10) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `i_userid` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
