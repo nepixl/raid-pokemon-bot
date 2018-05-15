@@ -39,7 +39,7 @@ if (count($data) < 8) {
 
 // Raid boss name
 $boss = $data[0];
-if ( empty( $boss ) || !is_int( $boss ) ) {
+if ( empty( $boss ) || !is_numeric( $boss ) ) {
     send_message($update['message']['chat']['id'], 'Invalid input - Raidboss ID is empty or invalid', []);
     exit;
 }
