@@ -314,7 +314,7 @@ Example for restricted access:
 
 With your `MAINTAINER_ID` and as a member of `BOT_ADMINS` you have the permissions to do anything. **For performance improvements, it's recommended to add the MAINTAINER and all members of BOT_ADMINS as moderator via /mods command!** 
 
-As a member of `BOT_ACCESS` you can create raid polls, update your own raid polls' pokemon and change the gym team of your last raid poll. `BOT_ACCESS` members who are moderators too, can also change the gym name and update pokemon from other users raid polls.
+As a member of `BOT_ACCESS` you can create raid polls, update your own raid polls' pokemon and change the gym team of your last raid poll. `BOT_ACCESS` members who are moderators too, can also change the gym name and update pokemon from other users raid polls. Not that members of `BOT_ACCESS` are not allowed to create polls for ex-raids, only the `MAINTAINER_ID` and the `BOT_ADMINS` have the right to create them.
 
 Telegram Users can only vote on raid polls, but have no access to other bot functions (unless you configured it for public access).
 
@@ -325,6 +325,7 @@ Telegram Users can only vote on raid polls, but have no access to other bot func
 |           | **Area**   | **Action and /command**          |               |            |            |            |          |
 |           | Raid poll  | Vote                             | Yes           | Yes        | Yes        | Yes        | Yes      |
 |           |            | Create `/start`, `/raid`, `/new` | Yes           | Yes        | Yes        | Yes        |          |
+|           |            | Create ex-raid `/start`          | Yes           | Yes        |            |            |          |
 |           |            | List `/list`                     | Yes           | Yes        | Yes        | Yes        |          |
 |           |            | Overview `/list`                 | Yes           | Yes        |            |            |          |
 |           |            | Delete ALL raid polls `/delete`  | Yes           | Yes        | Yes        |            |          |
