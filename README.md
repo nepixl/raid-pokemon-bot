@@ -213,6 +213,26 @@ Set `QUEST_LOCATION` to true to send back the location as message in addition to
 
 Set `QUEST_STOPS_RADIUS` to the amount in meters the bot will search for pokestops around the location shared with the bot.
 
+Set `QUEST_HIDE_REWARDS` to true to hide specific reward types, e.g. berries or revives. Specify the reward types you want to hide in `QUEST_HIDDEN_REWARDS` separated by comma. 
+
+Example to hide pokeballs, berries, potions and revives: `define('QUEST_HIDDEN_REWARDS', '2,3,8,10');`
+
+Every ID/number for all the available reward types:
+
+| Reward ID | Reward type |
+|-----------|-------------|
+| 1         | Pokemon     |
+| 2         | Pokeball    |
+| 3         | Berry       |
+| 4         | Stardust    |
+| 5         | Rare candy  |
+| 7         | Fast TM     | 
+| 7         | Charged TM  | 
+| 8         | Potion      | 
+| 9         | XP          | 
+| 10        | Revive      | 
+
+
 ## Cleanup
 
 The bot features an automatic cleanup of telegram raid poll messages as well as cleanup of the database (attendance and raids tables). Also quests can be cleaned up from telegram and the database.
@@ -324,7 +344,7 @@ Telegram Users can only vote on raid polls, but have no access to other bot func
 |           |            |                                  |               |            |            |            |          |
 |           | Quests     | Create `/quest`                  | Yes           | Yes        | Yes        | Yes        |          |
 |           |            | List `/listquest`                | Yes           | Yes        | Yes        | Yes        |          |
-|           |            | Delete ALL quests `/deletequest` | Yes           | Yes        | Yes        | Yes        |          |
+|           |            | Delete ALL quests `/deletequest` | Yes           | Yes        |            |            |          |
 |           |            | Delete OWN quests `/deletequest` | Yes           | Yes        | Yes        | Yes        |          |
 |           |            | Quests in DB by ID `/willow`     | Yes           | Yes        |            |            |          |
 |           |            |                                  |               |            |            |            |          |
@@ -539,4 +559,4 @@ Export command: `mysqldump -u USERNAME -p --skip-extended-insert --skip-comments
 
 #### quests-rewards-encounters.sql
 
-Export command: `mysqldump -u USERNAME -p --skip-extended-insert --skip-comments DATABASENAME questlist rewardlist encounterlist > sql/quest-rewards-encounters.sql`
+Export command: `mysqldump -u USERNAME -p --skip-extended-insert --skip-comments DATABASENAME questlist rewardlist encounterlist quick_questlist > sql/quests-rewards-encounters.sql`

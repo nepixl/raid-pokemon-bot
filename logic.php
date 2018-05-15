@@ -213,6 +213,77 @@ function raid_access_check($update, $data, $return_result = false)
 }
 
 /**
+ * Quest access check.
+ * @param $update
+ * @param $data
+ * @return bool
+ */
+function quest_access_check($update, $data, $return_result = false)
+{
+    // Default: Deny access to quests
+    $quest_access = false;
+
+    // Build query.
+    $rs = my_query(
+        "
+        SELECT    user_id
+        FROM      quests
+          WHERE   id = {$data['id']}
+        "
+    );
+
+    $quest = $rs->fetch_assoc();
+
+    if ($update['callback_query']['from']['id'] != $quest['user_id']) {
+        // Build query.
+        $rs = my_query(
+            "
+            SELECT    COUNT(*)
+            FROM      users
+              WHERE   user_id = {$update['callback_query']['from']['id']}
+               AND    moderator = 1
+            "
+        );
+
+        $row = $rs->fetch_row();
+
+        if (empty($row['0'])) {
+            $admin_access = bot_access_check($update, BOT_ADMINS, true);
+            if ($admin_access) {
+                // Allow quest access
+                $quest_access = true;
+            }
+        } else {
+            // Allow quest access
+            $quest_access = true;
+        }
+    } else {
+        // Allow quest access
+        $quest_access = true;
+    }
+
+    // Allow or deny access to the quest and log result
+    if ($quest_access && !$return_result) {
+        debug_log("Allowing access to the quest");
+    } else if ($quest_access && $return_result) {
+        debug_log("Allowing access to the quest");
+        return $quest_access;
+    } else if (!$quest_access && $return_result) {
+        debug_log("Denying access to the quest");
+        return $quest_access;
+    } else {
+        $keys = [];
+        if (isset($update['callback_query']['inline_message_id'])) {
+            editMessageText($update['callback_query']['inline_message_id'], '<b>' . getTranslation('quest_access_denied') . '</b>', $keys);
+        } else {
+            editMessageText($update['callback_query']['message']['message_id'], '<b>' . getTranslation('quest_access_denied') . '</b>', $keys, $update['callback_query']['message']['chat']['id'], $keys);
+        }
+        answerCallbackQuery($update['callback_query']['id'], getTranslation('quest_access_denied'));
+        exit;
+    }
+}
+
+/**
  * Raid duplication check.
  * @param $gym
  * @param $end
@@ -709,6 +780,54 @@ function get_todays_formatted_quests()
     }
 
     return $msg;
+}
+
+/**
+ * Get rewardlist entry.
+ * @param $reward_id
+ * @return array
+ */
+function get_rewardlist_entry($reward_id)
+{
+    // Get the reward data by id.
+    $rs = my_query(
+        "
+        SELECT     *
+        FROM       rewardlist
+        WHERE      id = {$reward_id}
+        "
+    );
+
+    // Get the row.
+    $reward = $rs->fetch_assoc();
+
+    debug_log($reward);
+
+    return $reward;
+}
+
+/**
+ * Get encounterlist entry.
+ * @param $reward_id
+ * @return array
+ */
+function get_encounterlist_entry($quest_id)
+{
+    // Get the reward data by id.
+    $rs = my_query(
+        "
+        SELECT     pokedex_ids
+        FROM       encounterlist
+        WHERE      quest_id = {$quest_id}
+        "
+    );
+
+    // Get the row.
+    $encounters = $rs->fetch_assoc();
+
+    debug_log($encounters);
+
+    return $encounters;
 }
 
 /**
@@ -1594,17 +1713,94 @@ function quest_type_keys($pokestop_id)
         );
     }
 
-    // Add abort navigation key.
-    $nav_keys = array();
-    $nav_keys[] = universal_inner_key($keys, '0', 'exit', '0', getTranslation('abort'));
-
     // Get the inline key array.
     $keys = inline_key_array($keys, 2);
+
+    // Add quick selection keys.
+    $quick_keys = quick_quest_keys($pokestop_id);
+    $keys = array_merge($keys, $quick_keys);
+
+    // Add navigation key.
+    $nav_keys = array();
+    $nav_keys[] = universal_inner_key($keys, '0', 'exit', '0', getTranslation('abort'));
     $keys[] = $nav_keys;
 
     debug_log($keys);
 
     return $keys;
+}
+
+/**
+ * Quick quest keys.
+ * @param $pokestop_id
+ * @return array
+ */
+function quick_quest_keys($pokestop_id)
+{
+    // Get data from quick questlist.
+    $qs = my_query(
+            "
+            SELECT    *
+            FROM      quick_questlist
+            "
+        );
+
+    // Init empty keys array.
+    $keys = array();
+
+    // Add key for each quest quantity and action
+    while ($qq = $qs->fetch_assoc()) {
+        $ql_entry = get_questlist_entry($qq['quest_id']);
+
+        // Quest action: Singular or plural?
+        $quest_action = explode(":", getTranslation('quest_action_' . $ql_entry['quest_action']));
+        $quest_action_singular = $quest_action[0];
+        $quest_action_plural = $quest_action[1];
+        $qty_action = $ql_entry['quest_quantity'] . SP . (($ql_entry['quest_quantity'] > 1) ? ($quest_action_plural) : ($quest_action_singular));
+
+        // Rewardlist entry.
+        $rl_entry = get_rewardlist_entry($qq['reward_id']);
+
+        // Reward type: Singular or plural?
+        $reward_type = explode(":", getTranslation('reward_type_' . $rl_entry['reward_type']));
+        $reward_type_singular = $reward_type[0];
+        $reward_type_plural = $reward_type[1];
+        $qty_reward = $rl_entry['reward_quantity'] . SP . (($rl_entry['reward_quantity'] > 1) ? ($reward_type_plural) : ($reward_type_singular));
+
+        // Reward pokemon forecast?
+        $msg_poke = '';
+
+        if($rl_entry['reward_type'] == 1) {
+            $el_entry = get_encounterlist_entry($ql_entry['id']);
+            $quest_pokemons = explode(',', $el_entry['pokedex_ids']);
+            // Get local pokemon name
+            foreach($quest_pokemons as $pokedex_id) {
+                $msg_poke .= get_local_pokemon_name($pokedex_id);
+                $msg_poke .= ' / ';
+            }
+            // Trim last slash
+            $msg_poke = rtrim($msg_poke,' / ');
+            $msg_poke = (!empty($msg_poke) ? (SP . '(' . $msg_poke . ')') : '');
+        }
+
+        // Quest and reward text.
+        $text = '';
+        $text .= getTranslation('quest_type_' . $ql_entry['quest_type']) . SP . $qty_action . ' — ' . $qty_reward . $msg_poke;
+
+        // Add keys.
+        $keys[] = array(
+            'text'          => $text,
+            'callback_data' => $pokestop_id . ',' . $qq['quest_id'] . ':quest_save:' . $qq['reward_id']
+        );
+    }
+
+    // Add quick selection keys.
+    $keys = inline_key_array($keys, 1);
+
+    debug_log($keys);
+
+    return $keys;
+    
 }
 
 /**
@@ -1678,8 +1874,16 @@ function reward_type_keys($pokestop_id, $quest_id, $quest_type)
     // Init empty keys array.
     $keys = array();
 
+    // Hidden rewards array.
+    $hide_rewards = array();
+    $hide_rewards = (QUEST_HIDE_REWARDS == true && !empty(QUEST_HIDDEN_REWARDS)) ? (explode(',', QUEST_HIDDEN_REWARDS)) : '';
+
     // Add key for each quest quantity and action
     while ($reward = $rs->fetch_assoc()) {
+        // Continue if some rewards shall be hidden
+        if(QUEST_HIDE_REWARDS == true && in_array($reward['reward_type'], $hide_rewards)) continue;
+
+        // Get translation.
         $rw_type = explode(":", getTranslation('reward_type_' . $reward['reward_type']));
         $text = $rw_type[0];
         // Add keys.

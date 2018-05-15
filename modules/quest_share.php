@@ -6,8 +6,8 @@ debug_log('raid_share()');
 //debug_log($update);
 //debug_log($data);
 
-// Check raid access.
-raid_access_check($update, $data);
+// Check quest access.
+quest_access_check($update, $data);
 
 // Get quest id.
 $id = $data['id'];

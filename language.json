@@ -125,6 +125,12 @@
                 "EN": "Create raid or quest:",
                 "PT-BR": "TRANSLATE"
         },
+	"quest_access_denied" : {
+		"NL": "Je hebt geen rechten om deze quest aan te passen!",
+		"DE": "Sie haben keine Berechtigung diese Forschung zu bearbeiten!",
+		"EN": "You are not allowed to edit this quest!",
+		"PT-BR": "Você não tem permissão para editar esta quest!"
+	},
         "raid" : {
                 "NL": "Raid",
                 "DE": "Raid",

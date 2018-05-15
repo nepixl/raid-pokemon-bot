@@ -57,6 +57,8 @@ define('RAID_PIN_MESSAGE',		'');
 define('QUEST_VIA_LOCATION',		true);
 define('QUEST_LOCATION',		false);
 define('QUEST_STOPS_RADIUS',		'50');
+define('QUEST_HIDE_REWARDS',		true);
+define('QUEST_HIDDEN_REWARDS',		'2,3,8,10');
 
 // Quest sharing
 define('SHARE_QUEST_MODERATORS',	true);

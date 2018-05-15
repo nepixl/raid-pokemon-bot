@@ -182,6 +182,22 @@ INSERT INTO `encounterlist` VALUES (42,42,'132,185');
 INSERT INTO `encounterlist` VALUES (43,43,'333');
 /*!40000 ALTER TABLE `encounterlist` ENABLE KEYS */;
 UNLOCK TABLES;
+DROP TABLE IF EXISTS `quick_questlist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `quick_questlist` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `quest_id` int(10) unsigned NOT NULL,
+  `reward_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `quick_questlist` WRITE;
+/*!40000 ALTER TABLE `quick_questlist` DISABLE KEYS */;
+INSERT INTO `quick_questlist` VALUES (1,33,1);
+/*!40000 ALTER TABLE `quick_questlist` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

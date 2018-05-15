@@ -6,6 +6,9 @@ debug_log('DELETEQUEST()');
 //debug_log($update);
 //debug_log($data);
 
+// Check quest access.
+quest_access_check($update, $data);
+
 // Get all quests of the day from database.
 $rs = my_query(
         "

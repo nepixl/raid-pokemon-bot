@@ -9,7 +9,7 @@ debug_log('quest_edit_reward()');
 // Pokestop id.
 $pokestop_id = $data['id'];
 
-// Quest id and type.
+// Questlist id and type.
 $quest_id_type = explode(",", $data['arg']);
 $quest_id = $quest_id_type[0];
 $quest_type = $quest_id_type[1];
