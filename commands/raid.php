@@ -20,7 +20,7 @@ $data = explode(',', $gym_data, 9);
 
 /**
  * Info:
- * [0] = Boss name
+ * [0] = Boss pokedex id
  * [1] = latitude
  * [2] = longitude
  * [3] = raid duration in minutes
@@ -33,12 +33,16 @@ $data = explode(',', $gym_data, 9);
 
 // Invalid data received.
 if (count($data) < 8) {
-    send_message($update['message']['chat']['id'], 'Invalid input', []);
+    send_message($update['message']['chat']['id'], 'Invalid input - Paramter mismatch', []);
     exit;
 }
 
 // Raid boss name
 $boss = $data[0];
+if ( empty( $boss ) || !is_int( $boss ) ) {
+    send_message($update['message']['chat']['id'], 'Invalid input - Raidboss ID is empty or invalid', []);
+    exit;
+}
 
 // Get latitude / longitude from data.
 $lat = floatval($data[1]);
