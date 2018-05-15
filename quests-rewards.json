@@ -245,6 +245,12 @@
 		"EN": "time a supereffective charged move in a gym:times a supereffective charged move in a gym",
 		"PT-BR": "TRANSLATE"
 	},
+	"quest_action_32" : {
+		"NL": "Pokestop:Pokestops",
+		"DE": "Pokestop:Pokestops",
+		"EN": "Pokestop:Pokestops",
+		"PT-BR": "TRANSLATE"
+	},
         "reward_type_1" : {
                 "NL": "Pokemon:Pokemon",
                 "DE": "Pokemon:Pokemon",
