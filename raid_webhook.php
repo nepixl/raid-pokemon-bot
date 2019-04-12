@@ -6,8 +6,6 @@
 //
 // Place raid_webhook.php in your rootdirectory of the Telegramraidbot
 //
-// Edit row: 221 and set your ChatID
-//
 // Set your MAD Webhookendpoint to: [raid]www.yourraidbot.de/raid_webhook.php?apikey=telegramapikey
 //
 // Extend your Telegramraidbottable: 'ALTER TABLE gyms ADD COLUMN external_id VARCHAR(35)'
@@ -217,7 +215,7 @@ foreach ($raids as $data) {
         $text = show_raid_poll($raid);
 
         // get chat_id
-		$chat_id = -08154711CHATID;
+	$chat_id = SHARE_CHATS;
          
         // Set keys.
         $keys = keys_vote($raid);
