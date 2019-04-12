@@ -218,7 +218,7 @@ foreach ($raids as $data) {
         $text = show_raid_poll($raid);
 
         // get chat_id
-		$chat_id = -1001148286555;
+		$chat_id = -08154711CHATID;
          
         // Set keys.
         $keys = keys_vote($raid);
