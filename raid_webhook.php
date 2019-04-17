@@ -13,8 +13,8 @@
 // Extend your Telegramraidbottable: 'ALTER TABLE gyms ADD COLUMN external_id VARCHAR(35)'
 //
 // Copy all external_id's and name from MAD to your Raidbot:
-// RM(MAD): 		SELECT CONCAT('''UPDATE GYMS SET external_id = ''',gym_id,''' WHERE gym_name = ''', name, ''';') from gymdetails;
-// Monocle(MAD): 	SELECT CONCAT('''UPDATE GYMS SET external_id = ''',external_id,''' WHERE gym_name = ''', name, '';') from forts;
+// RM(MAD): 		SELECT CONCAT('''UPDATE gyms SET external_id = ''',gym_id,''' WHERE gym_name = ''', name, ''';') FROM gymdetails;
+// Monocle(MAD): 	SELECT CONCAT('''UPDATE gyms SET external_id = ''',external_id,''' WHERE gym_name = ''', name, '';') FROM forts;
 // Insert the output of the upper statement into your Raidbot SQL-TABLE
 //
 //
