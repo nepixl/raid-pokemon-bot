@@ -232,7 +232,6 @@ foreach ($raids as $data) {
             'disable_web_page_preview' => 'true'
         ]);
 
-        notify_abos($raid);
     }
 }
 ?>
