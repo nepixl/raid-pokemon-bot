@@ -47,6 +47,11 @@ $raids = json_decode($dinput, true);
 
 $tz = TIMEZONE;
 foreach ($raids as $data) {
+	
+	//only lvl 1, 4 and 5 Raids
+	If($data['message']['level'] == 2 || $data['message']['level'] == 3){
+		continue;
+	}
     // Raid boss name
     $boss = $data['message']['pokemon_id'];
 
